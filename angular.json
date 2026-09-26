@@ -7,7 +7,7 @@
   },
   "newProjectRoot": "projects",
   "projects": {
-    "GenerateInvoiceWeb": {
+    "OdivonFaturaPro": {
       "projectType": "application",
       "schematics": {},
       "root": "",
@@ -56,10 +56,10 @@
           "builder": "@angular/build:dev-server",
           "configurations": {
             "production": {
-              "buildTarget": "GenerateInvoiceWeb:build:production"
+              "buildTarget": "OdivonFaturaPro:build:production"
             },
             "development": {
-              "buildTarget": "GenerateInvoiceWeb:build:development"
+              "buildTarget": "OdivonFaturaPro:build:development"
             }
           },
           "defaultConfiguration": "development"

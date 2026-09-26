@@ -1,6 +1,6 @@
 {
   "hosting": {
-    "public": "dist/GenerateInvoiceWeb/browser",
+    "public": "dist/OdivonFaturaPro/browser",
     "ignore": [
       "firebase.json",
       "**/.*",

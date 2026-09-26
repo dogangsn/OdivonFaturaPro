@@ -1,5 +1,5 @@
 {
-  "name": "generate-invoice-web",
+  "name": "odivon-fatura-pro",
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
@@ -8,7 +8,7 @@
     "deploy": "ng build && firebase deploy --only hosting",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:GenerateInvoiceWeb": "node dist/GenerateInvoiceWeb/server/server.mjs"
+    "serve:ssr:OdivonFaturaPro": "node dist/OdivonFaturaPro/server/server.mjs"
   },
   "prettier": {
     "printWidth": 100,
