@@ -323,11 +323,11 @@
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">İşlem Yapılacak Ülke</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('countries.label') }}</label>
                     <select [ngModel]="formData.countryCode || 'TR'" (ngModelChange)="onCountryChange($event)"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white">
                         <option *ngFor="let c of countries" [value]="c.code">
-                            {{ c.flag }} {{ c.defaultName }}
+                            {{ c.flag }} {{ lang.t(c.nameKey) }}
                         </option>
                     </select>
                 </div>

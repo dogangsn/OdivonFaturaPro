@@ -79,11 +79,11 @@
                 <h2 class="text-base sm:text-lg font-bold text-slate-900 border-b border-slate-100 pb-2">Ülke & Vergi Formatı Seçimi</h2>
                 <div class="space-y-4 bg-slate-50 p-4 rounded-xl border border-slate-200">
                     <div>
-                        <label class="block text-xs font-semibold text-slate-600 mb-1">İşlem Yapılacak Ülke</label>
+                        <label class="block text-xs font-semibold text-slate-600 mb-1">{{ lang.t('countries.label') }}</label>
                         <select [ngModel]="countryCode" (ngModelChange)="onCountryChange($event)" [ngModelOptions]="{standalone: true}"
                             class="w-full h-10 px-3 rounded-lg border border-slate-300 bg-white text-slate-900 text-sm font-medium focus:border-primary focus:ring-2 focus:ring-primary/20">
                             <option *ngFor="let c of countries" [value]="c.code">
-                                {{ c.flag }} {{ c.defaultName }}
+                                {{ c.flag }} {{ lang.t(c.nameKey) }}
                             </option>
                         </select>
                     </div>

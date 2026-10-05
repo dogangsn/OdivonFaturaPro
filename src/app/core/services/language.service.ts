@@ -38,6 +38,7 @@ const translations: Record<Language, Record<string, string>> = {
 
         // Countries
         'countries.title': 'İşlem Yapılacak Ülkeyi Seçiniz',
+        'countries.label': 'İşlem Yapılacak Ülke',
         'countries.subtitle': 'Oluşturulacak fatura, seçtiğiniz ülkenin vergi ve format kurallarına uygun olacaktır.',
         'countries.turkey': 'Türkiye',
         'countries.dubai': 'Dubai (BAE)',
@@ -199,6 +200,7 @@ const translations: Record<Language, Record<string, string>> = {
 
         // Countries
         'countries.title': 'Select Country for Transaction',
+        'countries.label': 'Transaction Country',
         'countries.subtitle': 'The invoice will comply with the tax and format rules of the selected country.',
         'countries.turkey': 'Turkey',
         'countries.dubai': 'Dubai (UAE)',
