@@ -80,13 +80,15 @@ export class InvoiceListComponent implements OnInit {
     deletingInvoiceId: string | null = null;
 
     // Status options
-    statusOptions: { value: Invoice['status']; label: string; color: string }[] = [
-        { value: 'draft', label: 'Taslak', color: 'bg-slate-100 text-slate-700' },
-        { value: 'sent', label: 'Gönderildi', color: 'bg-blue-100 text-blue-700' },
-        { value: 'paid', label: 'Ödendi', color: 'bg-green-100 text-green-700' },
-        { value: 'overdue', label: 'Gecikmiş', color: 'bg-red-100 text-red-700' },
-        { value: 'cancelled', label: 'İptal', color: 'bg-gray-100 text-gray-500' }
-    ];
+    get statusOptions(): { value: Invoice['status']; label: string; color: string }[] {
+        return this.lang.cached('invoiceList.statusOptions', () => [
+            { value: 'draft', label: this.lang.t('status.draft'), color: 'bg-slate-100 text-slate-700' },
+            { value: 'sent', label: this.lang.t('status.sent'), color: 'bg-blue-100 text-blue-700' },
+            { value: 'paid', label: this.lang.t('status.paid'), color: 'bg-green-100 text-green-700' },
+            { value: 'overdue', label: this.lang.t('status.overdue'), color: 'bg-red-100 text-red-700' },
+            { value: 'cancelled', label: this.lang.t('status.cancelled'), color: 'bg-gray-100 text-gray-500' }
+        ]);
+    }
 
     ngOnInit(): void {
         if (isPlatformBrowser(this.platformId)) {
@@ -196,12 +198,16 @@ export class InvoiceListComponent implements OnInit {
     sendDueReminder(invoice: Invoice): void {
         const days = this.getDaysOverdue(invoice.dueDate);
         const message = encodeURIComponent(
-            `Sayın ${invoice.customerName},\n\n` +
-            `${invoice.invoiceNo} numaralı, ₺${(invoice.total || 0).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} tutarındaki faturanızın son ödeme tarihi (${new Date(invoice.dueDate).toLocaleDateString('tr-TR')}) ${days > 0 ? days + ' gün geçmiştir' : 'yaklaşmıştır'}.\n\n` +
-            `Ödemenizi kontrol etmenizi rica eder, iyi çalışmalar dileriz.\nFaturaPro`
+            this.lang.t('invoices.reminderMsg', {
+                name: invoice.customerName,
+                no: invoice.invoiceNo,
+                amount: '₺' + (invoice.total || 0).toLocaleString(this.lang.locale, { minimumFractionDigits: 2 }),
+                date: new Date(invoice.dueDate).toLocaleDateString(this.lang.locale),
+                when: days > 0 ? this.lang.t('invoices.reminderPassed', { days }) : this.lang.t('invoices.reminderApproaching')
+            })
         );
         window.open(`https://wa.me/?text=${message}`, '_blank');
-        this.alertService.toast('Vade hatırlatma mesajı hazırlandı', 'info');
+        this.alertService.toast(this.lang.t('invoices.reminderReady'), 'info');
     }
 
     // Onay Mekanizması
@@ -210,10 +216,10 @@ export class InvoiceListComponent implements OnInit {
         try {
             await this.invoiceService.updateApprovalStatus(invoice.id, 'approved');
             invoice.approvalStatus = 'approved';
-            this.alertService.toast(`${invoice.invoiceNo} faturası onaylandı`, 'success');
+            this.alertService.toast(this.lang.t('invoices.approvedToast', { no: invoice.invoiceNo }), 'success');
             this.loadInvoices();
         } catch (error: any) {
-            this.alertService.error('Hata', 'Onaylama işlemi başarısız: ' + (error?.message || error));
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('invoices.approveFailed', { error: error?.message || error }));
         }
     }
 
@@ -222,21 +228,21 @@ export class InvoiceListComponent implements OnInit {
         try {
             await this.invoiceService.updateApprovalStatus(invoice.id, 'rejected');
             invoice.approvalStatus = 'rejected';
-            this.alertService.toast(`${invoice.invoiceNo} faturası reddedildi`, 'info');
+            this.alertService.toast(this.lang.t('invoices.rejectedToast', { no: invoice.invoiceNo }), 'info');
             this.loadInvoices();
         } catch (error: any) {
-            this.alertService.error('Hata', 'Red işlemi başarısız: ' + (error?.message || error));
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('invoices.rejectFailed', { error: error?.message || error }));
         }
     }
 
     getApprovalBadge(status?: string): { label: string; color: string; icon: string } {
         switch (status) {
             case 'approved':
-                return { label: 'Onaylandı', color: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800', icon: 'check_circle' };
+                return { label: this.lang.t('approval.approved'), color: 'bg-emerald-100 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border-emerald-200 dark:border-emerald-800', icon: 'check_circle' };
             case 'rejected':
-                return { label: 'Reddedildi', color: 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800', icon: 'cancel' };
+                return { label: this.lang.t('approval.rejected'), color: 'bg-rose-100 dark:bg-rose-950/60 text-rose-700 dark:text-rose-300 border-rose-200 dark:border-rose-800', icon: 'cancel' };
             default:
-                return { label: 'Onay Bekliyor', color: 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800', icon: 'pending' };
+                return { label: this.lang.t('approval.pending'), color: 'bg-amber-100 dark:bg-amber-950/60 text-amber-700 dark:text-amber-300 border-amber-200 dark:border-amber-800', icon: 'pending' };
         }
     }
 
@@ -313,7 +319,7 @@ export class InvoiceListComponent implements OnInit {
             const profile = await this.userService.getUserProfile(currentUser.uid);
             if (profile && (profile.plan === 'free' || !profile.plan)) {
                 if (this.invoices.length >= (profile.monthlyInvoiceLimit || 5)) {
-                    this.alertService.warning('Plan Limiti', '⚠️ Ücretsiz Plan fatura limitine ulaştınız! (Maksimum 5 Fatura).\n\nSınırsız fatura oluşturmak için lütfen Pro Plana yükseltin.');
+                    this.alertService.warning(this.lang.t('plans.limitTitle'), this.lang.t('plans.limitReachedShort'));
                     this.router.navigate(['/pricing']);
                     return;
                 }
@@ -340,7 +346,7 @@ export class InvoiceListComponent implements OnInit {
             date: typeof invoice.date === 'string' ? invoice.date : (invoice.date as any)?.toISOString?.().split('T')[0] || new Date().toISOString().split('T')[0],
             dueDate: typeof invoice.dueDate === 'string' ? invoice.dueDate : (invoice.dueDate as any)?.toISOString?.().split('T')[0] || new Date().toISOString().split('T')[0],
             countryCode: invoice.countryCode || 'TR',
-            taxLabel: invoice.taxLabel || 'KDV',
+            taxLabel: invoice.taxLabel || this.lang.t('doc.vat'),
             taxRate: invoice.taxRate || 20,
             items: invoice.items.map(i => ({ ...i })),
             additionalTaxes: invoice.additionalTaxes ? invoice.additionalTaxes.map(t => ({ ...t })) : [],
@@ -362,12 +368,12 @@ export class InvoiceListComponent implements OnInit {
 
     async saveInvoice(): Promise<void> {
         if (!this.formData.customerName || !this.formData.date) {
-            this.alertService.warning('Eksik Bilgi', 'Müşteri adı ve tarih zorunludur.');
+            this.alertService.warning(this.lang.t('common.missingInfo'), this.lang.t('invoices.customerDateRequired'));
             return;
         }
 
         if (this.formData.items.length === 0) {
-            this.alertService.warning('Kalem Gerekli', 'En az bir fatura kalemi eklemelisiniz.');
+            this.alertService.warning(this.lang.t('invoices.itemRequiredTitle'), this.lang.t('invoices.itemRequired'));
             return;
         }
 
@@ -387,16 +393,16 @@ export class InvoiceListComponent implements OnInit {
         try {
             if (this.isEditing && this.editingInvoiceId) {
                 await this.invoiceService.updateInvoice(this.editingInvoiceId, invoiceData);
-                this.alertService.toast('Fatura güncellendi', 'success');
+                this.alertService.toast(this.lang.t('invoices.updatedToast'), 'success');
             } else {
                 await this.invoiceService.createInvoice(invoiceData);
-                this.alertService.toast('Fatura oluşturuldu', 'success');
+                this.alertService.toast(this.lang.t('invoices.createdToast'), 'success');
             }
             this.closeModal();
             this.loadInvoices();
         } catch (error: any) {
             console.error('Fatura kaydedilirken hata:', error);
-            this.alertService.error('Hata', 'Fatura kaydedilirken bir hata oluştu: ' + (error?.message || error));
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('invoices.saveFailed', { error: error?.message || error }));
         } finally {
             this.isSaving = false;
         }
@@ -435,7 +441,7 @@ export class InvoiceListComponent implements OnInit {
         if (!this.formData.additionalTaxes) {
             this.formData.additionalTaxes = [];
         }
-        this.formData.additionalTaxes.push({ name: 'Ek Vergi', rate: 0 });
+        this.formData.additionalTaxes.push({ name: this.lang.t('create.extraTaxDefault'), rate: 0 });
     }
 
     removeAdditionalTax(index: number) {
@@ -544,7 +550,7 @@ export class InvoiceListComponent implements OnInit {
 
     exportToCsv(): void {
         if (this.filteredInvoices.length === 0) return;
-        const headers = ['Fatura No', 'Müşteri Adı', 'E-posta', 'Tarih', 'Vade Tarihi', 'Tutar (TL)', 'Durum'];
+        const headers = [this.lang.t('table.invoiceNo'), this.lang.t('preview.customerName'), this.lang.t('csv.email'), this.lang.t('table.date'), this.lang.t('csv.dueDate'), this.lang.t('csv.amount'), this.lang.t('table.status')];
         const rows = this.filteredInvoices.map(inv => [
             `"${inv.invoiceNo}"`,
             `"${inv.customerName}"`,
@@ -560,7 +566,7 @@ export class InvoiceListComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `faturalar_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `${this.lang.t('csv.invoicesFile')}_${new Date().toISOString().split('T')[0]}.csv`);
         link.click();
     }
 

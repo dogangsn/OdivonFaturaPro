@@ -67,10 +67,19 @@ export class CustomerListComponent implements OnInit {
     // Form data
     formData: CustomerFormData = this.getEmptyForm();
 
-    countries = [
-        'Türkiye', 'Dubai (BAE)', 'Almanya', 'Fransa', 'Birleşik Krallık', 'İspanya',
-        'İtalya', 'Hollanda', 'Kanada', 'ABD', 'Avustralya'
-    ];
+    // Stored values stay in Turkish for existing records; only the label is translated.
+    private readonly countryKeys: Record<string, string> = {
+        'Türkiye': 'countries.turkey', 'Dubai (BAE)': 'countries.dubai', 'Almanya': 'countries.germany',
+        'Fransa': 'countries.france', 'Birleşik Krallık': 'countries.uk', 'İspanya': 'countries.spain',
+        'İtalya': 'countries.italy', 'Hollanda': 'countries.netherlands', 'Kanada': 'countries.canada',
+        'ABD': 'countries.usa', 'Avustralya': 'countries.australia'
+    };
+    countries = Object.keys(this.countryKeys);
+
+    countryLabel(country: string): string {
+        const key = this.countryKeys[country];
+        return key ? this.lang.t(key) : country;
+    }
 
     ngOnInit(): void {
         if (isPlatformBrowser(this.platformId)) {
@@ -195,11 +204,11 @@ export class CustomerListComponent implements OnInit {
                 this.reconciliationStatus,
                 this.reconciliationNotes
             );
-            this.alertService.toast('Mutabakat durumu güncellendi', 'success');
+            this.alertService.toast(this.lang.t('customers.reconUpdated'), 'success');
             this.closeReconciliationModal();
             this.loadCustomers();
         } catch (err) {
-            this.alertService.error('Hata', 'Mutabakat kaydedilemedi.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('customers.reconSaveFailed'));
         } finally {
             this.isSavingReconciliation = false;
         }
@@ -209,8 +218,11 @@ export class CustomerListComponent implements OnInit {
         if (!this.selectedCustomerForReconciliation) return '';
         const c = this.selectedCustomerForReconciliation;
         const balance = this.getCustomerBalance(c);
-        const dateStr = new Date().toLocaleDateString('tr-TR');
-        return `Sayın ${c.name},\n\nŞirketimiz kayıtlarına göre ${dateStr} tarihi itibarıyla cari hesabınız ₺${balance.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} bakiyesi vermektedir.\n\nKayıtlarınız ile mutabık olup olmadığınızı bildirmenizi rica ederiz.\n\nOdivon FaturaPro Mutabakat Servisi`;
+        return this.lang.t('customers.reconLetterText', {
+            name: c.name,
+            date: new Date().toLocaleDateString(this.lang.locale),
+            balance: '₺' + balance.toLocaleString(this.lang.locale, { minimumFractionDigits: 2 })
+        });
     }
 
     shareViaWhatsApp(): void {
@@ -312,7 +324,7 @@ export class CustomerListComponent implements OnInit {
 
     async saveCustomer(): Promise<void> {
         if (!this.formData.name || !this.formData.email) {
-            this.alertService.warning('Eksik Bilgi', 'Lütfen cari unvanını ve e-posta adresini doldurun.');
+            this.alertService.warning(this.lang.t('common.missingInfo'), this.lang.t('customers.fillNameEmail'));
             return;
         }
 
@@ -320,16 +332,16 @@ export class CustomerListComponent implements OnInit {
         try {
             if (this.isEditing && this.editingCustomerId) {
                 await this.customerService.updateCustomer(this.editingCustomerId, this.formData);
-                this.alertService.toast('Cari hesap güncellendi', 'success');
+                this.alertService.toast(this.lang.t('customers.updated'), 'success');
             } else {
                 await this.customerService.addCustomer(this.formData);
-                this.alertService.toast('Yeni cari hesap oluşturuldu', 'success');
+                this.alertService.toast(this.lang.t('customers.created'), 'success');
             }
             this.closeModal();
             this.loadCustomers();
         } catch (error: any) {
             console.error('Cari kaydedilirken hata:', error);
-            this.alertService.error('Hata', 'Cari hesap kaydedilirken bir hata oluştu.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('customers.saveFailed'));
         } finally {
             this.isSaving = false;
         }
@@ -337,10 +349,10 @@ export class CustomerListComponent implements OnInit {
 
     async deleteCustomer(id: string): Promise<void> {
         const confirmed = await this.alertService.confirm({
-            title: 'Cari Hesabı Sil',
-            text: 'Bu cari hesabı silmek istediğinizden emin misiniz? Bu işlem geri alınamaz.',
-            confirmButtonText: 'Evet, Sil',
-            cancelButtonText: 'İptal',
+            title: this.lang.t('customers.deleteTitle'),
+            text: this.lang.t('customers.deleteText'),
+            confirmButtonText: this.lang.t('common.yesDelete'),
+            cancelButtonText: this.lang.t('common.cancelShort'),
             isDanger: true
         });
 
@@ -348,10 +360,10 @@ export class CustomerListComponent implements OnInit {
 
         try {
             await this.customerService.deleteCustomer(id);
-            this.alertService.toast('Cari hesap silindi', 'success');
+            this.alertService.toast(this.lang.t('customers.deleted'), 'success');
             this.loadCustomers();
         } catch (error) {
-            this.alertService.error('Hata', 'Cari hesap silinemedi.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('customers.deleteFailed'));
         }
     }
 
@@ -360,10 +372,10 @@ export class CustomerListComponent implements OnInit {
 
         const count = this.selectedIds.size;
         const confirmed = await this.alertService.confirm({
-            title: 'Toplu Silme',
-            text: `Seçilen ${count} cari hesabı silmek istediğinizden emin misiniz?`,
-            confirmButtonText: `Evet, ${count} Cariyi Sil`,
-            cancelButtonText: 'İptal',
+            title: this.lang.t('customers.bulkDeleteTitle'),
+            text: this.lang.t('customers.bulkDeleteText', { count }),
+            confirmButtonText: this.lang.t('customers.bulkDeleteConfirm', { count }),
+            cancelButtonText: this.lang.t('common.cancelShort'),
             isDanger: true
         });
 
@@ -372,20 +384,20 @@ export class CustomerListComponent implements OnInit {
         try {
             await this.customerService.deleteCustomers(Array.from(this.selectedIds));
             this.selectedIds.clear();
-            this.alertService.toast(`${count} cari hesap silindi`, 'success');
+            this.alertService.toast(this.lang.t('customers.bulkDeleted', { count }), 'success');
             this.loadCustomers();
         } catch (error) {
-            this.alertService.error('Hata', 'Cari hesaplar silinemedi.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('customers.bulkDeleteFailed'));
         }
     }
 
     exportToCsv(): void {
         if (this.customers.length === 0) {
-            this.alertService.warning('Veri Yok', 'Dışa aktarılacak cari hesap bulunamadı.');
+            this.alertService.warning(this.lang.t('common.noData'), this.lang.t('customers.noExport'));
             return;
         }
 
-        const headers = ['Cari Unvan', 'E-posta', 'Telefon', 'Vergi Dairesi', 'Vergi No', 'Cari Bakiye (TL)', 'Risk Seviyesi', 'Mutabakat Durumu'];
+        const headers = [this.lang.t('csv.accountName'), this.lang.t('csv.email'), this.lang.t('customers.phone'), this.lang.t('customers.taxOffice'), this.lang.t('csv.taxNo'), this.lang.t('csv.balance'), this.lang.t('csv.riskLevel'), this.lang.t('csv.reconStatus')];
         const rows = this.customers.map(c => [
             `"${c.name}"`,
             `"${c.email}"`,
@@ -402,7 +414,7 @@ export class CustomerListComponent implements OnInit {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `Cari_Hesaplar_${new Date().toISOString().split('T')[0]}.csv`;
+        a.download = `${this.lang.t('csv.customersFile')}_${new Date().toISOString().split('T')[0]}.csv`;
         a.click();
         URL.revokeObjectURL(url);
     }

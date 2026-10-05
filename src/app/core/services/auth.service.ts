@@ -58,7 +58,7 @@ export class AuthService {
                 this.userProfileSubject.next(profile);
             }
         } catch (error) {
-            console.error('Cache okuma hatası:', error);
+            console.error('Cache read error:', error);
             localStorage.removeItem(USER_PROFILE_CACHE_KEY);
         }
     }
@@ -70,7 +70,7 @@ export class AuthService {
             localStorage.setItem(USER_PROFILE_CACHE_KEY, JSON.stringify(profile));
             this.userProfileSubject.next(profile);
         } catch (error) {
-            console.error('Cache yazma hatası:', error);
+            console.error('Cache write error:', error);
         }
     }
 

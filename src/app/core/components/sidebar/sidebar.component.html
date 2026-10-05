@@ -42,10 +42,10 @@
             <span class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[18px] text-amber-500" *ngIf="!themeService.isDark">light_mode</span>
                 <span class="material-symbols-outlined text-[18px] text-indigo-400" *ngIf="themeService.isDark">dark_mode</span>
-                <span>{{ themeService.isDark ? 'Koyu Tema' : 'Açık Tema' }}</span>
+                <span>{{ themeService.isDark ? lang.t('sidebar.darkTheme') : lang.t('sidebar.lightTheme') }}</span>
             </span>
             <span class="text-[10px] uppercase tracking-wider px-2 py-0.5 rounded bg-white dark:bg-slate-900 text-slate-500 dark:text-slate-400 shadow-sm">
-                {{ themeService.isDark ? 'DARK' : 'LIGHT' }}
+                {{ themeService.isDark ? lang.t('sidebar.themeDark') : lang.t('sidebar.themeLight') }}
             </span>
         </button>
 
@@ -59,27 +59,18 @@
                 <div>
                     <div class="flex items-center gap-1.5">
                         <span class="text-xs font-bold text-slate-800 dark:text-slate-100">
-                            {{ (userProfile?.plan || 'pro') === 'enterprise' ? 'Kurumsal Plan' : ((userProfile?.plan || 'pro') === 'free' ? 'Ücretsiz Plan' : 'Pro Plan') }}
+                            {{ (userProfile?.plan || 'pro') === 'enterprise' ? lang.t('plans.enterprise') : ((userProfile?.plan || 'pro') === 'free' ? lang.t('plans.free') : lang.t('plans.pro')) }}
                         </span>
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
                     </div>
-                    <p class="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">Planı Yönet &bull; Yükselt</p>
+                    <p class="text-[10px] text-slate-500 dark:text-slate-400 group-hover:text-primary transition-colors">{{ lang.t('sidebar.managePlan') }}</p>
                 </div>
             </div>
             <span class="material-symbols-outlined text-[16px] text-slate-400 group-hover:text-primary group-hover:translate-x-0.5 transition-all">chevron_right</span>
         </a>
 
-        <!-- Language Selector -->
-        <div class="flex items-center gap-1 bg-slate-100 dark:bg-slate-800 rounded-lg p-1">
-            <button (click)="lang.setLanguage('tr')" 
-                [class]="'flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all ' + (lang.lang === 'tr' ? 'bg-white dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400')">
-                🇹🇷 Türkçe
-            </button>
-            <button (click)="lang.setLanguage('en')" 
-                [class]="'flex-1 px-3 py-1.5 rounded-md text-xs font-medium transition-all ' + (lang.lang === 'en' ? 'bg-white dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm' : 'text-slate-600 dark:text-slate-400')">
-                🇬🇧 English
-            </button>
-        </div>
+        <!-- Dil Seçici -->
+        <app-language-switcher direction="up" [fullWidth]="true"></app-language-switcher>
         
         <!-- Logout -->
         <button (click)="logout(); closeMobileMenu.emit()"

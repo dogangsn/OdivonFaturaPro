@@ -6,6 +6,7 @@ import { firstValueFrom } from 'rxjs';
 import { Invoice } from '../models/invoice.model';
 import { Expense } from '../models/expense.model';
 import { Customer } from '../models/customer.model';
+import { LanguageService } from './language.service';
 
 export interface FinancialHealthSummary {
     totalSalesVat: number;        // Hesaplanan KDV (391)
@@ -18,13 +19,14 @@ export interface FinancialHealthSummary {
     totalReceivables: number;     // Toplam açık alacak (ödenmemiş tüm faturalar)
     highRiskCustomersCount: number; // Yüksek riskli cari sayısı
     cashFlowForecast30Days: number;// 30 günlük tahmini net nakit akışı
-    recommendations: string[];    // AI Tavsiyeleri
+    recommendations: { key: string; params?: Record<string, string | number> }[]; // AI Tavsiyeleri (çeviri anahtarı)
 }
 
 export interface AiChatMessage {
     id: string;
     sender: 'user' | 'assistant';
     text: string;
+    textKey?: string;
     timestamp: Date;
     suggestedActions?: { label: string; action: string }[];
 }
@@ -36,6 +38,21 @@ export class AiAdvisorService {
     private invoiceService = inject(InvoiceService);
     private expenseService = inject(ExpenseService);
     private customerService = inject(CustomerService);
+    private lang = inject(LanguageService);
+
+    private money(value: number): string {
+        return value.toLocaleString(this.lang.locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    /** Soru metnindeki anahtar kelimelerden niyeti çıkarır (tüm desteklenen diller). */
+    private detectIntent(q: string): 'vat' | 'overdue' | 'risk' | 'cash' | 'general' {
+        const has = (words: string[]) => words.some(w => q.includes(w));
+        if (has(['kdv', 'vergi', 'vat', 'tax', 'mwst', 'steuer', 'tva', 'taxe', 'iva', 'impuesto', 'imposta', 'btw', 'belasting', 'ضريبة', 'الضريبة'])) return 'vat';
+        if (has(['vade', 'gecik', 'alacak', 'overdue', 'receivable', 'due', 'überfällig', 'forderung', 'fällig', 'retard', 'créance', 'échéance', 'vencid', 'cobro', 'scadut', 'credit', 'vervallen', 'vordering', 'متأخر', 'مستحق'])) return 'overdue';
+        if (has(['risk', 'müşteri', 'cari', 'customer', 'kunde', 'client', 'cliente', 'klant', 'مخاطر', 'عميل', 'العملاء'])) return 'risk';
+        if (has(['nakit', 'öngörü', 'tahmin', 'durum', 'cash', 'forecast', 'liquid', 'trésorerie', 'prévision', 'caja', 'previsi', 'cassa', 'prognose', 'نقد', 'تدفق', 'توقع'])) return 'cash';
+        return 'general';
+    }
 
     /**
      * İşletmenin anlık KDV, vade, alacak ve cari risk sağlığını hesaplar
@@ -104,22 +121,22 @@ export class AiAdvisorService {
         const cashFlowForecast30Days = upcoming30DaysReceivables - (monthlyExpenseAvg * 0.7);
 
         // Akıllı AI Tavsiyeleri
-        const recommendations: string[] = [];
+        const recommendations: FinancialHealthSummary['recommendations'] = [];
 
         if (isVatRefund) {
-            recommendations.push(`💡 Bu dönem indirilecek KDV'niz hesaplanan KDV'den ₺${netVatPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} fazla. Devlete vergi ödemesi çıkmıyor, sonraki aya devreden KDV hakkınız doğdu.`);
+            recommendations.push({ key: 'ai.recVatRefund', params: { amount: this.money(netVatPayable) } });
         } else if (netVatPayable > 0) {
-            recommendations.push(`⚠️ Bu ay tahmini ₺${netVatPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} KDV ödemeniz bulunmaktadır. Ay sonuna kadar olan gider fişlerinizi AI Tarayıcı ile sisteme girerek KDV matrahınızı optimize edebilirsiniz.`);
+            recommendations.push({ key: 'ai.recVatPayable', params: { amount: this.money(netVatPayable) } });
         }
 
         if (overdueAmount > 0) {
-            recommendations.push(`🚨 Toplam ₺${overdueAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} tutarında ${overdueCount} adet vadesi geçmiş alacağınız var. Cari hesaplardan hızlı mutabakat veya tek tıkla vade hatırlatma e-postası göndermeniz önerilir.`);
+            recommendations.push({ key: 'ai.recOverdue', params: { amount: this.money(overdueAmount), n: overdueCount } });
         } else {
-            recommendations.push(`✅ Tebrikler! Vadesi geçmiş hiçbir faturanız bulunmuyor, alacak tahsilat performansınız mükemmel.`);
+            recommendations.push({ key: 'ai.recNoOverdue' });
         }
 
         if (cashFlowForecast30Days < 0) {
-            recommendations.push(`📉 Önümüzdeki 30 gün için net nakit akışı negatif öngörülüyor (₺${Math.abs(cashFlowForecast30Days).toLocaleString('tr-TR', { minimumFractionDigits: 2 })} açık). Kısa vadeli tahsilatlara öncelik veriniz.`);
+            recommendations.push({ key: 'ai.recCashNegative', params: { amount: this.money(Math.abs(cashFlowForecast30Days)) } });
         }
 
         return {
@@ -141,36 +158,45 @@ export class AiAdvisorService {
      * Doğal dildeki kullanıcı sorusuna gerçek verilere dayalı akıllı cevap üretir
      */
     async answerFinancialQuery(query: string): Promise<string> {
-        const q = query.toLowerCase().trim();
+        const q = query.toLocaleLowerCase().trim();
         const health = await this.calculateFinancialHealth();
+        const t = (key: string, params?: Record<string, string | number>) => this.lang.t(key, params);
 
-        if (q.includes('kdv') || q.includes('vergi')) {
-            if (health.isVatRefund) {
-                return `📊 **KDV Durumu Analizi:**\n\n• **Hesaplanan KDV (Satışlar):** ₺${health.totalSalesVat.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n• **İndirilecek KDV (Giderler):** ₺${health.totalExpenseVat.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\n🎉 **Sonuç:** Bu dönem **₺${health.netVatPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}** tutarında **Sonraki Döneme Devreden KDV** bakiyeniz mevcuttur. Devlete KDV ödemesi çıkmamaktadır.`;
-            } else {
-                return `📊 **KDV Durumu Analizi:**\n\n• **Hesaplanan KDV (Satışlar):** ₺${health.totalSalesVat.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n• **İndirilecek KDV (Giderler):** ₺${health.totalExpenseVat.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\n⚠️ **Sonuç:** Bu dönem tahmini **₺${health.netVatPayable.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}** **Ödenecek KDV** tutarı oluşmuştur. Giderlerinizi eksiksiz kaydederek KDV yükünüzü dengeleyebilirsiniz.`;
+        switch (this.detectIntent(q)) {
+            case 'vat':
+                return t(health.isVatRefund ? 'ai.ansVatRefund' : 'ai.ansVatPayable', {
+                    sales: this.money(health.totalSalesVat),
+                    expense: this.money(health.totalExpenseVat),
+                    amount: this.money(health.netVatPayable)
+                });
+            case 'overdue':
+                if (health.overdueTotalAmount > 0) {
+                    return t('ai.ansOverdue', {
+                        n: health.overdueInvoicesCount,
+                        overdue: this.money(health.overdueTotalAmount),
+                        upcoming: this.money(health.upcomingInvoicesAmount),
+                        receivables: this.money(health.totalReceivables)
+                    });
+                }
+                return t('ai.ansNoOverdue', { receivables: this.money(health.totalReceivables) });
+            case 'risk':
+                return t('ai.ansRisk', { n: health.highRiskCustomersCount, overdue: this.money(health.overdueTotalAmount) });
+            case 'cash': {
+                const net = health.cashFlowForecast30Days;
+                return t('ai.ansCash', {
+                    upcoming: this.money(health.upcomingInvoicesAmount),
+                    sign: net >= 0 ? '+' : '-',
+                    net: this.money(Math.abs(net)),
+                    verdict: t(net >= 0 ? 'ai.cashPositive' : 'ai.cashNegative')
+                });
             }
+            default:
+                return t('ai.ansGeneral', {
+                    vatLine: t(health.isVatRefund ? 'ai.genVatRefund' : 'ai.genVatPayable', { amount: this.money(health.netVatPayable) }),
+                    overdue: this.money(health.overdueTotalAmount),
+                    n: health.overdueInvoicesCount,
+                    receivables: this.money(health.totalReceivables)
+                });
         }
-
-        if (q.includes('vade') || q.includes('gecik') || q.includes('alacak')) {
-            if (health.overdueTotalAmount > 0) {
-                return `⏰ **Vade & Alacak Takip Raporu:**\n\n• **Vadesi Geçmiş Fatura Adedi:** ${health.overdueInvoicesCount}\n• **Geciken Toplam Tutar:** ₺${health.overdueTotalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n• **Bu Hafta Vadesi Dolan:** ₺${health.upcomingInvoicesAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n• **Toplam Bekleyen Alacak:** ₺${health.totalReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\n💡 **Öneri:** Faturalar menüsündeki "Vadesi Geçenler" sekmesinden ilgili müşterilere tek tıkla vade hatırlatması iletebilirsiniz.`;
-            } else {
-                return `✨ **Vade Durumu:** Vadesi geçmiş hiçbir alacağınız bulunmuyor! Tüm faturalarınız vadesinde ödenmiş veya vadesi henüz dolmamıştır. Toplam açık alacak tutarınız: ₺${health.totalReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}.`;
-            }
-        }
-
-        if (q.includes('risk') || q.includes('müşteri') || q.includes('cari')) {
-            return `🛡️ **Cari Risk Değerlendirmesi:**\n\n• **Yüksek Riskli Cari Sayısı:** ${health.highRiskCustomersCount}\n• **Gecikmiş Alacak Tutarı:** ₺${health.overdueTotalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\n📌 **AI Tavsiyesi:** Cari Hesaplar menüsünden yüksek riskli carilerin borç bakiyesini inceleyip yeni fatura kesmeden önce **Hızlı Mutabakat Formu** göndermeniz önerilir.`;
-        }
-
-        if (q.includes('nakit') || q.includes('öngörü') || q.includes('tahmin') || q.includes('durum')) {
-            const net = health.cashFlowForecast30Days;
-            const sign = net >= 0 ? '+' : '-';
-            return `📈 **Önümüzdeki 30 Günlük Nakit Akışı Öngörüsü:**\n\n• **Gelecek 30 Günlük Alacaklar:** ₺${health.upcomingInvoicesAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}+\n• **Tahmini Net Nakit Dengesi:** ${sign}₺${Math.abs(net).toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\n${net >= 0 ? '🟢 Nakit akışı görünümünüz pozitif ve sağlıklı.' : '🔴 Nakit akışında geçici bir daralma öngörülüyor. Öncelikli tahsilatları tamamlayınız.'}`;
-        }
-
-        // Genel yanıt
-        return `🤖 **Odivon FaturaPro AI Özeti:**\n\nİşletmenizin finansal verilerini analiz ettim:\n\n1. **KDV Durumu:** ${health.isVatRefund ? 'Devreden KDV mevcut (₺' + health.netVatPayable.toFixed(2) + ')' : 'Tahmini Ödenecek KDV: ₺' + health.netVatPayable.toFixed(2)}\n2. **Vadesi Geçen Alacak:** ₺${health.overdueTotalAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} (${health.overdueInvoicesCount} fatura)\n3. **Toplam Açık Alacak:** ₺${health.totalReceivables.toLocaleString('tr-TR', { minimumFractionDigits: 2 })}\n\nÖzel bir analiz için "KDV durumum nedir?", "Vadesi geçen alacaklarım?", "Cari risk analizi" gibi sorular sorabilirsiniz.`;
     }
 }

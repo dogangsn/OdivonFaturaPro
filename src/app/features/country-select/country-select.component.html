@@ -8,16 +8,7 @@
         
         <div class="flex items-center gap-3">
             <!-- Dil Seçici -->
-            <div class="flex items-center gap-1 bg-slate-100 rounded-lg p-1">
-                <button (click)="lang.setLanguage('tr')" 
-                    [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-all ' + (lang.lang === 'tr' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700')">
-                    🇹🇷 TR
-                </button>
-                <button (click)="lang.setLanguage('en')" 
-                    [class]="'px-3 py-1.5 rounded-md text-sm font-medium transition-all ' + (lang.lang === 'en' ? 'bg-white text-primary shadow-sm' : 'text-slate-500 hover:text-slate-700')">
-                    🇬🇧 EN
-                </button>
-            </div>
+            <app-language-switcher></app-language-switcher>
             
             <!-- Loading -->
             <ng-container *ngIf="isLoading()">
@@ -28,11 +19,11 @@
             <ng-container *ngIf="!isLoading() && !isLoggedIn()">
                 <button (click)="goToPricing()"
                     class="text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm">
-                    Fiyatlandırma
+                    {{ lang.t('common.pricing') }}
                 </button>
                 <button (click)="goToRegister()"
                     class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 transition-colors text-xs sm:text-sm">
-                    Kayıt Ol
+                    {{ lang.t('auth.register') }}
                 </button>
                 <button (click)="goToLogin()"
                     class="bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-xs sm:text-sm shadow-sm">
@@ -59,7 +50,7 @@
                     <!-- Çıkış Butonu -->
                     <button (click)="logout()" 
                         class="p-2 text-slate-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
-                        title="Çıkış Yap">
+                        [title]="lang.t('auth.logoutTitle')">
                         <span class="material-symbols-outlined">logout</span>
                     </button>
                 </div>
@@ -92,13 +83,13 @@
     <!-- Footer -->
     <footer class="py-6 text-center text-xs sm:text-sm text-slate-400 border-t border-slate-200 bg-white space-y-2">
         <div class="flex items-center justify-center gap-4 text-xs">
-            <button (click)="openLegal('terms')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">Kullanım Şartları</button>
+            <button (click)="openLegal('terms')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.terms') }}</button>
             <span>•</span>
-            <button (click)="openLegal('privacy')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">Gizlilik & Çerezler</button>
+            <button (click)="openLegal('privacy')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.privacyCookies') }}</button>
             <span>•</span>
-            <button (click)="openLegal('kvkk')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">KVKK Metni</button>
+            <button (click)="openLegal('kvkk')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.kvkk') }}</button>
         </div>
-        <p>© 2026 Odivon FaturaPro • Tüm hakları saklıdır.</p>
+        <p>{{ lang.t('legal.copyright') }}</p>
     </footer>
 
     <!-- Legal Modal -->

@@ -1,12 +1,14 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
 import Swal, { SweetAlertIcon, SweetAlertOptions } from 'sweetalert2';
+import { LanguageService } from './language.service';
 
 @Injectable({
     providedIn: 'root'
 })
 export class AlertService {
     private platformId = inject(PLATFORM_ID);
+    private lang = inject(LanguageService);
 
     private get isBrowser(): boolean {
         return isPlatformBrowser(this.platformId);
@@ -43,7 +45,7 @@ export class AlertService {
             title,
             text,
             showConfirmButton: true,
-            confirmButtonText: 'Tamam',
+            confirmButtonText: this.lang.t('alert.ok'),
             timer: 2500,
             timerProgressBar: true
         });
@@ -60,7 +62,7 @@ export class AlertService {
             title,
             text,
             confirmButtonColor: '#ef4444',
-            confirmButtonText: 'Kapat'
+            confirmButtonText: this.lang.t('alert.close')
         });
     }
 
@@ -75,7 +77,7 @@ export class AlertService {
             title,
             text,
             confirmButtonColor: '#f59e0b',
-            confirmButtonText: 'Anladım'
+            confirmButtonText: this.lang.t('alert.gotIt')
         });
     }
 
@@ -89,7 +91,7 @@ export class AlertService {
             icon: 'info',
             title,
             text,
-            confirmButtonText: 'Tamam'
+            confirmButtonText: this.lang.t('alert.ok')
         });
     }
 
@@ -99,8 +101,8 @@ export class AlertService {
     async confirm(
         titleOrOptions: string | { title: string; text?: string; confirmButtonText?: string; cancelButtonText?: string; isDanger?: boolean },
         text?: string,
-        confirmBtnText = 'Evet, Onaylıyorum',
-        cancelBtnText = 'Vazgeç'
+        confirmBtnText = this.lang.t('alert.confirmYes'),
+        cancelBtnText = this.lang.t('alert.cancel')
     ): Promise<boolean> {
         if (!this.isBrowser) return false;
 
@@ -113,8 +115,8 @@ export class AlertService {
         if (typeof titleOrOptions === 'object') {
             title = titleOrOptions.title;
             msg = titleOrOptions.text || '';
-            confirmText = titleOrOptions.confirmButtonText || 'Evet, Onaylıyorum';
-            cancelText = titleOrOptions.cancelButtonText || 'Vazgeç';
+            confirmText = titleOrOptions.confirmButtonText || this.lang.t('alert.confirmYes');
+            cancelText = titleOrOptions.cancelButtonText || this.lang.t('alert.cancel');
             isDanger = titleOrOptions.isDanger !== false;
         } else {
             title = titleOrOptions;
@@ -167,7 +169,7 @@ export class AlertService {
     /**
      * Yükleniyor / İşlem Sürüyor Animasyonu
      */
-    loading(title = 'İşlem yapılıyor...'): void {
+    loading(title = this.lang.t('alert.processing')): void {
         if (!this.isBrowser) return;
         Swal.fire({
             ...this.getBaseOptions(),

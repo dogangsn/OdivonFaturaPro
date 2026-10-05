@@ -62,11 +62,9 @@ export class ReportsComponent implements OnInit {
     netVat: number = 0;
 
     // Chart Data
-    monthlySales: { month: string; value: number; amount: number }[] = [];
-    monthlyExpensesData: { month: string; value: number; amount: number }[] = [];
-    monthlyProfitLoss: { month: string; revenue: number; expense: number; profit: number; revVal: number; expVal: number }[] = [];
-
-    monthsList = ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'];
+    monthlySales: { month: number; value: number; amount: number }[] = [];
+    monthlyExpensesData: { month: number; value: number; amount: number }[] = [];
+    monthlyProfitLoss: { month: number; revenue: number; expense: number; profit: number; revVal: number; expVal: number }[] = [];
 
     ngOnInit(): void {
         const today = new Date();
@@ -97,7 +95,7 @@ export class ReportsComponent implements OnInit {
                 this.isLoading = false;
             },
             error: (err) => {
-                console.error('Rapor verisi yüklenirken hata:', err);
+                console.error('Failed to load report data:', err);
                 this.isLoading = false;
             }
         });
@@ -157,7 +155,7 @@ export class ReportsComponent implements OnInit {
             invoiceTax += taxAmt;
 
             // Customer aggregation
-            const cName = inv.customerName?.trim() || 'Diğer Müşteri';
+            const cName = inv.customerName?.trim() || this.lang.t('reports.otherCustomer');
             const curr = customerMap.get(cName) || { count: 0, total: 0 };
             customerMap.set(cName, {
                 count: curr.count + 1,
@@ -205,13 +203,13 @@ export class ReportsComponent implements OnInit {
         const maxCombined = Math.max(...monthlyRev, ...monthlyExp, 1);
 
         this.monthlySales = monthlyRev.map((amt, idx) => ({
-            month: this.monthsList[idx],
+            month: idx,
             amount: amt,
             value: Math.round((amt / maxRev) * 100)
         }));
 
         this.monthlyExpensesData = monthlyExp.map((amt, idx) => ({
-            month: this.monthsList[idx],
+            month: idx,
             amount: amt,
             value: Math.round((amt / maxExp) * 100)
         }));
@@ -219,7 +217,7 @@ export class ReportsComponent implements OnInit {
         this.monthlyProfitLoss = monthlyRev.map((rev, idx) => {
             const exp = monthlyExp[idx];
             return {
-                month: this.monthsList[idx],
+                month: idx,
                 revenue: rev,
                 expense: exp,
                 profit: rev - exp,
@@ -243,20 +241,20 @@ export class ReportsComponent implements OnInit {
     exportReportToCsv(): void {
         let headers: string[] = [];
         let rows: (string | number)[][] = [];
-        let filename = `fatura_raporu_${this.activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
+        let filename = `${this.lang.t('reports.csvFile')}_${this.activeTab}_${new Date().toISOString().split('T')[0]}.csv`;
 
         if (this.activeTab === 'expenses') {
-            headers = ['Firma/Tedarikçi', 'Kategori', 'Tarih', 'KDV Tutarı', 'Toplam Tutar', 'Ödeme Yöntemi'];
+            headers = ['csv.supplier', 'csv.category', 'csv.date', 'csv.vatAmount', 'csv.totalAmount', 'csv.paymentMethod'].map(k => this.lang.t(k));
             rows = this.filteredExpenses.map(exp => [
                 `"${exp.merchantName || exp.title}"`,
-                `"${exp.category}"`,
+                `"${this.categoryLabel(exp.category)}"`,
                 `"${exp.date}"`,
                 `"${exp.taxAmount || 0}"`,
                 `"${exp.amount || 0}"`,
-                `"${exp.paymentMethod || ''}"`
+                `"${this.paymentLabel(exp.paymentMethod)}"`
             ]);
         } else if (this.activeTab === 'customers') {
-            headers = ['Müşteri Adı', 'Fatura Adedi', 'Toplam Satış Tutarı (₺)', 'Satış Oranı (%)'];
+            headers = ['csv.customerName', 'csv.invoiceCount', 'csv.totalSales', 'csv.salesShare'].map(k => this.lang.t(k));
             rows = this.customerBreakdown.map(c => [
                 `"${c.customerName}"`,
                 `"${c.invoiceCount}"`,
@@ -264,7 +262,7 @@ export class ReportsComponent implements OnInit {
                 `"%${c.percentage}"`
             ]);
         } else {
-            headers = ['Fatura No', 'Müşteri', 'Tarih', 'Vade', 'Vergi Toplamı', 'Genel Toplam', 'Durum'];
+            headers = ['csv.invoiceNo', 'csv.customer', 'csv.date', 'csv.dueDate', 'csv.taxTotal', 'csv.grandTotal', 'csv.status'].map(k => this.lang.t(k));
             rows = this.filteredInvoices.map(inv => [
                 `"${inv.invoiceNo}"`,
                 `"${inv.customerName}"`,
@@ -307,9 +305,27 @@ export class ReportsComponent implements OnInit {
             'paid': this.lang.t('reports.filterPaid'),
             'pending': this.lang.t('reports.filterPending'),
             'overdue': this.lang.t('reports.filterOverdue'),
-            'draft': 'Taslak',
-            'cancelled': 'İptal'
+            'draft': this.lang.t('status.draft'),
+            'cancelled': this.lang.t('status.cancelled')
         };
         return labels[status] || status;
+    }
+
+    categoryLabel(category: string | undefined): string {
+        if (!category) return '';
+        const key = 'cat.' + category;
+        const label = this.lang.t(key);
+        return label === key ? category : label;
+    }
+
+    paymentLabel(method: string | undefined): string {
+        const keys: Record<string, string> = {
+            'credit_card': 'pay.creditCard',
+            'cash': 'pay.cash',
+            'bank_transfer': 'pay.bankTransfer',
+            'company_card': 'pay.companyCard',
+            'other': 'pay.other'
+        };
+        return method && keys[method] ? this.lang.t(keys[method]) : (method || '');
     }
 }

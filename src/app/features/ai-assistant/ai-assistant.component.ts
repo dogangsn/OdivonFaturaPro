@@ -25,14 +25,9 @@ export class AiAssistantComponent implements OnInit {
         {
             id: '1',
             sender: 'assistant',
-            text: 'Merhaba! Ben **Odivon FaturaPro AI**. İşletmenizin satış faturalarını, giderlerini, cari hesaplarını, KDV durumunu ve vade risklerini 7/24 analiz ediyorum. Size bugün nasıl yardımcı olabilirim?',
-            timestamp: new Date(),
-            suggestedActions: [
-                { label: '📊 KDV Durumu', action: 'kdv' },
-                { label: '⏰ Vadesi Geçenler', action: 'vade' },
-                { label: '🛡️ Cari Risk Analizi', action: 'risk' },
-                { label: '📈 30 Günlük Nakit Akışı', action: 'nakit' }
-            ]
+            text: '',
+            textKey: 'ai.welcome',
+            timestamp: new Date()
         }
     ];
 
@@ -45,7 +40,7 @@ export class AiAssistantComponent implements OnInit {
         try {
             this.health = await this.aiAdvisor.calculateFinancialHealth();
         } catch (err) {
-            console.error('Finansal sağlık özeti yüklenirken hata:', err);
+            console.error('Failed to load financial health summary:', err);
         } finally {
             this.isLoadingHealth = false;
         }
@@ -77,7 +72,7 @@ export class AiAssistantComponent implements OnInit {
             this.chatMessages.push({
                 id: (Date.now() + 1).toString(),
                 sender: 'assistant',
-                text: 'Üzgünüm, sorunuzu analiz ederken bir hata oluştu. Lütfen tekrar deneyiniz.',
+                text: this.lang.t('ai.error'),
                 timestamp: new Date()
             });
         } finally {

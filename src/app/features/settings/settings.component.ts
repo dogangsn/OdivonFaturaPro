@@ -64,7 +64,7 @@ export class SettingsComponent implements OnInit {
     async saveSettings(): Promise<void> {
         const currentUser = this.authService.currentUser;
         if (!currentUser) {
-            this.errorMessage = 'Oturum açık değil.';
+            this.errorMessage = this.lang.t('settings.errNotLoggedIn');
             return;
         }
 
@@ -87,7 +87,7 @@ export class SettingsComponent implements OnInit {
             setTimeout(() => this.successMessage = '', 4000);
         } catch (error: any) {
             console.error('Ayarlar kaydedilirken hata:', error);
-            this.errorMessage = 'Ayarlar kaydedilirken bir hata oluştu.';
+            this.errorMessage = this.lang.t('settings.errSave');
         } finally {
             this.isSaving = false;
         }

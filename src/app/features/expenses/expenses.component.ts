@@ -61,26 +61,26 @@ export class ExpensesComponent implements OnInit, OnDestroy {
         receiptUrl: ['']
     });
 
-    readonly categories: { value: ExpenseCategory; labelTr: string; labelEn: string; icon: string; color: string }[] = [
-        { value: 'food', labelTr: 'Yemek & Temsil', labelEn: 'Food & Meals', icon: 'restaurant', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' },
-        { value: 'transport', labelTr: 'Ulaşım & Yakıt', labelEn: 'Transport & Fuel', icon: 'directions_car', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' },
-        { value: 'office', labelTr: 'Ofis & Kırtasiye', labelEn: 'Office & Supplies', icon: 'desk', color: 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300' },
-        { value: 'utilities', labelTr: 'Kira & Faturalar', labelEn: 'Rent & Utilities', icon: 'bolt', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950/60 dark:text-yellow-300' },
-        { value: 'software', labelTr: 'Yazılım & SaaS', labelEn: 'Software & SaaS', icon: 'terminal', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300' },
-        { value: 'marketing', labelTr: 'Pazarlama & Reklam', labelEn: 'Marketing & Ads', icon: 'campaign', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300' },
-        { value: 'travel', labelTr: 'Seyahat & Konaklama', labelEn: 'Travel & Lodging', icon: 'flight', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300' },
-        { value: 'consulting', labelTr: 'Danışmanlık & Hizmet', labelEn: 'Consulting', icon: 'handshake', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' },
-        { value: 'salary', labelTr: 'Maaş & Personel', labelEn: 'Salary & Payroll', icon: 'badge', color: 'bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300' },
-        { value: 'tax', labelTr: 'Vergi & Harç', labelEn: 'Tax & Duties', icon: 'account_balance', color: 'bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300' },
-        { value: 'other', labelTr: 'Diğer Giderler', labelEn: 'Other', icon: 'more_horiz', color: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300' },
+    readonly categories: { value: ExpenseCategory; labelKey: string; icon: string; color: string }[] = [
+        { value: 'food', labelKey: 'cat.food', icon: 'restaurant', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' },
+        { value: 'transport', labelKey: 'cat.transport', icon: 'directions_car', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/60 dark:text-blue-300' },
+        { value: 'office', labelKey: 'cat.office', icon: 'desk', color: 'bg-purple-100 text-purple-800 dark:bg-purple-950/60 dark:text-purple-300' },
+        { value: 'utilities', labelKey: 'cat.utilities', icon: 'bolt', color: 'bg-yellow-100 text-yellow-800 dark:bg-yellow-950/60 dark:text-yellow-300' },
+        { value: 'software', labelKey: 'cat.software', icon: 'terminal', color: 'bg-cyan-100 text-cyan-800 dark:bg-cyan-950/60 dark:text-cyan-300' },
+        { value: 'marketing', labelKey: 'cat.marketing', icon: 'campaign', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/60 dark:text-rose-300' },
+        { value: 'travel', labelKey: 'cat.travel', icon: 'flight', color: 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/60 dark:text-indigo-300' },
+        { value: 'consulting', labelKey: 'cat.consulting', icon: 'handshake', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300' },
+        { value: 'salary', labelKey: 'cat.salary', icon: 'badge', color: 'bg-teal-100 text-teal-800 dark:bg-teal-950/60 dark:text-teal-300' },
+        { value: 'tax', labelKey: 'cat.tax', icon: 'account_balance', color: 'bg-red-100 text-red-800 dark:bg-red-950/60 dark:text-red-300' },
+        { value: 'other', labelKey: 'cat.other', icon: 'more_horiz', color: 'bg-slate-100 text-slate-800 dark:bg-slate-800 dark:text-slate-300' },
     ];
 
-    readonly paymentMethods: { value: PaymentMethod; labelTr: string; labelEn: string }[] = [
-        { value: 'credit_card', labelTr: 'Kredi Kartı', labelEn: 'Credit Card' },
-        { value: 'cash', labelTr: 'Nakit', labelEn: 'Cash' },
-        { value: 'bank_transfer', labelTr: 'Havale / EFT', labelEn: 'Bank Transfer' },
-        { value: 'company_card', labelTr: 'Şirket Kartı', labelEn: 'Company Card' },
-        { value: 'other', labelTr: 'Diğer', labelEn: 'Other' },
+    readonly paymentMethods: { value: PaymentMethod; labelKey: string }[] = [
+        { value: 'credit_card', labelKey: 'pay.creditCard' },
+        { value: 'cash', labelKey: 'pay.cash' },
+        { value: 'bank_transfer', labelKey: 'pay.bankTransfer' },
+        { value: 'company_card', labelKey: 'pay.companyCard' },
+        { value: 'other', labelKey: 'pay.other' },
     ];
 
     ngOnInit(): void {
@@ -133,7 +133,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     getPaymentMethodLabel(method: PaymentMethod): string {
         const pm = this.paymentMethods.find(m => m.value === method);
         if (!pm) return method;
-        return this.lang.lang === 'tr' ? pm.labelTr : pm.labelEn;
+        return this.lang.t(pm.labelKey);
     }
 
     // KDV Dahil / Hariç Hesaplama Metotları
@@ -274,15 +274,15 @@ export class ExpensesComponent implements OnInit, OnDestroy {
         try {
             if (this.isEditing && this.editingExpenseId) {
                 await this.expenseService.updateExpense(this.editingExpenseId, formData);
-                this.alertService.toast('Gider güncellendi', 'success');
+                this.alertService.toast(this.lang.t('expenses.updated'), 'success');
             } else {
                 await this.expenseService.createExpense(formData);
-                this.alertService.toast('Gider kaydedildi', 'success');
+                this.alertService.toast(this.lang.t('expenses.saved'), 'success');
             }
             this.closeExpenseModal();
         } catch (err) {
             console.error('Failed to save expense:', err);
-            this.alertService.error('Hata', 'Gider kaydedilirken bir hata oluştu.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('expenses.saveFailed'));
         } finally {
             this.isSaving = false;
         }
@@ -290,19 +290,19 @@ export class ExpensesComponent implements OnInit, OnDestroy {
 
     async deleteExpense(id: string): Promise<void> {
         const confirmed = await this.alertService.confirm(
-            'Gider Silinsin mi?',
+            this.lang.t('expenses.deleteTitle'),
             this.lang.t('expenses.deleteConfirm'),
-            'Evet, Sil',
-            'Vazgeç'
+            this.lang.t('common.yesDelete'),
+            this.lang.t('alert.cancel')
         );
 
         if (confirmed) {
             try {
                 await this.expenseService.deleteExpense(id);
-                this.alertService.toast('Gider silindi', 'info');
+                this.alertService.toast(this.lang.t('expenses.deleted'), 'info');
             } catch (err) {
                 console.error('Failed to delete expense:', err);
-                this.alertService.error('Hata', 'Gider silinirken bir hata oluştu.');
+                this.alertService.error(this.lang.t('common.error'), this.lang.t('expenses.deleteFailed'));
             }
         }
     }
@@ -368,7 +368,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
             this.scannedResult = result;
         } catch (err: any) {
             console.error('AI Scanning failed:', err);
-            this.scannerError = err.message || 'Belge taranırken bir hata oluştu.';
+            this.scannerError = err.message || this.lang.t('scanner.error');
         } finally {
             this.isScanning = false;
         }
@@ -414,15 +414,15 @@ export class ExpensesComponent implements OnInit, OnDestroy {
     // Export CSV
     exportToCsv(): void {
         if (this.filteredExpenses.length === 0) {
-            this.alertService.warning('Kayıt Bulunamadı', 'Dışa aktarılacak gider kaydı bulunamadı.');
+            this.alertService.warning(this.lang.t('common.noRecords'), this.lang.t('expenses.noExport'));
             return;
         }
 
-        const headers = ['Tarih', 'Firma / Açıklama', 'Kategori', 'Tutar', 'KDV', 'Para Birimi', 'Ödeme Yöntemi'];
+        const headers = [this.lang.t('table.date'), this.lang.t('csv.merchantDesc'), this.lang.t('csv.category'), this.lang.t('table.amount'), this.lang.t('doc.vat'), this.lang.t('expenses.currency'), this.lang.t('csv.paymentMethod')];
         const rows = this.filteredExpenses.map(e => [
-            `"${typeof e.date === 'string' ? e.date : (e.date ? new Date(e.date).toLocaleDateString('tr-TR') : '')}"`,
+            `"${typeof e.date === 'string' ? e.date : (e.date ? new Date(e.date).toLocaleDateString(this.lang.locale) : '')}"`,
             `"${(e.merchantName || e.title || e.supplierName || '').replace(/"/g, '""')}"`,
-            `"${this.getCategoryMeta(e.category).labelTr}"`,
+            `"${this.lang.t(this.getCategoryMeta(e.category).labelKey)}"`,
             e.amount.toString(),
             (e.taxAmount || 0).toString(),
             `"${e.currency || 'TRY'}"`,
@@ -434,7 +434,7 @@ export class ExpensesComponent implements OnInit, OnDestroy {
         const url = URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.setAttribute('href', url);
-        link.setAttribute('download', `Giderler_${new Date().toISOString().split('T')[0]}.csv`);
+        link.setAttribute('download', `${this.lang.t('csv.expensesFile')}_${new Date().toISOString().split('T')[0]}.csv`);
         document.body.appendChild(link);
         link.click();
         document.body.removeChild(link);

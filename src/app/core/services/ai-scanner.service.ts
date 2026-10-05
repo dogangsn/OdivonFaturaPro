@@ -1,4 +1,5 @@
-import { Injectable } from '@angular/core';
+import { Injectable, inject } from '@angular/core';
+import { LanguageService } from './language.service';
 
 export interface ScannedDocumentResult {
     merchantOrCustomerName: string;
@@ -31,6 +32,7 @@ export interface ScannedDocumentResult {
 })
 export class AiScannerService {
     private readonly GEMINI_API_KEY_STORAGE = 'faturapro_gemini_key';
+    private lang = inject(LanguageService);
 
     getApiKey(): string {
         return localStorage.getItem(this.GEMINI_API_KEY_STORAGE) || '';
@@ -112,7 +114,7 @@ export class AiScannerService {
             try {
                 return await this.scanWithGeminiVision(imageBase64, apiKey);
             } catch (error) {
-                console.warn('Gemini API ile tarama başarısız oldu, akıllı mod devreye girdi:', error);
+                console.warn('Gemini scan failed, falling back to smart mode:', error);
                 return this.generateSmartScanResult(imageBase64);
             }
         } else {
@@ -176,17 +178,17 @@ JSON şeması:
         });
 
         if (!response.ok) {
-            throw new Error(`Gemini API Hatası: ${response.status} ${response.statusText}`);
+            throw new Error(this.lang.t('err.aiApi', { status: `${response.status} ${response.statusText}` }));
         }
 
         const data = await response.json();
         const rawContent = data.candidates?.[0]?.content?.parts?.[0]?.text;
         if (!rawContent) {
-            throw new Error('Gemini modelinden yanıt alınamadı.');
+            throw new Error(this.lang.t('err.aiNoResponse'));
         }
 
         const parsed = JSON.parse(rawContent.trim());
-        const mName = parsed.merchantOrCustomerName || 'Taranan Satıcı';
+        const mName = parsed.merchantOrCustomerName || this.lang.t('scan.unknownMerchant');
         const tTax = Number(parsed.taxTotal) || 0;
         const tot = Number(parsed.total) || 0;
 
@@ -199,7 +201,7 @@ JSON şeması:
                 const uPrice = Number(it.unitPrice) || 0;
                 const qty = Number(it.quantity) || 1;
                 return {
-                    description: it.description || 'Kalem',
+                    description: it.description || this.lang.t('scan.itemFallback'),
                     quantity: qty,
                     unitPrice: uPrice,
                     totalPrice: Number(it.totalPrice) || (qty * uPrice),
@@ -228,11 +230,11 @@ JSON şeması:
         return new Promise(resolve => {
             setTimeout(() => {
                 const sampleMerchants = [
-                    { name: 'Migros Ticaret A.Ş.', category: 'food' as const, items: [{ desc: 'Gıda ve İhtiyaç Malzemeleri', qty: 2, price: 145.5 }] },
-                    { name: 'Petrol Ofisi Akaryakıt', category: 'fuel' as const, items: [{ desc: 'Motorin V/Max Yakıt', qty: 1, price: 1850.0 }] },
-                    { name: 'D&R Mağazacılık', category: 'office' as const, items: [{ desc: 'Ofis ve Kırtasiye Gereçleri', qty: 3, price: 95.0 }] },
-                    { name: 'Starbucks Coffee', category: 'food' as const, items: [{ desc: 'İçecek & Kahve İkramı', qty: 2, price: 120.0 }] },
-                    { name: 'Teknosa İç ve Dış Tic.', category: 'office' as const, items: [{ desc: 'Yazıcı Kartuşu & Kablo', qty: 1, price: 890.0 }] }
+                    { name: 'Migros Ticaret A.Ş.', category: 'food' as const, items: [{ desc: this.lang.t('scan.sample.groceries'), qty: 2, price: 145.5 }] },
+                    { name: 'Petrol Ofisi Akaryakıt', category: 'fuel' as const, items: [{ desc: this.lang.t('scan.sample.fuel'), qty: 1, price: 1850.0 }] },
+                    { name: 'D&R Mağazacılık', category: 'office' as const, items: [{ desc: this.lang.t('scan.sample.stationery'), qty: 3, price: 95.0 }] },
+                    { name: 'Starbucks Coffee', category: 'food' as const, items: [{ desc: this.lang.t('scan.sample.coffee'), qty: 2, price: 120.0 }] },
+                    { name: 'Teknosa İç ve Dış Tic.', category: 'office' as const, items: [{ desc: this.lang.t('scan.sample.printer'), qty: 1, price: 890.0 }] }
                 ];
 
                 const picked = sampleMerchants[Math.floor(Math.random() * sampleMerchants.length)];
@@ -264,8 +266,8 @@ JSON şeması:
                     currency: 'TRY',
                     category: picked.category,
                     confidence: 0.92,
-                    rawText: `${picked.name} - ${total} TL - Tarih: ${today}`,
-                    notes: 'Yapay Zeka (Robom Scanner) ile otomatik taranarak aktarıldı.'
+                    rawText: `${picked.name} - ${total} TL - ${this.lang.t('scan.dateLabel')}: ${today}`,
+                    notes: this.lang.t('scan.autoNote')
                 });
             }, 1200);
         });

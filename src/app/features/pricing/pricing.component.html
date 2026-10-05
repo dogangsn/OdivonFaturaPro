@@ -4,21 +4,22 @@
         <div class="flex items-center justify-between pb-3 border-b border-slate-200 dark:border-slate-800">
             <a routerLink="/" class="flex items-center gap-2 text-slate-700 dark:text-slate-300 hover:text-primary transition-colors text-sm font-semibold">
                 <span class="material-symbols-outlined text-xl">arrow_back</span>
-                <span>Ana Sayfa</span>
+                <span>{{ lang.t('pricing.home') }}</span>
             </a>
             <div class="flex items-center gap-2">
+                <app-language-switcher></app-language-switcher>
                 <ng-container *ngIf="isLoggedIn">
                     <a routerLink="/dashboard" class="flex items-center gap-1.5 px-3.5 py-1.5 bg-primary text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm">
                         <span class="material-symbols-outlined text-base">dashboard</span>
-                        <span>Yönetim Paneli</span>
+                        <span>{{ lang.t('pricing.dashboard') }}</span>
                     </a>
                 </ng-container>
                 <ng-container *ngIf="!isLoggedIn">
                     <a routerLink="/login" [queryParams]="{ mode: 'register' }" class="px-3 py-1.5 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-300 hover:text-primary">
-                        Kayıt Ol
+                        {{ lang.t('pricing.register') }}
                     </a>
                     <a routerLink="/login" class="px-3.5 py-1.5 bg-primary text-white rounded-lg text-xs sm:text-sm font-semibold hover:bg-blue-700 transition-colors shadow-sm">
-                        Giriş Yap
+                        {{ lang.t('pricing.login') }}
                     </a>
                 </ng-container>
             </div>
@@ -27,13 +28,13 @@
         <!-- Header -->
         <div class="text-center max-w-3xl mx-auto space-y-2 mb-2">
             <span class="px-3 py-1 rounded-full bg-primary/10 text-primary dark:bg-blue-950 dark:text-blue-400 text-xs font-bold uppercase tracking-wider">
-                ABONELİK & ÜCRETLENDİRME
+                {{ lang.t('pricing.eyebrow') }}
             </span>
             <h1 class="text-2xl sm:text-3xl font-black text-slate-900 dark:text-white tracking-tight">
-                İhtiyacınıza Uygun Planı Seçin
+                {{ lang.t('pricing.title') }}
             </h1>
             <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
-                Odivon FaturaPro ile dijital fatura kesim süreçlerinizi hızlandırın. İstediğiniz zaman paketinizi değiştirebilir veya iptal edebilirsiniz.
+                {{ lang.t('pricing.subtitle') }}
             </p>
         </div>
 
@@ -44,13 +45,13 @@
                     <span class="material-symbols-outlined text-2xl text-amber-300">workspace_premium</span>
                 </div>
                 <div>
-                    <p class="text-xs uppercase font-bold tracking-wider text-blue-200">MEVCUT AKTİF PLANINIZ</p>
-                    <h3 class="text-lg sm:text-xl font-bold uppercase">{{ currentPlan }} PAKETİ</h3>
+                    <p class="text-xs uppercase font-bold tracking-wider text-blue-200">{{ lang.t('pricing.currentPlanLabel') }}</p>
+                    <h3 class="text-lg sm:text-xl font-bold uppercase">{{ lang.t('pricing.planSuffix', { plan: currentPlan }) }}</h3>
                 </div>
             </div>
             <div class="text-right">
                 <span class="inline-block px-3.5 py-1.5 bg-white/20 backdrop-blur rounded-lg text-xs sm:text-sm font-semibold">
-                    Sınırsız Fatura & Proforma Erişimi Aktif
+                    {{ lang.t('pricing.accessActive') }}
                 </span>
             </div>
         </div>
@@ -75,7 +76,7 @@
 
                     <!-- Features List -->
                     <div class="space-y-2.5 mb-6 border-t border-slate-100 dark:border-slate-800 pt-5">
-                        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">DAHİL OLAN ÖZELLİKLER</p>
+                        <p class="text-[11px] font-bold uppercase tracking-wider text-slate-400">{{ lang.t('pricing.included') }}</p>
                         <div *ngFor="let feat of plan.features" class="flex items-center gap-2.5 text-xs sm:text-sm text-slate-700 dark:text-slate-200">
                             <span class="material-symbols-outlined text-emerald-500 text-[18px]">check_circle</span>
                             <span>{{ feat }}</span>
@@ -92,7 +93,7 @@
                 <button (click)="selectPlan($any(plan.id))" [disabled]="isUpdating"
                     [class]="'w-full py-2.5 sm:py-3 rounded-xl font-bold transition-all text-xs sm:text-sm flex items-center justify-center gap-2 min-h-[40px] ' + (currentPlan === plan.id ? 'bg-emerald-600 text-white cursor-default' : plan.btnClass)">
                     <span *ngIf="currentPlan === plan.id" class="material-symbols-outlined text-[18px]">done</span>
-                    <span>{{ currentPlan === plan.id ? 'Mevcut Planınız' : 'Bu Plana Geç' }}</span>
+                    <span>{{ currentPlan === plan.id ? lang.t('pricing.yourPlan') : lang.t('pricing.switchPlan') }}</span>
                 </button>
             </div>
         </div>
@@ -109,9 +110,9 @@
                     </div>
                     <div>
                         <h3 class="text-base sm:text-lg font-bold text-slate-900 dark:text-white">
-                            {{ targetPlan?.name }} Yükseltme
+                            {{ lang.t('pricing.upgradeTitle', { plan: targetPlan?.name }) }}
                         </h3>
-                        <p class="text-xs text-slate-500">Abonelik & Ödeme Aktivasyonu</p>
+                        <p class="text-xs text-slate-500">{{ lang.t('pricing.upgradeSubtitle') }}</p>
                     </div>
                 </div>
                 <button (click)="showUpgradeModal = false" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 p-1 rounded-lg">
@@ -123,21 +124,21 @@
             <div class="p-6 space-y-5">
                 <div class="flex items-baseline justify-between p-4 rounded-xl bg-slate-50 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700">
                     <div>
-                        <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">Abonelik Tutarı</div>
-                        <div class="text-xs text-slate-500 mt-0.5">Aylık faturalandırılır (KDV Dahil)</div>
+                        <div class="text-xs text-slate-400 uppercase font-bold tracking-wider">{{ lang.t('pricing.amount') }}</div>
+                        <div class="text-xs text-slate-500 mt-0.5">{{ lang.t('pricing.billedMonthly') }}</div>
                     </div>
                     <div class="text-2xl font-black text-slate-900 dark:text-white">
-                        {{ targetPlan?.price }} <span class="text-xs text-slate-400 font-normal">/ay</span>
+                        {{ targetPlan?.price }} <span class="text-xs text-slate-400 font-normal">{{ lang.t('pricing.perMonth') }}</span>
                     </div>
                 </div>
 
                 <div class="p-4 rounded-xl bg-blue-50 dark:bg-blue-950/40 border border-blue-200 dark:border-blue-900 text-xs text-blue-800 dark:text-blue-300 space-y-2">
                     <div class="flex items-center gap-2 font-bold">
                         <span class="material-symbols-outlined text-base">info</span>
-                        <span>Güvenli Kurumsal Ödeme</span>
+                        <span>{{ lang.t('pricing.securePayment') }}</span>
                     </div>
                     <p>
-                        Stripe ve İyzico online sanal POS altyapımız canlı onay aşamasındadır. FaturaPro kurumsal paket lisansınızı hemen başlatmak ve resmi e-arşiv faturanızı temin etmek için aşağıdaki kanallardan hemen ekibimize ulaşabilirsiniz.
+                        {{ lang.t('pricing.paymentInfo') }}
                     </p>
                 </div>
 
@@ -146,22 +147,22 @@
                     <button (click)="contactViaWhatsApp()"
                         class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
                         <span class="material-symbols-outlined text-lg">chat</span>
-                        WhatsApp İle Hemen Başlat & Bilgi Al
+                        {{ lang.t('pricing.whatsapp') }}
                     </button>
 
                     <button (click)="contactViaEmail()"
                         class="w-full py-3 px-4 bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-800 dark:text-slate-200 font-semibold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 transition-all">
                         <span class="material-symbols-outlined text-lg">mail</span>
-                        E-posta İle Lisanslama Talebi Gönder
+                        {{ lang.t('pricing.emailRequest') }}
                     </button>
                 </div>
 
                 <!-- Developer / Test Bypass -->
                 <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                    <span>Geliştirici / Test Erişimi:</span>
-                    <button (click)="applyPlanChange(targetPlan?.id)" [disabled]="isUpdating"
+                    <span>{{ lang.t('pricing.devAccess') }}</span>
+                    <button (click)="targetPlanId && applyPlanChange(targetPlanId)" [disabled]="isUpdating"
                         class="text-primary hover:underline font-medium text-xs bg-transparent border-0 cursor-pointer">
-                        🧪 Test Modunda Şimdi Aktif Et
+                        {{ lang.t('pricing.testActivate') }}
                     </button>
                 </div>
             </div>

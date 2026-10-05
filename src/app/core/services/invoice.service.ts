@@ -5,12 +5,14 @@ import { Auth } from '@angular/fire/auth';
 import { Invoice, InvoiceFormData, InvoiceItem } from '../models/invoice.model';
 import { Observable, map, of, from, switchMap } from 'rxjs';
 
+import { LanguageService } from './language.service';
 @Injectable({
     providedIn: 'root'
 })
 export class InvoiceService {
     private platformId = inject(PLATFORM_ID);
     private injector = inject(Injector);
+    private lang = inject(LanguageService);
 
     // Lazy injection - sadece browser'da kullanılacak
     private _firestore: Firestore | null = null;
@@ -109,12 +111,12 @@ export class InvoiceService {
      */
     async createInvoice(data: InvoiceFormData): Promise<string> {
         if (!isPlatformBrowser(this.platformId) || !this.firestore || !this.auth) {
-            throw new Error('Bu işlem sadece tarayıcıda yapılabilir');
+            throw new Error(this.lang.t('err.browserOnly'));
         }
 
         await this.auth.authStateReady();
         const userId = this.auth.currentUser?.uid;
-        if (!userId) throw new Error('Kullanıcı giriş yapmamış');
+        if (!userId) throw new Error(this.lang.t('err.notLoggedIn'));
 
         const { subtotal, taxTotal, total } = this.calculateTotals(data);
         const invoicesCol = collection(this.firestore, 'invoices');

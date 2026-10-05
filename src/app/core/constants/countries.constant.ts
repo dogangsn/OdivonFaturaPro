@@ -1,6 +1,6 @@
 export interface TaxRateOption {
     rate: number;
-    label: string;
+    labelKey: string;
 }
 
 export interface CountryConfig {
@@ -28,10 +28,10 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'TRY',
         currencySymbol: '₺',
         rates: [
-            { rate: 20, label: '%20 (Standart KDV)' },
-            { rate: 10, label: '%10 (İndirimli - Gıda, Turizm, Tıp vb.)' },
-            { rate: 1, label: '%1 (Temel İhtiyaç / Tarım)' },
-            { rate: 0, label: '%0 (KDV Muafiyeti / İhracat)' }
+            { rate: 20, labelKey: 'rate.standardVat' },
+            { rate: 10, labelKey: 'rate.reducedFood' },
+            { rate: 1, labelKey: 'rate.basicNeeds' },
+            { rate: 0, labelKey: 'rate.exemptExport' }
         ]
     },
     {
@@ -45,8 +45,8 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'AED',
         currencySymbol: 'AED',
         rates: [
-            { rate: 5, label: '%5 (Standart VAT)' },
-            { rate: 0, label: '%0 (Sıfır Oran / Zero-Rated & Muaf)' }
+            { rate: 5, labelKey: 'rate.standardVat' },
+            { rate: 0, labelKey: 'rate.zeroExempt' }
         ]
     },
     {
@@ -60,9 +60,9 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'EUR',
         currencySymbol: '€',
         rates: [
-            { rate: 19, label: '%19 (Regelsteuersatz - Standart)' },
-            { rate: 7, label: '%7 (Ermäßigter Satz - İndirimli)' },
-            { rate: 0, label: '%0 (Steuerfrei - Muaf)' }
+            { rate: 19, labelKey: 'rate.standard' },
+            { rate: 7, labelKey: 'rate.reduced' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     },
     {
@@ -76,11 +76,11 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'EUR',
         currencySymbol: '€',
         rates: [
-            { rate: 20, label: '%20 (Taux Normal - Standart)' },
-            { rate: 10, label: '%10 (Taux Intermédiaire - Ara Oran)' },
-            { rate: 5.5, label: '%5.5 (Taux Réduit - İndirimli)' },
-            { rate: 2.1, label: '%2.1 (Taux Particulier - Özel)' },
-            { rate: 0, label: '%0 (Exonéré - Muaf)' }
+            { rate: 20, labelKey: 'rate.standard' },
+            { rate: 10, labelKey: 'rate.intermediate' },
+            { rate: 5.5, labelKey: 'rate.reduced' },
+            { rate: 2.1, labelKey: 'rate.special' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     },
     {
@@ -94,9 +94,9 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'GBP',
         currencySymbol: '£',
         rates: [
-            { rate: 20, label: '%20 (Standard Rate)' },
-            { rate: 5, label: '%5 (Reduced Rate)' },
-            { rate: 0, label: '%0 (Zero-Rated / Exempt)' }
+            { rate: 20, labelKey: 'rate.standard' },
+            { rate: 5, labelKey: 'rate.reduced' },
+            { rate: 0, labelKey: 'rate.zeroExempt' }
         ]
     },
     {
@@ -110,10 +110,10 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'EUR',
         currencySymbol: '€',
         rates: [
-            { rate: 21, label: '%21 (Tipo General - Standart)' },
-            { rate: 10, label: '%10 (Tipo Reducido - İndirimli)' },
-            { rate: 4, label: '%4 (Tipo Superreducido - Süper İndirimli)' },
-            { rate: 0, label: '%0 (Exento - Muaf)' }
+            { rate: 21, labelKey: 'rate.standard' },
+            { rate: 10, labelKey: 'rate.reduced' },
+            { rate: 4, labelKey: 'rate.superReduced' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     },
     {
@@ -127,11 +127,11 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'EUR',
         currencySymbol: '€',
         rates: [
-            { rate: 22, label: '%22 (Aliquota Ordinaria - Standart)' },
-            { rate: 10, label: '%10 (Aliquota Ridotta - İndirimli)' },
-            { rate: 5, label: '%5 (Aliquota Ridotta - Özel)' },
-            { rate: 4, label: '%4 (Aliquota Minima - Minimum)' },
-            { rate: 0, label: '%0 (Esente - Muaf)' }
+            { rate: 22, labelKey: 'rate.standard' },
+            { rate: 10, labelKey: 'rate.reduced' },
+            { rate: 5, labelKey: 'rate.special' },
+            { rate: 4, labelKey: 'rate.minimum' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     },
     {
@@ -145,9 +145,9 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'EUR',
         currencySymbol: '€',
         rates: [
-            { rate: 21, label: '%21 (Algemeen Tarief - Standart)' },
-            { rate: 9, label: '%9 (Verlaagd Tarief - İndirimli)' },
-            { rate: 0, label: '%0 (Vrijgesteld - Muaf)' }
+            { rate: 21, labelKey: 'rate.standard' },
+            { rate: 9, labelKey: 'rate.reduced' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     },
     {
@@ -161,8 +161,8 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'CAD',
         currencySymbol: 'CA$',
         rates: [
-            { rate: 5, label: '%5 (Federal GST)' },
-            { rate: 0, label: '%0 (Zero-Rated - Muaf)' }
+            { rate: 5, labelKey: 'rate.federalGst' },
+            { rate: 0, labelKey: 'rate.zeroExempt' }
         ]
     },
     {
@@ -176,11 +176,11 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'USD',
         currencySymbol: '$',
         rates: [
-            { rate: 0, label: '%0 (Vergisiz / Muaf)' },
-            { rate: 5, label: '%5 (Eyalet Ortalaması)' },
-            { rate: 6, label: '%6 (Eyalet Ortalaması)' },
-            { rate: 7, label: '%7 (Eyalet Ortalaması)' },
-            { rate: 8.875, label: '%8.875 (NYC Oranı)' }
+            { rate: 0, labelKey: 'rate.exempt' },
+            { rate: 5, labelKey: 'rate.stateAvg' },
+            { rate: 6, labelKey: 'rate.stateAvg' },
+            { rate: 7, labelKey: 'rate.stateAvg' },
+            { rate: 8.875, labelKey: 'rate.nyc' }
         ]
     },
     {
@@ -194,8 +194,8 @@ export const COUNTRIES_CONFIG: CountryConfig[] = [
         currency: 'AUD',
         currencySymbol: 'A$',
         rates: [
-            { rate: 10, label: '%10 (Standard GST)' },
-            { rate: 0, label: '%0 (GST-Free - Muaf)' }
+            { rate: 10, labelKey: 'rate.standardGst' },
+            { rate: 0, labelKey: 'rate.exempt' }
         ]
     }
 ];

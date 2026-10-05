@@ -4,6 +4,7 @@ import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDo
 import { Auth } from '@angular/fire/auth';
 import { Customer, CustomerFormData } from '../models/customer.model';
 import { Observable, map, of, from, switchMap } from 'rxjs';
+import { LanguageService } from './language.service';
 
 @Injectable({
     providedIn: 'root'
@@ -11,6 +12,7 @@ import { Observable, map, of, from, switchMap } from 'rxjs';
 export class CustomerService {
     private platformId = inject(PLATFORM_ID);
     private injector = inject(Injector);
+    private lang = inject(LanguageService);
 
     // Lazy injection - sadece browser'da kullanılacak
     private _firestore: Firestore | null = null;
@@ -101,12 +103,12 @@ export class CustomerService {
      */
     async addCustomer(data: CustomerFormData): Promise<string> {
         if (!isPlatformBrowser(this.platformId) || !this.firestore || !this.auth) {
-            throw new Error('Bu işlem sadece tarayıcıda yapılabilir');
+            throw new Error(this.lang.t('err.browserOnly'));
         }
 
         await this.auth.authStateReady();
         const userId = this.auth.currentUser?.uid;
-        if (!userId) throw new Error('Kullanıcı giriş yapmamış');
+        if (!userId) throw new Error(this.lang.t('err.notLoggedIn'));
 
         const customersCol = collection(this.firestore, 'customers');
 
@@ -208,7 +210,7 @@ export class CustomerService {
         const totalInvoiced = activeInvoices.reduce((s, i) => s + (i.total || 0), 0);
 
         let score = 15; // Taban başlangıç skoru (Güvenli)
-        let reason = 'Düzenli ödeme geçmişi, vadesi geçmiş borç bulunmuyor.';
+        let reason = this.lang.t('risk.reasonRegular');
 
         if (overdueAmount > 0) {
             const overdueRatio = totalInvoiced > 0 ? (overdueAmount / totalInvoiced) : 1;
@@ -218,7 +220,7 @@ export class CustomerService {
 
         if (customer.creditLimit && (customer.balance || 0) > customer.creditLimit) {
             score += 20;
-            reason = 'Belirlenen kredi limiti aşıldı.';
+            reason = this.lang.t('risk.reasonCreditLimit');
         }
 
         score = Math.min(100, Math.max(0, score));
@@ -226,10 +228,10 @@ export class CustomerService {
         let level: 'low' | 'medium' | 'high' = 'low';
         if (score >= 70) {
             level = 'high';
-            reason = `Kritik Risk: ₺${overdueAmount.toLocaleString('tr-TR', { minimumFractionDigits: 2 })} vadesi geçmiş alacak mevcut.`;
+            reason = this.lang.t('risk.reasonCritical', { amount: '₺' + overdueAmount.toLocaleString(this.lang.locale, { minimumFractionDigits: 2 }) });
         } else if (score >= 40) {
             level = 'medium';
-            reason = `Orta Risk: ${overdueInvoices.length} adet faturada gecikme yaşanmış.`;
+            reason = this.lang.t('risk.reasonMedium', { count: overdueInvoices.length });
         }
 
         return { score, level, reason };

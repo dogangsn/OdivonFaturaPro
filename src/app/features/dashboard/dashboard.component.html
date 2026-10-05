@@ -2,8 +2,8 @@
     <!-- Header -->
     <div class="flex flex-col md:flex-row items-start md:items-center justify-between gap-4">
         <div>
-            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Hoş Geldiniz, {{ userName }}! 👋</h1>
-            <p class="text-slate-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">{{ currentDate | date:'d MMMM yyyy, EEEE':'':'tr' }}</p>
+            <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{{ lang.t('dashboard.greeting', { name: userName }) }}</h1>
+            <p class="text-slate-500 dark:text-slate-400 mt-1 text-xs sm:text-sm">{{ currentDate | date:'d MMMM yyyy, EEEE':'':lang.locale }}</p>
         </div>
         <div class="flex flex-wrap items-center gap-2 sm:gap-3 w-full md:w-auto">
             <!-- Kullanıcı Bilgisi -->
@@ -20,7 +20,7 @@
             <button routerLink="/create-invoice"
                 class="bg-primary text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-primary/25 flex items-center justify-center gap-2 text-xs sm:text-sm shrink-0">
                 <span class="material-symbols-outlined text-[18px]">add</span>
-                Yeni Fatura Kes
+                {{ lang.t('dashboard.newInvoiceCta') }}
             </button>
         </div>
     </div>
@@ -29,10 +29,10 @@
     <!-- Quick Actions (Hızlı Kısayollar) Bar -->
     <div class="bg-white dark:bg-slate-900 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm">
         <div class="flex items-center justify-between mb-3">
-            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">HIZLI İŞLEMLER & KISAYOLLAR</h2>
+            <h2 class="text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500">{{ lang.t('dashboard.quickActions') }}</h2>
             <span class="inline-flex items-center gap-1 text-[11px] font-bold text-indigo-600 dark:text-indigo-400">
                 <span class="material-symbols-outlined text-[14px]">bolt</span>
-                Yapay Zeka Destekli
+                {{ lang.t('dashboard.aiPowered') }}
             </span>
         </div>
         <div class="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3">
@@ -40,56 +40,56 @@
             <a routerLink="/expenses"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-gradient-to-b from-indigo-50/80 to-purple-50/80 dark:from-indigo-950/40 dark:to-purple-950/40 hover:shadow-md border border-indigo-200/60 dark:border-indigo-800/60 text-slate-800 dark:text-slate-100 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-indigo-600 dark:text-indigo-400 mb-1.5 group-hover:scale-110 transition-transform">document_scanner</span>
-                <span class="text-xs font-bold text-center">AI Fiş Tara</span>
+                <span class="text-xs font-bold text-center">{{ lang.t('dashboard.qaScan') }}</span>
             </a>
 
             <!-- Gider Ekle -->
             <a routerLink="/expenses"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-rose-50 dark:hover:bg-rose-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-rose-600 dark:text-rose-400 mb-1.5 group-hover:scale-110 transition-transform">payments</span>
-                <span class="text-xs font-semibold">Gider Ekle</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaExpense') }}</span>
             </a>
 
             <!-- Satış Faturası -->
             <a routerLink="/create-invoice" [queryParams]="{ type: 'commercial' }"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-primary/10 dark:hover:bg-primary/20 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-primary mb-1.5 group-hover:scale-110 transition-transform">post_add</span>
-                <span class="text-xs font-semibold">Satış Faturası</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaSales') }}</span>
             </a>
 
             <!-- Proforma Fatura -->
             <a routerLink="/create-invoice" [queryParams]="{ type: 'proforma' }"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-purple-50 dark:hover:bg-purple-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-purple-600 dark:text-purple-400 mb-1.5 group-hover:scale-110 transition-transform">request_quote</span>
-                <span class="text-xs font-semibold">Proforma</span>
+                <span class="text-xs font-semibold">{{ lang.t('invoiceType.proforma') }}</span>
             </a>
 
             <!-- Müşteri Ekle -->
             <a routerLink="/customers"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-emerald-600 dark:text-emerald-400 mb-1.5 group-hover:scale-110 transition-transform">person_add</span>
-                <span class="text-xs font-semibold">Müşteri Ekle</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaCustomer') }}</span>
             </a>
 
             <!-- Raporlar -->
             <a routerLink="/reports"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-amber-50 dark:hover:bg-amber-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-amber-600 dark:text-amber-400 mb-1.5 group-hover:scale-110 transition-transform">analytics</span>
-                <span class="text-xs font-semibold">Raporlar</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaReports') }}</span>
             </a>
 
             <!-- Firma Ayarları -->
             <a routerLink="/settings"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-blue-50 dark:hover:bg-blue-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-blue-600 dark:text-blue-400 mb-1.5 group-hover:scale-110 transition-transform">settings</span>
-                <span class="text-xs font-semibold">Firma Ayar</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaSettings') }}</span>
             </a>
 
             <!-- Paket & Plan -->
             <a routerLink="/pricing"
                 class="flex flex-col items-center justify-center p-3 rounded-xl bg-slate-50 dark:bg-slate-800/60 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 border border-slate-200 dark:border-slate-700/60 text-slate-700 dark:text-slate-200 transition-all group">
                 <span class="material-symbols-outlined text-2xl text-indigo-600 dark:text-indigo-400 mb-1.5 group-hover:scale-110 transition-transform">workspace_premium</span>
-                <span class="text-xs font-semibold">Paket & Plan</span>
+                <span class="text-xs font-semibold">{{ lang.t('dashboard.qaPlan') }}</span>
             </a>
         </div>
     </div>
@@ -100,12 +100,12 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Toplam Kesilen Ciro</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ lang.t('dashboard.totalBilled') }}</p>
                     <p class="text-2xl font-black text-slate-900 dark:text-white mt-1">₺{{ stats.totalBilled | number:'1.2-2' }}</p>
                     <div class="flex items-center gap-1 mt-2">
                         <span class="material-symbols-outlined text-green-500 text-[16px]">trending_up</span>
                         <span class="text-xs font-semibold text-green-500">+{{ stats.monthlyGrowth }}%</span>
-                        <span class="text-xs text-slate-400">aylık büyüme</span>
+                        <span class="text-xs text-slate-400">{{ lang.t('dashboard.monthlyGrowth') }}</span>
                     </div>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-blue-500 to-blue-700 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/30">
@@ -118,11 +118,11 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Toplam Giderler</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ lang.t('dashboard.totalExpenses') }}</p>
                     <p class="text-2xl font-black text-rose-600 dark:text-rose-400 mt-1">₺{{ stats.totalExpenses | number:'1.2-2' }}</p>
                     <div class="flex items-center gap-1 mt-2">
                         <a routerLink="/expenses" class="text-xs font-semibold text-rose-600 hover:underline flex items-center gap-0.5">
-                            <span>Giderleri İncele</span>
+                            <span>{{ lang.t('dashboard.reviewExpenses') }}</span>
                             <span class="material-symbols-outlined text-[14px]">arrow_forward</span>
                         </a>
                     </div>
@@ -137,11 +137,11 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Net Finansal Durum</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ lang.t('dashboard.netPosition') }}</p>
                     <p [class]="'text-2xl font-black mt-1 ' + (stats.netBalance >= 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-rose-600')">
                         ₺{{ stats.netBalance | number:'1.2-2' }}
                     </p>
-                    <p class="text-xs text-slate-400 mt-2">Gelir - Gider Farkı</p>
+                    <p class="text-xs text-slate-400 mt-2">{{ lang.t('dashboard.incomeMinusExpense') }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-emerald-500 to-teal-600 rounded-2xl flex items-center justify-center shadow-lg shadow-emerald-500/30">
                     <span class="material-symbols-outlined text-white text-2xl">monitoring</span>
@@ -153,9 +153,9 @@
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-5 border border-slate-200 dark:border-slate-800 shadow-sm hover:shadow-md transition-all">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">Tahsil Edilen (Ödenen)</p>
+                    <p class="text-xs font-bold uppercase tracking-wider text-slate-400">{{ lang.t('dashboard.collected') }}</p>
                     <p class="text-2xl font-black text-indigo-600 dark:text-indigo-400 mt-1">₺{{ stats.totalRevenue | number:'1.2-2' }}</p>
-                    <p class="text-xs text-slate-400 mt-2">{{ stats.paidInvoices }} adet ödenmiş fatura</p>
+                    <p class="text-xs text-slate-400 mt-2">{{ lang.t('dashboard.paidInvoicesCount', { count: stats.paidInvoices }) }}</p>
                 </div>
                 <div class="w-12 h-12 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-2xl flex items-center justify-center shadow-lg shadow-indigo-500/30">
                     <span class="material-symbols-outlined text-white text-2xl">price_check</span>
@@ -171,30 +171,30 @@
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-blue-700 dark:text-blue-400 flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[18px]">receipt_long</span>
-                    KDV Dengesi & Durumu
+                    {{ lang.t('dashboard.vatBalance') }}
                 </span>
                 <span [class]="'px-2 py-0.5 rounded-full text-[10px] font-bold ' + (stats.netVatPayable > 0 ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/60 dark:text-amber-300' : 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/60 dark:text-emerald-300')">
-                    {{ stats.netVatPayable > 0 ? 'Ödenecek KDV' : 'Devreden KDV' }}
+                    {{ stats.netVatPayable > 0 ? lang.t('dashboard.vatPayable') : lang.t('dashboard.vatCarried') }}
                 </span>
             </div>
             <div class="space-y-2 text-xs">
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Hesaplanan Satış KDV:</span>
+                    <span>{{ lang.t('dashboard.salesVat') }}</span>
                     <span class="font-bold text-slate-900 dark:text-white">₺{{ stats.salesVat | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>İndirilecek Gider KDV:</span>
+                    <span>{{ lang.t('dashboard.expenseVat') }}</span>
                     <span class="font-bold text-slate-900 dark:text-white">₺{{ stats.expenseVat | number:'1.2-2' }}</span>
                 </div>
                 <div class="pt-2 border-t border-blue-200 dark:border-indigo-800 flex justify-between items-center text-sm font-black">
-                    <span class="text-slate-800 dark:text-slate-200">Net Durum:</span>
+                    <span class="text-slate-800 dark:text-slate-200">{{ lang.t('dashboard.netStatus') }}</span>
                     <span [class]="stats.netVatPayable > 0 ? 'text-amber-600 dark:text-amber-400' : 'text-emerald-600 dark:text-emerald-400'">
                         ₺{{ (stats.netVatPayable > 0 ? stats.netVatPayable : -stats.netVatPayable) | number:'1.2-2' }}
                     </span>
                 </div>
             </div>
             <p class="text-[11px] text-slate-500 dark:text-slate-400 mt-3">
-                {{ stats.netVatPayable > 0 ? 'Bu ay devlete ödenecek tahmini KDV yükümlülüğünüz bulunmaktadır.' : 'Gider KDV tutarınız yüksek, sonraki döneme devreden KDV oluşmuştur.' }}
+                {{ stats.netVatPayable > 0 ? lang.t('dashboard.vatPayableHint') : lang.t('dashboard.vatCarriedHint') }}
             </p>
         </div>
 
@@ -203,22 +203,22 @@
             <div class="flex items-center justify-between mb-3">
                 <span class="text-xs font-bold uppercase tracking-wider text-rose-700 dark:text-rose-400 flex items-center gap-1.5">
                     <span class="material-symbols-outlined text-[18px]">schedule</span>
-                    Vade & Geciken Alacaklar
+                    {{ lang.t('dashboard.overdueTitle') }}
                 </span>
                 <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-100 dark:bg-rose-950/60 text-rose-800 dark:text-rose-300">
-                    {{ stats.overdueCount }} Fatura Gecikti
+                    {{ lang.t('dashboard.overdueCount', { count: stats.overdueCount }) }}
                 </span>
             </div>
             <div class="space-y-1">
-                <p class="text-xs text-slate-500 dark:text-slate-400">Geciken Toplam Tahsilat:</p>
+                <p class="text-xs text-slate-500 dark:text-slate-400">{{ lang.t('dashboard.overdueAmount') }}</p>
                 <p class="text-2xl font-black text-rose-600 dark:text-rose-400">₺{{ stats.overdueAmount | number:'1.2-2' }}</p>
             </div>
             <div class="mt-3 pt-3 border-t border-rose-200 dark:border-rose-900/60 flex items-center justify-between">
                 <a routerLink="/invoices" class="text-xs font-bold text-rose-600 dark:text-rose-400 hover:underline flex items-center gap-1">
-                    <span>Vadesi Geçenleri Listele</span>
+                    <span>{{ lang.t('dashboard.listOverdue') }}</span>
                     <span class="material-symbols-outlined text-[15px]">arrow_forward</span>
                 </a>
-                <span class="text-[10px] text-slate-400">WhatsApp Hatırlatıcılı</span>
+                <span class="text-[10px] text-slate-400">{{ lang.t('dashboard.whatsappReminders') }}</span>
             </div>
         </div>
 
@@ -228,21 +228,21 @@
                 <div class="flex items-center justify-between mb-2">
                     <span class="text-xs font-bold uppercase tracking-wider text-purple-700 dark:text-purple-300 flex items-center gap-1.5">
                         <span class="material-symbols-outlined text-[18px]">smart_toy</span>
-                        FaturaPro AI Danışmanı
+                        {{ lang.t('dashboard.aiAdvisor') }}
                     </span>
                     <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-purple-100 dark:bg-purple-950 text-purple-700 dark:text-purple-300 animate-pulse">
-                        CANLI
+                        {{ lang.t('dashboard.live') }}
                     </span>
                 </div>
-                <h3 class="text-sm font-bold text-slate-900 dark:text-white">Nakit Akışı &amp; Cari Risk Analizi</h3>
+                <h3 class="text-sm font-bold text-slate-900 dark:text-white">{{ lang.t('dashboard.cashFlowTitle') }}</h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400 mt-1 leading-relaxed">
-                    Yapay zeka motorumuz borç/alacak dengenizi, riskli carilerinizi ve KDV optimizasyonunuzu analiz etti.
+                    {{ lang.t('dashboard.cashFlowDesc') }}
                 </p>
             </div>
             <div class="mt-3">
                 <a routerLink="/ai-assistant"
                     class="w-full inline-flex items-center justify-center gap-2 bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white px-4 py-2 rounded-xl text-xs font-bold shadow-md shadow-purple-500/20 transition-all">
-                    <span>AI Danışmanına Sor &amp; Raporu Aç</span>
+                    <span>{{ lang.t('dashboard.askAdvisor') }}</span>
                     <span class="material-symbols-outlined text-[16px]">chat</span>
                 </a>
             </div>
@@ -255,8 +255,8 @@
         <div class="lg:col-span-2 bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm">
             <div class="flex items-center justify-between mb-6">
                 <div>
-                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">Aylık Ciro Grafiği</h2>
-                    <p class="text-xs text-slate-400">Aylık toplam faturayla kesilen tutar analizi</p>
+                    <h2 class="text-lg font-bold text-slate-900 dark:text-white">{{ lang.t('dashboard.monthlyChart') }}</h2>
+                    <p class="text-xs text-slate-400">{{ lang.t('dashboard.monthlyChartHint') }}</p>
                 </div>
                 <span class="px-3 py-1 bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 rounded-full text-xs font-semibold">2026</span>
             </div>
@@ -268,8 +268,8 @@
         <!-- Top Customers Card -->
         <div class="bg-white dark:bg-slate-900 rounded-2xl p-6 border border-slate-200 dark:border-slate-800 shadow-sm flex flex-col justify-between">
             <div>
-                <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">En Çok Satış Yapılan Müşteriler</h2>
-                <p class="text-xs text-slate-400 mb-4">Ciro hacmine göre sıralı</p>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-1">{{ lang.t('dashboard.topCustomers') }}</h2>
+                <p class="text-xs text-slate-400 mb-4">{{ lang.t('dashboard.topCustomersHint') }}</p>
 
                 <div class="space-y-4">
                     <div *ngFor="let cust of topCustomers" class="flex items-center justify-between p-3 bg-slate-50 dark:bg-slate-800/50 rounded-xl">
@@ -279,20 +279,20 @@
                             </div>
                             <div>
                                 <p class="text-xs font-bold text-slate-900 dark:text-white">{{ cust.name }}</p>
-                                <p class="text-[10px] text-slate-400">{{ cust.invoiceCount }} fatura</p>
+                                <p class="text-[10px] text-slate-400">{{ lang.t('dashboard.invoiceCount', { count: cust.invoiceCount }) }}</p>
                             </div>
                         </div>
                         <span class="text-xs font-bold text-slate-900 dark:text-white">₺{{ cust.totalAmount | number:'1.0-0' }}</span>
                     </div>
 
                     <div *ngIf="topCustomers.length === 0" class="text-center py-6 text-slate-400 text-xs">
-                        Henüz müşteri satış verisi yok.
+                        {{ lang.t('dashboard.noCustomerSales') }}
                     </div>
                 </div>
             </div>
 
             <a routerLink="/customers" class="mt-4 w-full py-2 text-center text-xs font-semibold text-primary dark:text-blue-400 hover:underline">
-                Müşterileri Yönet →
+                {{ lang.t('dashboard.manageCustomers') }}
             </a>
         </div>
     </div>
@@ -301,11 +301,11 @@
     <div class="bg-white dark:bg-slate-900 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-sm overflow-hidden">
         <div class="p-5 border-b border-slate-100 dark:border-slate-800 flex items-center justify-between">
             <div>
-                <h2 class="text-lg font-bold text-slate-900 dark:text-white">Son Eklenen Faturalar</h2>
-                <p class="text-xs text-slate-400">Son kesilen fatura ve proforma kayıtları</p>
+                <h2 class="text-lg font-bold text-slate-900 dark:text-white">{{ lang.t('dashboard.recentInvoices') }}</h2>
+                <p class="text-xs text-slate-400">{{ lang.t('dashboard.recentInvoicesHint') }}</p>
             </div>
             <a routerLink="/invoices" class="text-sm font-semibold text-primary dark:text-blue-400 hover:underline flex items-center gap-1">
-                Tümünü Gör
+                {{ lang.t('common.viewAll') }}
                 <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
             </a>
         </div>
@@ -314,12 +314,12 @@
             <table class="w-full text-left text-sm">
                 <thead class="bg-slate-50 dark:bg-slate-800/80 text-xs uppercase text-slate-500 dark:text-slate-400">
                     <tr>
-                        <th class="px-6 py-3.5 font-semibold">Fatura No</th>
-                        <th class="px-6 py-3.5 font-semibold">Tür</th>
-                        <th class="px-6 py-3.5 font-semibold">Müşteri</th>
-                        <th class="px-6 py-3.5 font-semibold">Tarih</th>
-                        <th class="px-6 py-3.5 font-semibold text-right">Tutar</th>
-                        <th class="px-6 py-3.5 font-semibold">Durum</th>
+                        <th class="px-6 py-3.5 font-semibold">{{ lang.t('table.invoiceNo') }}</th>
+                        <th class="px-6 py-3.5 font-semibold">{{ lang.t('table.type') }}</th>
+                        <th class="px-6 py-3.5 font-semibold">{{ lang.t('table.customer') }}</th>
+                        <th class="px-6 py-3.5 font-semibold">{{ lang.t('table.date') }}</th>
+                        <th class="px-6 py-3.5 font-semibold text-right">{{ lang.t('table.amount') }}</th>
+                        <th class="px-6 py-3.5 font-semibold">{{ lang.t('table.status') }}</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100 dark:divide-slate-800">
@@ -327,7 +327,7 @@
                         <td class="px-6 py-4 font-semibold text-slate-900 dark:text-white">{{ invoice.invoiceNo }}</td>
                         <td class="px-6 py-4">
                             <span [class]="'px-2 py-0.5 rounded text-[11px] font-bold uppercase ' + (invoice.invoiceType === 'proforma' ? 'bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300')">
-                                {{ invoice.invoiceType === 'proforma' ? 'Proforma' : 'Satış' }}
+                                {{ invoice.invoiceType === 'proforma' ? lang.t('invoiceType.proforma') : lang.t('invoiceType.sales') }}
                             </span>
                         </td>
                         <td class="px-6 py-4 font-medium text-slate-700 dark:text-slate-300">{{ invoice.customerName }}</td>
@@ -340,7 +340,7 @@
                         </td>
                     </tr>
                     <tr *ngIf="recentInvoices.length === 0">
-                        <td colspan="6" class="px-6 py-8 text-center text-slate-400">Henüz fatura eklenmedi.</td>
+                        <td colspan="6" class="px-6 py-8 text-center text-slate-400">{{ lang.t('dashboard.noInvoices') }}</td>
                     </tr>
                 </tbody>
             </table>
@@ -353,7 +353,7 @@
                     <div class="flex items-center gap-2">
                         <span class="font-bold text-slate-900 dark:text-white text-sm">{{ invoice.invoiceNo }}</span>
                         <span [class]="'px-2 py-0.5 rounded text-[10px] font-bold uppercase ' + (invoice.invoiceType === 'proforma' ? 'bg-purple-100 dark:bg-purple-950/50 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-300')">
-                            {{ invoice.invoiceType === 'proforma' ? 'Proforma' : 'Satış' }}
+                            {{ invoice.invoiceType === 'proforma' ? lang.t('invoiceType.proforma') : lang.t('invoiceType.sales') }}
                         </span>
                     </div>
                     <span [class]="'px-2 py-0.5 rounded-full text-xs font-semibold ' + getStatusClass(invoice.status)">
@@ -365,11 +365,11 @@
                     <span class="font-bold text-slate-900 dark:text-white text-sm">₺{{ invoice.amount | number:'1.2-2' }}</span>
                 </div>
                 <div class="text-[11px] text-slate-400">
-                    Tarih: {{ invoice.date | date:'dd.MM.yyyy' }}
+                    {{ lang.t('common.dateLabel', { date: (invoice.date | date:'dd.MM.yyyy') }) }}
                 </div>
             </div>
             <div *ngIf="recentInvoices.length === 0" class="p-6 text-center text-slate-400 text-xs">
-                Henüz fatura eklenmedi.
+                {{ lang.t('dashboard.noInvoices') }}
             </div>
         </div>
     </div>

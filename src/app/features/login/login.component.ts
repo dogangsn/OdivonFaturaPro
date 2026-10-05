@@ -1,3 +1,4 @@
+import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router, ActivatedRoute } from '@angular/router';
@@ -9,7 +10,7 @@ import { LegalModalComponent, LegalDocType } from '../../shared/components/legal
 @Component({
     selector: 'app-login',
     standalone: true,
-    imports: [CommonModule, FormsModule, LegalModalComponent],
+    imports: [CommonModule, FormsModule, LegalModalComponent, LanguageSwitcherComponent],
     templateUrl: './login.component.html',
     styleUrl: './login.component.css'
 })
@@ -62,7 +63,7 @@ export class LoginComponent implements OnInit {
 
     async login() {
         if (!this.email || !this.password) {
-            this.errorMessage = 'Lütfen e-posta ve şifre giriniz.';
+            this.errorMessage = this.lang.t('auth.errEmailPassword');
             return;
         }
 
@@ -82,22 +83,22 @@ export class LoginComponent implements OnInit {
 
     async register() {
         if (!this.displayName.trim() || !this.email.trim() || !this.password) {
-            this.errorMessage = 'Lütfen ad, e-posta ve şifre alanlarını doldurunuz.';
+            this.errorMessage = this.lang.t('auth.errFillAll');
             return;
         }
 
         if (this.password.length < 6) {
-            this.errorMessage = 'Şifre en az 6 karakter uzunluğunda olmalıdır.';
+            this.errorMessage = this.lang.t('auth.errPasswordLength');
             return;
         }
 
         if (this.password !== this.confirmPassword) {
-            this.errorMessage = 'Girdiğiniz şifreler birbiriyle eşleşmiyor.';
+            this.errorMessage = this.lang.t('auth.errPasswordMismatch');
             return;
         }
 
         if (!this.acceptTerms) {
-            this.errorMessage = 'Kayıt olmak için lütfen Kullanım Şartları ve Gizlilik Politikasını onaylayınız.';
+            this.errorMessage = this.lang.t('auth.errAcceptTerms');
             return;
         }
 
@@ -135,7 +136,7 @@ export class LoginComponent implements OnInit {
 
     async forgotPassword() {
         if (!this.email) {
-            this.errorMessage = 'Şifre sıfırlama bağlantısı göndermek için e-posta adresinizi giriniz.';
+            this.errorMessage = this.lang.t('auth.errResetEmail');
             return;
         }
 
@@ -144,7 +145,7 @@ export class LoginComponent implements OnInit {
         this.successMessage = '';
         try {
             await this.authService.resetPassword(this.email.trim());
-            this.successMessage = 'Şifre sıfırlama bağlantısı e-posta adresinize gönderildi.';
+            this.successMessage = this.lang.t('auth.resetSent');
         } catch (error: any) {
             console.error('Reset password error:', error);
             this.errorMessage = this.getErrorMessage(error.code);
@@ -155,20 +156,20 @@ export class LoginComponent implements OnInit {
 
     private getErrorMessage(errorCode: string): string {
         const errorMessages: { [key: string]: string } = {
-            'auth/email-already-in-use': 'Bu e-posta adresi ile kayıtlı bir hesap zaten mevcut.',
-            'auth/weak-password': 'Şifre çok zayıf. Lütfen en az 6 karakterli bir şifre seçiniz.',
-            'auth/user-not-found': 'Bu e-posta adresi ile kayıtlı kullanıcı bulunamadı.',
-            'auth/wrong-password': 'Şifre hatalı. Lütfen tekrar deneyin.',
-            'auth/invalid-email': 'Geçersiz e-posta adresi biçimi.',
-            'auth/user-disabled': 'Bu hesap devre dışı bırakılmış.',
-            'auth/too-many-requests': 'Çok fazla başarısız deneme. Lütfen daha sonra tekrar deneyin.',
-            'auth/popup-closed-by-user': 'Giriş penceresi kapatıldı. Lütfen tekrar deneyin.',
-            'auth/cancelled-popup-request': 'Giriş işlemi iptal edildi.',
-            'auth/popup-blocked': 'Popup penceresi engellendi. Lütfen popup engelleyiciyi devre dışı bırakın.',
-            'auth/invalid-credential': 'Geçersiz kimlik bilgileri. Lütfen tekrar deneyin.',
-            'auth/operation-not-allowed': 'E-posta ile giriş sağlayıcısı henüz Firebase panelinde aktif edilmemiş. Lütfen Google ile giriş yapınız veya sistem yöneticisine danışınız.',
+            'auth/email-already-in-use': this.lang.t('auth.errEmailInUse'),
+            'auth/weak-password': this.lang.t('auth.errWeakPassword'),
+            'auth/user-not-found': this.lang.t('auth.errUserNotFound'),
+            'auth/wrong-password': this.lang.t('auth.errWrongPassword'),
+            'auth/invalid-email': this.lang.t('auth.errInvalidEmail'),
+            'auth/user-disabled': this.lang.t('auth.errUserDisabled'),
+            'auth/too-many-requests': this.lang.t('auth.errTooManyRequests'),
+            'auth/popup-closed-by-user': this.lang.t('auth.errPopupClosed'),
+            'auth/cancelled-popup-request': this.lang.t('auth.errPopupCancelled'),
+            'auth/popup-blocked': this.lang.t('auth.errPopupBlocked'),
+            'auth/invalid-credential': this.lang.t('auth.errInvalidCredential'),
+            'auth/operation-not-allowed': this.lang.t('auth.errOperationNotAllowed'),
         };
-        return errorMessages[errorCode] || 'İşlem sırasında bir hata oluştu. Lütfen tekrar deneyin.';
+        return errorMessages[errorCode] || this.lang.t('common.errGeneric');
     }
 }
 

@@ -9,11 +9,11 @@
                 <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
                     Odivon <span class="text-primary">FaturaPro AI</span>
                     <span class="rounded-full bg-gradient-to-r from-purple-600 to-indigo-600 px-2.5 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">
-                        Finans Danışmanı
+                        {{ lang.t('ai.badge') }}
                     </span>
                 </h1>
                 <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">
-                    Yapay zeka ile KDV dengesi, vade riskleri, cari mutabakat ve nakit akışı öngörüleri.
+                    {{ lang.t('ai.subtitle') }}
                 </p>
             </div>
         </div>
@@ -22,12 +22,12 @@
             <button (click)="loadHealthSummary()"
                 class="flex-1 sm:flex-none justify-center bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 px-3.5 sm:px-4 py-2 sm:py-2.5 rounded-xl font-semibold hover:bg-slate-100 dark:hover:bg-slate-700 transition-all flex items-center gap-2 text-xs sm:text-sm min-h-[40px]">
                 <span class="material-symbols-outlined text-[18px] sm:text-[20px]" [class.animate-spin]="isLoadingHealth">sync</span>
-                <span>Analizi Yenile</span>
+                <span>{{ lang.t('ai.refresh') }}</span>
             </button>
             <button (click)="navigateTo('/invoices')"
                 class="flex-1 sm:flex-none justify-center bg-primary text-white px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-all shadow-lg shadow-primary/25 flex items-center gap-2 text-xs sm:text-sm min-h-[40px]">
                 <span class="material-symbols-outlined text-[18px] sm:text-[20px]">receipt_long</span>
-                <span>Faturalara Git</span>
+                <span>{{ lang.t('ai.goInvoices') }}</span>
             </button>
         </div>
     </div>
@@ -37,7 +37,7 @@
         <!-- Card 1: KDV Durumu -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">KDV Durumu</span>
+                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{{ lang.t('ai.vatStatus') }}</span>
                 <div [class]="'flex h-9 w-9 items-center justify-center rounded-lg ' + (health?.isVatRefund ? 'bg-emerald-50 text-emerald-600 dark:bg-emerald-950/60 dark:text-emerald-400' : 'bg-amber-50 text-amber-600 dark:bg-amber-950/60 dark:text-amber-400')">
                     <span class="material-symbols-outlined text-[20px]">{{ health?.isVatRefund ? 'savings' : 'receipt' }}</span>
                 </div>
@@ -48,7 +48,7 @@
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs font-semibold" [class]="health?.isVatRefund ? 'text-emerald-600 dark:text-emerald-400' : 'text-amber-600 dark:text-amber-400'">
                     <span class="material-symbols-outlined text-[14px]">{{ health?.isVatRefund ? 'arrow_downward' : 'priority_high' }}</span>
-                    <span>{{ health?.isVatRefund ? 'Sonraki Aya Devreden KDV' : 'Tahmini Ödenecek KDV' }}</span>
+                    <span>{{ health?.isVatRefund ? lang.t('ai.vatCarry') : lang.t('ai.vatPayable') }}</span>
                 </div>
             </div>
         </div>
@@ -56,7 +56,7 @@
         <!-- Card 2: Vadesi Geçen Alacaklar -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Geciken Alacaklar</span>
+                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{{ lang.t('ai.overdue') }}</span>
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-rose-50 text-rose-600 dark:bg-rose-950/60 dark:text-rose-400">
                     <span class="material-symbols-outlined text-[20px]">alarm</span>
                 </div>
@@ -67,7 +67,7 @@
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-rose-600 dark:text-rose-400 font-semibold">
                     <span class="material-symbols-outlined text-[14px]">error</span>
-                    <span>{{ health?.overdueInvoicesCount || 0 }} adet faturada vade aşıldı</span>
+                    <span>{{ lang.t('ai.overdueCount', { n: health?.overdueInvoicesCount || 0 }) }}</span>
                 </div>
             </div>
         </div>
@@ -75,7 +75,7 @@
         <!-- Card 3: 30 Günlük Nakit Akışı Öngörüsü -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">30 Günlük Nakit Öngörüsü</span>
+                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{{ lang.t('ai.cashForecast') }}</span>
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-indigo-50 text-indigo-600 dark:bg-indigo-950/60 dark:text-indigo-400">
                     <span class="material-symbols-outlined text-[20px]">trending_up</span>
                 </div>
@@ -86,7 +86,7 @@
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
                     <span class="material-symbols-outlined text-[14px]">query_stats</span>
-                    <span>Tahmini net likidite dengesi</span>
+                    <span>{{ lang.t('ai.liquidity') }}</span>
                 </div>
             </div>
         </div>
@@ -94,18 +94,18 @@
         <!-- Card 4: Cari Risk Skoru -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">Riskli Cari Sayısı</span>
+                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{{ lang.t('ai.riskyCount') }}</span>
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary dark:bg-blue-950/60 dark:text-blue-400">
                     <span class="material-symbols-outlined text-[20px]">shield</span>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    {{ health?.highRiskCustomersCount || 0 }} <span class="text-xs font-semibold text-slate-400">müşteri</span>
+                    {{ health?.highRiskCustomersCount || 0 }} <span class="text-xs font-semibold text-slate-400">{{ lang.t('ai.customersUnit') }}</span>
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
                     <span class="material-symbols-outlined text-[14px] text-blue-500">verified_user</span>
-                    <span>Hızlı Mutabakat önerilir</span>
+                    <span>{{ lang.t('ai.reconcile') }}</span>
                 </div>
             </div>
         </div>
@@ -115,12 +115,12 @@
     <div *ngIf="health?.recommendations?.length" class="rounded-xl border border-indigo-200/80 dark:border-indigo-900/60 bg-gradient-to-r from-indigo-50/50 to-purple-50/50 dark:from-indigo-950/30 dark:to-purple-950/30 p-4 mb-6 shadow-sm space-y-2">
         <div class="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-indigo-700 dark:text-indigo-300">
             <span class="material-symbols-outlined text-[18px]">auto_awesome</span>
-            <span>FaturaPro AI Akıllı Finansal Önerileri</span>
+            <span>{{ lang.t('ai.recsTitle') }}</span>
         </div>
         <ul class="space-y-1.5 text-xs text-slate-700 dark:text-slate-300">
             <li *ngFor="let rec of health?.recommendations" class="flex items-start gap-2">
                 <span class="text-indigo-600 dark:text-indigo-400 mt-0.5">•</span>
-                <span>{{ rec }}</span>
+                <span>{{ lang.t(rec.key, rec.params) }}</span>
             </li>
         </ul>
     </div>
@@ -134,32 +134,32 @@
                     <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                     <span class="relative inline-flex rounded-full h-3 w-3 bg-emerald-500"></span>
                 </span>
-                <span class="font-bold text-sm text-slate-900 dark:text-white">Finansal Asistan ile Sohbet</span>
+                <span class="font-bold text-sm text-slate-900 dark:text-white">{{ lang.t('ai.chatTitle') }}</span>
             </div>
-            <span class="text-xs text-slate-400">Gerçek Zamanlı Muhasebe Analizi</span>
+            <span class="text-xs text-slate-400">{{ lang.t('ai.realtime') }}</span>
         </div>
 
         <!-- Quick Prompts Bar -->
         <div class="px-4 py-2.5 bg-slate-50/70 dark:bg-slate-800/40 border-b border-slate-100 dark:border-slate-800/80 flex items-center gap-2 overflow-x-auto scrollbar-none">
-            <button (click)="sendQuickPrompt('KDV durumum nedir? Bu dönem ne kadar vergi ödeyeceğim?')"
+            <button (click)="sendQuickPrompt(lang.t('ai.qVat'))"
                 class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                 <span class="material-symbols-outlined text-[15px] text-amber-500">receipt</span>
-                <span>KDV Durumu</span>
+                <span>{{ lang.t('ai.vatStatus') }}</span>
             </button>
-            <button (click)="sendQuickPrompt('Vadesi geçen alacaklarım neler? Kimlerden tahsilat yapmalıyım?')"
+            <button (click)="sendQuickPrompt(lang.t('ai.qOverdue'))"
                 class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                 <span class="material-symbols-outlined text-[15px] text-rose-500">alarm</span>
-                <span>Vadesi Geçenler</span>
+                <span>{{ lang.t('ai.chipOverdue') }}</span>
             </button>
-            <button (click)="sendQuickPrompt('Cari hesaplarımda en riskli müşteriler kimler?')"
+            <button (click)="sendQuickPrompt(lang.t('ai.qRisk'))"
                 class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                 <span class="material-symbols-outlined text-[15px] text-blue-500">shield</span>
-                <span>Riskli Cariler</span>
+                <span>{{ lang.t('ai.chipRisk') }}</span>
             </button>
-            <button (click)="sendQuickPrompt('Önümüzdeki 30 gün içinde nakit akışım nasıl görünüyor?')"
+            <button (click)="sendQuickPrompt(lang.t('ai.qCash'))"
                 class="shrink-0 inline-flex items-center gap-1.5 rounded-lg bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 px-3 py-1.5 text-xs font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 transition-colors">
                 <span class="material-symbols-outlined text-[15px] text-purple-500">trending_up</span>
-                <span>30 Günlük Nakit Öngörüsü</span>
+                <span>{{ lang.t('ai.cashForecast') }}</span>
             </button>
         </div>
 
@@ -175,7 +175,7 @@
                     (msg.sender === 'user' 
                         ? 'bg-primary text-white rounded-tr-none' 
                         : 'bg-slate-100 dark:bg-slate-800/80 text-slate-900 dark:text-slate-100 rounded-tl-none border border-slate-200/60 dark:border-slate-700/60')">
-                    <div class="whitespace-pre-wrap font-sans">{{ msg.text }}</div>
+                    <div class="whitespace-pre-wrap font-sans">{{ msg.textKey ? lang.t(msg.textKey) : msg.text }}</div>
                     <div class="mt-2 text-[10px] opacity-60 text-right">
                         {{ msg.timestamp | date:'HH:mm' }}
                     </div>
@@ -189,7 +189,7 @@
                 </div>
                 <div class="bg-slate-100 dark:bg-slate-800 rounded-2xl rounded-tl-none p-3 border border-slate-200 dark:border-slate-700 flex items-center gap-2 text-xs text-slate-500">
                     <span class="material-symbols-outlined text-[16px] animate-spin text-primary">progress_activity</span>
-                    <span>İşletme verileri analiz ediliyor...</span>
+                    <span>{{ lang.t('ai.thinking') }}</span>
                 </div>
             </div>
         </div>
@@ -197,11 +197,11 @@
         <!-- Chat Input Bar -->
         <div class="p-3 sm:p-4 border-t border-slate-100 dark:border-slate-800 bg-white dark:bg-slate-900">
             <form (ngSubmit)="sendMessage()" class="flex items-center gap-2">
-                <input type="text" [(ngModel)]="userQuery" name="userQuery" placeholder="Örn: Bu ay ne kadar KDV ödeyeceğim? veya Vadesi geçen faturalar neler?"
+                <input type="text" [(ngModel)]="userQuery" name="userQuery" [placeholder]="lang.t('ai.placeholder')"
                     class="flex-1 h-11 px-4 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
                 <button type="submit" [disabled]="!userQuery.trim() || isThinking"
                     class="h-11 px-5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 text-white font-semibold text-xs sm:text-sm hover:opacity-95 disabled:opacity-50 flex items-center justify-center gap-1.5 shadow-sm transition-all min-w-[90px]">
-                    <span>Gönder</span>
+                    <span>{{ lang.t('ai.send') }}</span>
                     <span class="material-symbols-outlined text-[18px]">send</span>
                 </button>
             </form>

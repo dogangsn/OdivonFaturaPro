@@ -1,4 +1,4 @@
-import { Component, inject, OnInit, AfterViewInit, ElementRef, ViewChild, PLATFORM_ID } from '@angular/core';
+import { Component, inject, OnInit, AfterViewInit, ElementRef, ViewChild, PLATFORM_ID, effect } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
@@ -103,12 +103,17 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         if (isPlatformBrowser(this.platformId)) {
             Chart.register(...registerables);
         }
+        // Re-label the charts when the user switches language.
+        effect(() => {
+            this.lang.currentLang();
+            this.translateCharts();
+        });
     }
 
     ngOnInit() {
         this.authService.user$.subscribe(user => {
             if (user) {
-                this.userName = user.displayName?.split(' ')[0] || 'Kullanıcı';
+                this.userName = user.displayName?.split(' ')[0] || this.lang.t('common.user');
                 this.userEmail = user.email || '';
             }
         });
@@ -302,6 +307,18 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         }));
     }
 
+    private translateCharts() {
+        if (this.revenueChart) {
+            this.revenueChart.data.labels = this.lang.monthNamesShort();
+            this.revenueChart.data.datasets[0].label = this.lang.t('dashboard.chartRevenue');
+            this.revenueChart.update();
+        }
+        if (this.statusChart) {
+            this.statusChart.data.labels = [this.lang.t('status.paid'), this.lang.t('status.pending'), this.lang.t('status.overdue')];
+            this.statusChart.update();
+        }
+    }
+
     private updateCharts() {
         if (this.revenueChart) {
             this.revenueChart.data.datasets[0].data = [...this.monthlyRevenueData];
@@ -330,9 +347,9 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.revenueChart = new Chart(ctx, {
             type: 'line',
             data: {
-                labels: ['Oca', 'Şub', 'Mar', 'Nis', 'May', 'Haz', 'Tem', 'Ağu', 'Eyl', 'Eki', 'Kas', 'Ara'],
+                labels: this.lang.monthNamesShort(),
                 datasets: [{
-                    label: 'Kesilen Ciro (₺)',
+                    label: this.lang.t('dashboard.chartRevenue'),
                     data: [...this.monthlyRevenueData],
                     borderColor: '#3b82f6',
                     backgroundColor: gradient,
@@ -393,7 +410,7 @@ export class DashboardComponent implements OnInit, AfterViewInit {
         this.statusChart = new Chart(ctx, {
             type: 'doughnut',
             data: {
-                labels: ['Ödendi', 'Bekliyor', 'Gecikmiş'],
+                labels: [this.lang.t('status.paid'), this.lang.t('status.pending'), this.lang.t('status.overdue')],
                 datasets: [{
                     data: [
                         this.statusCounts.paid,
@@ -443,12 +460,12 @@ export class DashboardComponent implements OnInit, AfterViewInit {
 
     getStatusText(status: string): string {
         const texts: Record<string, string> = {
-            'paid': 'Ödendi',
-            'pending': 'Bekliyor',
-            'sent': 'Gönderildi',
-            'overdue': 'Gecikmiş',
-            'draft': 'Taslak',
-            'cancelled': 'İptal'
+            'paid': this.lang.t('status.paid'),
+            'pending': this.lang.t('status.pending'),
+            'sent': this.lang.t('status.sent'),
+            'overdue': this.lang.t('status.overdue'),
+            'draft': this.lang.t('status.draft'),
+            'cancelled': this.lang.t('status.cancelled')
         };
         return texts[status] || status;
     }

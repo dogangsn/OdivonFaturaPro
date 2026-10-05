@@ -1,3 +1,4 @@
+import { LanguageSwitcherComponent } from '../../../shared/components/language-switcher/language-switcher.component';
 import { Component, Input, Output, EventEmitter, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
@@ -10,7 +11,7 @@ import { UserProfile } from '../../models/user.model';
 @Component({
     selector: 'app-sidebar',
     standalone: true,
-    imports: [CommonModule, RouterModule],
+    imports: [CommonModule, RouterModule, LanguageSwitcherComponent],
     templateUrl: './sidebar.component.html',
     styleUrl: './sidebar.component.css'
 })

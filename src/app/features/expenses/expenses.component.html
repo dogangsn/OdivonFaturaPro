@@ -6,7 +6,7 @@
                 {{ lang.t('expenses.title') }}
                 <span class="inline-flex items-center gap-1 rounded-full bg-purple-50 dark:bg-purple-950/60 border border-purple-200 dark:border-purple-800/60 px-2.5 py-0.5 text-[11px] font-semibold text-purple-700 dark:text-purple-300">
                     <span class="material-symbols-outlined text-[13px]">auto_awesome</span>
-                    <span>AI Destekli</span>
+                    <span>{{ lang.t('expenses.aiBadge') }}</span>
                 </span>
             </h1>
             <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">{{ lang.t('expenses.subtitle') }}</p>
@@ -51,7 +51,7 @@
                     {{ totalAmount | number:'1.2-2' }} <span class="text-xs font-semibold text-slate-400">TL</span>
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                    <span>Toplam kayıtlı gider</span>
+                    <span>{{ lang.t('expenses.totalRecorded') }}</span>
                 </div>
             </div>
         </div>
@@ -69,7 +69,7 @@
                     {{ thisMonthAmount | number:'1.2-2' }} <span class="text-xs font-semibold text-slate-400">TL</span>
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-indigo-600 dark:text-indigo-400 font-medium">
-                    <span>Cari ay harcamaları</span>
+                    <span>{{ lang.t('expenses.currentMonth') }}</span>
                 </div>
             </div>
         </div>
@@ -87,7 +87,7 @@
                     {{ totalTaxAmount | number:'1.2-2' }} <span class="text-xs font-semibold text-slate-400">TL</span>
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                    <span>İndirilecek KDV</span>
+                    <span>{{ lang.t('expenses.deductibleVat') }}</span>
                 </div>
             </div>
         </div>
@@ -95,17 +95,17 @@
         <!-- Card 4: Expense Count -->
         <div class="rounded-xl border border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 p-4 sm:p-5 shadow-sm">
             <div class="flex items-center justify-between">
-                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">İşlem Adedi</span>
+                <span class="text-xs sm:text-sm font-medium text-slate-500 dark:text-slate-400">{{ lang.t('expenses.txCount') }}</span>
                 <div class="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-50 text-primary dark:bg-blue-950/50 dark:text-blue-400">
                     <span class="material-symbols-outlined text-[20px]">list_alt</span>
                 </div>
             </div>
             <div class="mt-3">
                 <div class="text-xl sm:text-2xl font-bold tracking-tight text-slate-900 dark:text-white">
-                    {{ expenses.length }} <span class="text-xs font-semibold text-slate-400">belge</span>
+                    {{ expenses.length }} <span class="text-xs font-semibold text-slate-400">{{ lang.t('expenses.docs') }}</span>
                 </div>
                 <div class="mt-1 flex items-center gap-1 text-xs text-slate-500 dark:text-slate-400">
-                    <span>Toplam kayıt</span>
+                    <span>{{ lang.t('expenses.totalRecords') }}</span>
                 </div>
             </div>
         </div>
@@ -118,7 +118,7 @@
             <div class="relative flex-1 sm:max-w-md">
                 <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-[20px]">search</span>
                 <input type="text" [(ngModel)]="searchTerm" (ngModelChange)="applyFilters()"
-                    placeholder="Gider veya firma adı ile ara..."
+                    [placeholder]="lang.t('expenses.searchPlaceholder')"
                     class="h-10 w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white pl-10 pr-10 text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20 transition-all" />
                 <button *ngIf="searchTerm" (click)="searchTerm = ''; applyFilters()"
                     class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 p-1">
@@ -127,7 +127,7 @@
             </div>
 
             <div class="text-xs text-slate-500 dark:text-slate-400 sm:text-right">
-                Toplam <span class="font-semibold text-slate-900 dark:text-white">{{ filteredExpenses.length }}</span> kayıt gösteriliyor
+                {{ lang.t('expenses.showingCount', { count: filteredExpenses.length }) }}
             </div>
         </div>
 
@@ -151,7 +151,7 @@
                         ? 'bg-primary text-white shadow-sm' 
                         : 'bg-slate-50 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700')">
                 <span class="material-symbols-outlined text-[16px]">{{ cat.icon }}</span>
-                <span>{{ lang.lang === 'tr' ? cat.labelTr : cat.labelEn }}</span>
+                <span>{{ lang.t(cat.labelKey) }}</span>
             </button>
         </div>
     </div>
@@ -192,7 +192,7 @@
                         <td class="whitespace-nowrap px-3 py-3.5">
                             <span [class]="'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-xs font-semibold ' + getCategoryMeta(item.category).color">
                                 <span class="material-symbols-outlined text-[13px]">{{ getCategoryMeta(item.category).icon }}</span>
-                                <span>{{ lang.lang === 'tr' ? getCategoryMeta(item.category).labelTr : getCategoryMeta(item.category).labelEn }}</span>
+                                <span>{{ lang.t(getCategoryMeta(item.category).labelKey) }}</span>
                             </span>
                         </td>
 
@@ -207,13 +207,13 @@
                         <!-- Tax Amount -->
                         <td class="whitespace-nowrap px-3 py-3.5 text-right text-xs font-medium">
                             <span class="text-blue-600 dark:text-blue-400 font-semibold">{{ (item.taxAmount || 0) | number:'1.2-2' }} {{ item.currency || 'TL' }}</span>
-                            <span class="block text-[10px] text-slate-400 font-normal">%{{ item.taxRate !== undefined ? item.taxRate : 20 }} KDV</span>
+                            <span class="block text-[10px] text-slate-400 font-normal">{{ lang.t('expenses.taxRateLine', { rate: item.taxRate !== undefined ? item.taxRate : 20 }) }}</span>
                         </td>
 
                         <!-- Total Amount -->
                         <td class="whitespace-nowrap px-3 py-3.5 text-right">
                             <span class="font-extrabold text-slate-900 dark:text-white text-sm">{{ item.amount | number:'1.2-2' }} <span class="text-xs font-medium text-slate-400">{{ item.currency || 'TL' }}</span></span>
-                            <span class="block text-[10px] text-slate-400">Matrah: {{ (item.subtotal || (item.amount - (item.taxAmount || 0))) | number:'1.2-2' }}</span>
+                            <span class="block text-[10px] text-slate-400">{{ lang.t('expenses.netBaseValue', { amount: ((item.subtotal || (item.amount - (item.taxAmount || 0))) | number:'1.2-2') }) }}</span>
                         </td>
 
                         <!-- Receipt Thumbnail -->
@@ -221,7 +221,7 @@
                             <button *ngIf="item.receiptUrl" (click)="openReceiptPreview(item.receiptUrl)"
                                 class="inline-flex items-center gap-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2 py-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:bg-indigo-100 dark:hover:bg-indigo-900/60 transition-colors">
                                 <span class="material-symbols-outlined text-[15px]">attachment</span>
-                                <span>Görsel</span>
+                                <span>{{ lang.t('expenses.image') }}</span>
                             </button>
                             <span *ngIf="!item.receiptUrl" class="text-xs text-slate-300 dark:text-slate-600">-</span>
                         </td>
@@ -229,11 +229,11 @@
                         <!-- Actions -->
                         <td class="whitespace-nowrap py-3.5 pl-3 pr-6 text-right">
                             <div class="flex items-center justify-end gap-1">
-                                <button (click)="openEditModal(item)" title="Düzenle"
+                                <button (click)="openEditModal(item)" [title]="lang.t('common.editShort')"
                                     class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">edit</span>
                                 </button>
-                                <button (click)="deleteExpense(item.id)" title="Sil"
+                                <button (click)="deleteExpense(item.id)" [title]="lang.t('common.deleteShort')"
                                     class="p-1.5 text-slate-400 hover:text-red-600 dark:hover:text-red-400 rounded-lg hover:bg-red-50 dark:hover:bg-red-950/30 transition-colors">
                                     <span class="material-symbols-outlined text-[18px]">delete</span>
                                 </button>
@@ -252,7 +252,7 @@
                         <div class="flex items-center gap-2">
                             <span [class]="'inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-semibold ' + getCategoryMeta(item.category).color">
                                 <span class="material-symbols-outlined text-[13px]">{{ getCategoryMeta(item.category).icon }}</span>
-                                <span>{{ lang.lang === 'tr' ? getCategoryMeta(item.category).labelTr : getCategoryMeta(item.category).labelEn }}</span>
+                                <span>{{ lang.t(getCategoryMeta(item.category).labelKey) }}</span>
                             </span>
                             <span class="text-xs text-slate-400 dark:text-slate-500">
                                 {{ item.date | date:'dd.MM.yyyy' }}
@@ -271,7 +271,7 @@
                             {{ item.amount | number:'1.2-2' }} <span class="text-xs font-normal text-slate-400">{{ item.currency || 'TL' }}</span>
                         </div>
                         <div *ngIf="item.taxAmount" class="text-[11px] text-slate-400 dark:text-slate-500">
-                            KDV: {{ item.taxAmount | number:'1.2-2' }}
+                            {{ lang.t('doc.vat') }}: {{ item.taxAmount | number:'1.2-2' }}
                         </div>
                     </div>
                 </div>
@@ -286,7 +286,7 @@
                         <button *ngIf="item.receiptUrl" (click)="openReceiptPreview(item.receiptUrl)"
                             class="inline-flex items-center gap-1 rounded-md bg-indigo-50 dark:bg-indigo-950/50 px-2.5 py-1.5 font-semibold text-indigo-600 dark:text-indigo-400 min-h-[36px]">
                             <span class="material-symbols-outlined text-[16px]">image</span>
-                            <span>Fiş</span>
+                            <span>{{ lang.t('expenses.receiptShort') }}</span>
                         </button>
                         <button (click)="openEditModal(item)"
                             class="p-2 text-slate-500 hover:text-slate-700 dark:text-slate-400 dark:hover:text-slate-200 min-h-[36px] min-w-[36px] flex items-center justify-center">
@@ -310,18 +310,18 @@
                 {{ lang.t('expenses.noExpenses') }}
             </h3>
             <p class="mt-1 text-sm text-slate-500 dark:text-slate-400 max-w-sm mx-auto">
-                Fiş veya faturalarınızı yapay zeka ile otomatik tarayabilir veya elle gider kaydı oluşturabilirsiniz.
+                {{ lang.t('expenses.emptyHint') }}
             </p>
             <div class="mt-6 flex flex-wrap items-center justify-center gap-3">
                 <button (click)="openScannerModal()"
                     class="inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 px-4 py-2 text-xs sm:text-sm font-semibold text-white shadow-sm hover:opacity-95 min-h-[40px]">
                     <span class="material-symbols-outlined text-[18px]">document_scanner</span>
-                    <span>AI ile Fiş Tara</span>
+                    <span>{{ lang.t('expenses.scanAi') }}</span>
                 </button>
                 <button (click)="openAddModal()"
                     class="inline-flex items-center gap-2 rounded-xl border border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 text-xs sm:text-sm font-semibold text-slate-700 dark:text-slate-200 hover:bg-slate-50 dark:hover:bg-slate-700 min-h-[40px]">
                     <span class="material-symbols-outlined text-[18px]">add</span>
-                    <span>Manuel Ekle</span>
+                    <span>{{ lang.t('expenses.addManual') }}</span>
                 </button>
             </div>
         </div>
@@ -340,10 +340,10 @@
         <div class="flex items-center justify-between pb-4 border-b border-slate-100 dark:border-slate-800">
             <div>
                 <h3 class="text-lg font-bold text-slate-900 dark:text-white">
-                    {{ isEditing ? 'Gideri Düzenle' : lang.t('expenses.new') }}
+                    {{ isEditing ? lang.t('expenses.editTitle') : lang.t('expenses.new') }}
                 </h3>
                 <p class="text-xs text-slate-500 dark:text-slate-400">
-                    Firma, tutar ve vergi bilgilerini giriniz.
+                    {{ lang.t('expenses.formHint') }}
                 </p>
             </div>
             <button (click)="closeExpenseModal()" class="p-1.5 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg min-h-[40px] min-w-[40px] flex items-center justify-center">
@@ -357,28 +357,28 @@
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
                     {{ lang.t('expenses.merchant') }} *
                 </label>
-                <input type="text" formControlName="merchantName" placeholder="Örn: Shell, Migros, Turkcell, AWS"
+                <input type="text" formControlName="merchantName" [placeholder]="lang.t('expenses.merchantPlaceholder')"
                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary focus:outline-none min-h-[40px]" />
                 <span *ngIf="expenseForm.get('merchantName')?.touched && expenseForm.get('merchantName')?.invalid" class="text-xs text-red-500 mt-0.5 block">
-                    Firma adı zorunludur.
+                    {{ lang.t('expenses.merchantRequired') }}
                 </span>
             </div>
 
             <!-- KDV Dahil / Hariç Seçimi -->
             <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1.5">
-                    KDV Hesaplama Yöntemi
+                    {{ lang.t('expenses.vatMethod') }}
                 </label>
                 <div class="grid grid-cols-2 p-1 bg-slate-100 dark:bg-slate-800 rounded-xl border border-slate-200 dark:border-slate-700 text-xs font-bold">
                     <button type="button" (click)="setTaxInclusive(true)"
                         [class]="'py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ' + (isTaxInclusive ? 'bg-white dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white')">
                         <span class="material-symbols-outlined text-[16px]">check_circle</span>
-                        KDV Dahil (Brüt)
+                        {{ lang.t('expenses.vatInclusive') }}
                     </button>
                     <button type="button" (click)="setTaxInclusive(false)"
                         [class]="'py-2 px-3 rounded-lg flex items-center justify-center gap-1.5 transition-all ' + (!isTaxInclusive ? 'bg-white dark:bg-slate-700 text-primary dark:text-blue-400 shadow-sm font-black' : 'text-slate-500 hover:text-slate-800 dark:hover:text-white')">
                         <span class="material-symbols-outlined text-[16px]">add_circle</span>
-                        KDV Hariç (+KDV Ekle)
+                        {{ lang.t('expenses.vatExclusive') }}
                     </button>
                 </div>
             </div>
@@ -387,14 +387,14 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-                        {{ isTaxInclusive ? 'Tutar (KDV Dahil)' : 'Tutar (KDV Hariç Matrah)' }} *
+                        {{ isTaxInclusive ? lang.t('expenses.amountInclusive') : lang.t('expenses.amountExclusive') }} *
                     </label>
                     <input type="number" step="0.01" formControlName="amount" (input)="onAmountChange()" placeholder="0.00"
                         class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm font-bold text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary focus:outline-none min-h-[40px]" />
                 </div>
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-                        Para Birimi
+                        {{ lang.t('expenses.currency') }}
                     </label>
                     <select formControlName="currency"
                         class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-primary focus:outline-none min-h-[40px]">
@@ -410,14 +410,14 @@
             <div class="grid grid-cols-2 gap-3">
                 <div>
                     <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-                        KDV Oranı (%)
+                        {{ lang.t('expenses.vatRate') }}
                     </label>
                     <select formControlName="taxRate" (change)="onTaxRateChange()"
                         class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm font-semibold text-slate-900 dark:text-white focus:border-primary focus:outline-none min-h-[40px]">
-                        <option [value]="0">%0 (KDV Muaf)</option>
+                        <option [value]="0">{{ lang.t('expenses.vatExempt') }}</option>
                         <option [value]="1">%1</option>
                         <option [value]="10">%10</option>
-                        <option [value]="20">%20 (Standart)</option>
+                        <option [value]="20">{{ lang.t('expenses.vatStandard') }}</option>
                     </select>
                 </div>
                 <div>
@@ -432,15 +432,15 @@
             <!-- Canlı KDV ve Toplam Hesap Özeti Kutusu -->
             <div class="p-3.5 rounded-xl bg-gradient-to-r from-blue-50/70 via-indigo-50/50 to-purple-50/50 dark:from-slate-800/90 dark:via-indigo-950/40 dark:to-slate-800/90 border border-blue-200/70 dark:border-indigo-900/60 text-xs space-y-1.5">
                 <div class="flex justify-between text-slate-600 dark:text-slate-400">
-                    <span>Net Matrah (KDV Hariç):</span>
+                    <span>{{ lang.t('expenses.netBase') }}</span>
                     <span class="font-bold text-slate-900 dark:text-white">₺{{ computedSubtotal | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-blue-600 dark:text-blue-400 font-semibold">
-                    <span>Otomatik KDV (%{{ expenseForm.get('taxRate')?.value }}):</span>
+                    <span>{{ lang.t('expenses.autoVat', { rate: expenseForm.get('taxRate')?.value }) }}</span>
                     <span class="font-bold">₺{{ computedTaxAmount | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-sm font-black pt-1.5 border-t border-blue-200 dark:border-indigo-800 text-slate-900 dark:text-white">
-                    <span>Toplam Gider (KDV Dahil):</span>
+                    <span>{{ lang.t('expenses.totalInclusive') }}</span>
                     <span class="text-primary dark:text-blue-400 text-base">₺{{ computedTotalAmount | number:'1.2-2' }}</span>
                 </div>
             </div>
@@ -461,7 +461,7 @@
                     <select formControlName="category"
                         class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm font-medium text-slate-900 dark:text-white focus:border-primary focus:outline-none min-h-[40px]">
                         <option *ngFor="let cat of categories" [value]="cat.value">
-                            {{ lang.lang === 'tr' ? cat.labelTr : cat.labelEn }}
+                            {{ lang.t(cat.labelKey) }}
                         </option>
                     </select>
                 </div>
@@ -475,7 +475,7 @@
                 <select formControlName="paymentMethod"
                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2.5 text-sm text-slate-900 dark:text-white focus:border-primary focus:outline-none min-h-[40px]">
                     <option *ngFor="let pm of paymentMethods" [value]="pm.value">
-                        {{ lang.lang === 'tr' ? pm.labelTr : pm.labelEn }}
+                        {{ lang.t(pm.labelKey) }}
                     </option>
                 </select>
             </div>
@@ -483,9 +483,9 @@
             <!-- Description -->
             <div>
                 <label class="block text-xs font-semibold uppercase tracking-wider text-slate-600 dark:text-slate-400 mb-1">
-                    Açıklama / Kalem Detayları
+                    {{ lang.t('expenses.descDetails') }}
                 </label>
-                <textarea formControlName="description" rows="2" placeholder="Gider ile ilgili ek detaylar..."
+                <textarea formControlName="description" rows="2" [placeholder]="lang.t('expenses.descPlaceholder')"
                     class="w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-800/60 px-3.5 py-2 text-sm text-slate-900 dark:text-white placeholder-slate-400 focus:border-primary focus:outline-none"></textarea>
             </div>
 
@@ -497,8 +497,8 @@
                 <div *ngIf="expenseForm.get('receiptUrl')?.value" class="flex items-center gap-3 p-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800">
                     <img [src]="expenseForm.get('receiptUrl')?.value" class="h-12 w-12 rounded-lg object-cover border border-slate-300 dark:border-slate-600" />
                     <div class="flex-1 min-w-0">
-                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 block">✓ Fiş Görseli Eklendi</span>
-                        <span class="text-[11px] text-slate-400 block truncate">Fiş veya fatura görüntüsü ekli</span>
+                        <span class="text-xs font-semibold text-emerald-600 dark:text-emerald-400 block">{{ lang.t('expenses.receiptAdded') }}</span>
+                        <span class="text-[11px] text-slate-400 block truncate">{{ lang.t('expenses.receiptAttached') }}</span>
                     </div>
                     <button type="button" (click)="removeFormReceipt()" class="p-1 text-red-500 hover:text-red-700 min-h-[36px] min-w-[36px] flex items-center justify-center">
                         <span class="material-symbols-outlined text-[20px]">delete</span>
@@ -510,7 +510,7 @@
                     <label for="receiptFileInput"
                         class="flex items-center justify-center gap-2 w-full rounded-xl border border-dashed border-slate-300 dark:border-slate-700 p-3 text-xs font-medium text-slate-600 dark:text-slate-400 hover:bg-slate-50 dark:hover:bg-slate-800 cursor-pointer transition-colors min-h-[40px]">
                         <span class="material-symbols-outlined text-[18px]">add_a_photo</span>
-                        <span>Fiş Fotoğrafı veya Belge Yükle</span>
+                        <span>{{ lang.t('expenses.uploadReceipt') }}</span>
                     </label>
                 </div>
             </div>
@@ -548,7 +548,7 @@
                 <div>
                     <h3 class="text-lg font-black text-slate-900 dark:text-white flex items-center gap-2">
                         {{ lang.t('scanner.modalTitle') }}
-                        <span class="rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">AI Vision</span>
+                        <span class="rounded-full bg-gradient-to-r from-purple-500 to-indigo-500 px-2 py-0.5 text-[10px] font-extrabold uppercase tracking-wider text-white">{{ lang.t('scanner.aiVision') }}</span>
                     </h3>
                     <p class="text-xs text-slate-500 dark:text-slate-400">
                         {{ lang.t('scanner.modalDesc') }}
@@ -578,7 +578,7 @@
                     </span>
                     <span class="mt-4 inline-flex items-center gap-2 rounded-xl bg-indigo-600 px-4 py-2 text-xs font-semibold text-white shadow-sm hover:bg-indigo-700 min-h-[38px]">
                         <span class="material-symbols-outlined text-[16px]">upload_file</span>
-                        <span>Dosya Seç veya Kamera ile Çek</span>
+                        <span>{{ lang.t('expenses.chooseOrCapture') }}</span>
                     </span>
                 </label>
             </div>
@@ -604,10 +604,10 @@
                 <div class="flex items-center justify-between p-3 rounded-xl bg-emerald-50 dark:bg-emerald-950/40 border border-emerald-200 dark:border-emerald-800/60">
                     <div class="flex items-center gap-2 text-emerald-700 dark:text-emerald-300 font-semibold text-xs">
                         <span class="material-symbols-outlined text-[18px]">verified</span>
-                        <span>Yapay Zeka Taraması Başarılı</span>
+                        <span>{{ lang.t('expenses.scanSuccess') }}</span>
                     </div>
                     <span class="rounded-md bg-emerald-100 dark:bg-emerald-900/60 px-2 py-0.5 text-[11px] font-bold text-emerald-800 dark:text-emerald-200">
-                        Güven: {{ (scannedResult.confidence * 100) | number:'1.0-0' }}%
+                        {{ lang.t('scanner.confidenceValue', { value: ((scannedResult.confidence * 100) | number:'1.0-0') }) }}
                     </span>
                 </div>
 
@@ -647,7 +647,7 @@
 
                 <!-- Extracted Line Items preview -->
                 <div *ngIf="scannedResult.items && scannedResult.items.length > 0" class="rounded-xl border border-slate-200 dark:border-slate-800 p-3">
-                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">Çıkarılan Kalemler ({{ scannedResult.items.length }})</span>
+                    <span class="text-[11px] font-bold uppercase tracking-wider text-slate-400 block mb-2">{{ lang.t('expenses.extractedItems', { count: scannedResult.items.length }) }}</span>
                     <ul class="space-y-1.5 text-xs divide-y divide-slate-100 dark:divide-slate-800">
                         <li *ngFor="let item of scannedResult.items" class="pt-1 flex items-center justify-between">
                             <span class="text-slate-800 dark:text-slate-200 truncate pr-2">{{ item.description }}</span>

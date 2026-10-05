@@ -1,15 +1,6 @@
 <div class="min-h-screen min-h-[100dvh] flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-950 p-4 relative transition-colors duration-200">
     <!-- Dil Seçici -->
-    <div class="absolute top-4 right-4 flex items-center gap-1 bg-white dark:bg-slate-900 rounded-lg p-1 shadow-md border border-slate-200 dark:border-slate-800 z-10">
-        <button (click)="lang.setLanguage('tr')" 
-            [class]="'px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all ' + (lang.lang === 'tr' ? 'bg-primary text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800')">
-            🇹🇷 TR
-        </button>
-        <button (click)="lang.setLanguage('en')" 
-            [class]="'px-3 py-1.5 rounded-md text-xs sm:text-sm font-medium transition-all ' + (lang.lang === 'en' ? 'bg-primary text-white' : 'text-slate-600 dark:text-slate-400 hover:bg-slate-100 dark:hover:bg-slate-800')">
-            🇬🇧 EN
-        </button>
-    </div>
+    <div class="absolute top-4 end-4 z-10"><app-language-switcher></app-language-switcher></div>
 
     <div class="w-full max-w-md bg-white dark:bg-slate-900 p-6 sm:p-8 rounded-2xl shadow-xl border border-slate-200 dark:border-slate-800 my-auto">
         <!-- Logo -->
@@ -19,10 +10,10 @@
                 <span class="text-xl sm:text-2xl font-black tracking-tight text-slate-900 dark:text-white">Odivon <span class="text-primary">FaturaPro</span></span>
             </div>
             <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">
-                {{ isRegisterMode ? 'Yeni Hesap Oluştur' : lang.t('auth.welcome') }}
+                {{ isRegisterMode ? lang.t('auth.createAccountTitle') : lang.t('auth.welcome') }}
             </h1>
             <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm mt-1">
-                {{ isRegisterMode ? 'Hemen kaydolun, saniyeler içinde ilk faturanızı oluşturun' : lang.t('auth.enterCredentials') }}
+                {{ isRegisterMode ? lang.t('auth.createAccountSubtitle') : lang.t('auth.enterCredentials') }}
             </p>
         </div>
 
@@ -36,7 +27,7 @@
                 [class.shadow-sm]="!isRegisterMode"
                 [class.text-slate-500]="isRegisterMode"
                 class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all text-center">
-                Giriş Yap
+                {{ lang.t('auth.loginTab') }}
             </button>
             <button type="button" (click)="toggleMode(true)"
                 [class.bg-white]="isRegisterMode"
@@ -46,7 +37,7 @@
                 [class.shadow-sm]="isRegisterMode"
                 [class.text-slate-500]="!isRegisterMode"
                 class="flex-1 py-2 text-xs sm:text-sm font-bold rounded-lg transition-all text-center">
-                Kayıt Ol ✨
+                {{ lang.t('auth.registerTab') }}
             </button>
         </div>
 
@@ -55,7 +46,7 @@
             class="w-full flex items-center justify-center gap-3 bg-white dark:bg-slate-800 border-2 border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200 font-semibold py-2.5 sm:py-3 rounded-xl hover:bg-slate-50 dark:hover:bg-slate-700/80 transition-all mb-5 text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed">
             <img *ngIf="!isLoading" src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google" class="w-5 h-5">
             <span *ngIf="isLoading" class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
-            {{ isLoading ? lang.t('auth.loggingIn') : (isRegisterMode ? 'Google ile Hızlı Kayıt Ol' : lang.t('auth.loginWithGoogle')) }}
+            {{ isLoading ? lang.t('auth.loggingIn') : (isRegisterMode ? lang.t('auth.registerWithGoogle') : lang.t('auth.loginWithGoogle')) }}
         </button>
 
         <!-- Messages -->
@@ -74,7 +65,7 @@
             </div>
             <div class="relative flex justify-center text-xs sm:text-sm">
                 <span class="px-3 bg-white dark:bg-slate-900 text-slate-400 dark:text-slate-500">
-                    {{ isRegisterMode ? 'veya e-posta ile kayıt ol' : lang.t('auth.orWithEmail') }}
+                    {{ isRegisterMode ? lang.t('auth.orRegisterWithEmail') : lang.t('auth.orWithEmail') }}
                 </span>
             </div>
         </div>
@@ -83,10 +74,10 @@
         <form (ngSubmit)="onSubmit()" class="space-y-4">
             <!-- Ad Soyad (Sadece Kayıt Ol modunda) -->
             <div *ngIf="isRegisterMode">
-                <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Ad Soyad veya Şirket Yetkilisi</label>
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('auth.fullName') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">person</span>
-                    <input type="text" [(ngModel)]="displayName" name="displayName" placeholder="Örn: Ahmet Yılmaz"
+                    <input type="text" [(ngModel)]="displayName" name="displayName" [placeholder]="lang.t('auth.fullNamePlaceholder')"
                         class="w-full h-11 sm:h-12 pl-11 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-0 transition-colors">
                 </div>
             </div>
@@ -96,7 +87,7 @@
                 <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('common.email') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">mail</span>
-                    <input type="email" [(ngModel)]="email" name="email" placeholder="ornek@sirket.com"
+                    <input type="email" [(ngModel)]="email" name="email" [placeholder]="lang.t('auth.emailPlaceholder')"
                         class="w-full h-11 sm:h-12 pl-11 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-0 transition-colors">
                 </div>
             </div>
@@ -106,17 +97,17 @@
                 <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('auth.password') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock</span>
-                    <input type="password" [(ngModel)]="password" name="password" placeholder="En az 6 karakter"
+                    <input type="password" [(ngModel)]="password" name="password" [placeholder]="lang.t('auth.passwordMinPlaceholder')"
                         class="w-full h-11 sm:h-12 pl-11 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-0 transition-colors">
                 </div>
             </div>
 
             <!-- Şifre Tekrar (Sadece Kayıt Ol modunda) -->
             <div *ngIf="isRegisterMode">
-                <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Şifre Tekrar</label>
+                <label class="block text-xs sm:text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('auth.passwordRepeat') }}</label>
                 <div class="relative">
                     <span class="material-symbols-outlined absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xl">lock_reset</span>
-                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" placeholder="Şifrenizi tekrar girin"
+                    <input type="password" [(ngModel)]="confirmPassword" name="confirmPassword" [placeholder]="lang.t('auth.passwordRepeatPlaceholder')"
                         class="w-full h-11 sm:h-12 pl-11 pr-4 rounded-xl border-2 border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-xs sm:text-sm focus:border-primary focus:ring-0 transition-colors">
                 </div>
             </div>
@@ -137,9 +128,10 @@
                 <label class="flex items-start gap-2 cursor-pointer">
                     <input type="checkbox" [(ngModel)]="acceptTerms" name="acceptTerms" class="w-4 h-4 mt-0.5 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary">
                     <span>
-                        <button type="button" (click)="openLegal('terms')" class="text-primary underline hover:text-blue-700">Kullanım Koşulları</button>,
-                        <button type="button" (click)="openLegal('privacy')" class="text-primary underline hover:text-blue-700">Gizlilik Politikası</button> ve
-                        <button type="button" (click)="openLegal('kvkk')" class="text-primary underline hover:text-blue-700">KVKK Aydınlatma Metni</button>'ni okudum, kabul ediyorum.
+                        {{ lang.t('auth.consentPrefix') }}
+                        <button type="button" (click)="openLegal('terms')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.termsOfUse') }}</button>,
+                        <button type="button" (click)="openLegal('privacy')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.privacyPolicy') }}</button> {{ lang.t('auth.consentAnd') }}
+                        <button type="button" (click)="openLegal('kvkk')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.kvkkNotice') }}</button>{{ lang.t('auth.consentSuffix') }}
                     </span>
                 </label>
             </div>
@@ -147,22 +139,22 @@
             <!-- Submit Button -->
             <button type="submit" [disabled]="isLoading"
                 class="w-full h-11 sm:h-12 bg-primary text-white font-semibold rounded-xl hover:bg-blue-700 transition-colors text-xs sm:text-sm disabled:opacity-50 disabled:cursor-not-allowed shadow-md shadow-primary/25">
-                {{ isRegisterMode ? 'Hesap Oluştur ve Başla' : lang.t('auth.login') }}
+                {{ isRegisterMode ? lang.t('auth.createAndStart') : lang.t('auth.login') }}
             </button>
         </form>
 
         <!-- Mode Switch Footer Link -->
         <div class="mt-6 text-center text-xs sm:text-sm text-slate-500 dark:text-slate-400">
             <span *ngIf="!isRegisterMode">
-                Henüz hesabınız yok mu?
+                {{ lang.t('auth.noAccount') }}
                 <button type="button" (click)="toggleMode(true)" class="text-primary font-bold hover:underline cursor-pointer ml-1">
-                    Ücretsiz Kayıt Olun
+                    {{ lang.t('auth.registerFree') }}
                 </button>
             </span>
             <span *ngIf="isRegisterMode">
-                Zaten bir hesabınız var mı?
+                {{ lang.t('auth.haveAccount') }}
                 <button type="button" (click)="toggleMode(false)" class="text-primary font-bold hover:underline cursor-pointer ml-1">
-                    Giriş Yapın
+                    {{ lang.t('auth.loginNow') }}
                 </button>
             </span>
         </div>

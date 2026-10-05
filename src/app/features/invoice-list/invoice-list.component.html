@@ -3,7 +3,7 @@
     <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 mb-6">
         <div>
             <h1 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">{{ lang.t('invoices.title') }}</h1>
-            <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">Faturalarınızı yönetin, önizleyin ve PDF indirin.</p>
+            <p class="text-slate-500 dark:text-slate-400 text-xs sm:text-sm">{{ lang.t('invoices.subtitle') }}</p>
         </div>
         <div class="flex items-center gap-2.5 w-full sm:w-auto">
             <button (click)="exportToCsv()"
@@ -25,42 +25,42 @@
             <!-- Belge Türü Filtresi -->
             <select [(ngModel)]="typeFilter" (ngModelChange)="filterInvoices()"
                 class="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm font-semibold focus:border-primary focus:ring-2 focus:ring-primary/20">
-                <option value="all">Tüm Belge Türleri</option>
-                <option value="commercial">📄 Satış Faturaları</option>
-                <option value="proforma">📑 Proforma Faturalar</option>
+                <option value="all">{{ lang.t('invoices.filterAllTypes') }}</option>
+                <option value="commercial">{{ lang.t('invoices.filterSales') }}</option>
+                <option value="proforma">{{ lang.t('invoices.filterProforma') }}</option>
             </select>
 
             <!-- Ödeme Durumu Filtresi -->
             <select [(ngModel)]="statusFilter" (ngModelChange)="filterInvoices()"
                 class="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
-                <option value="all">Tüm Ödeme Durumları</option>
-                <option value="draft">Taslak</option>
-                <option value="sent">Gönderildi</option>
-                <option value="paid">Ödendi</option>
-                <option value="overdue">Gecikmiş</option>
-                <option value="cancelled">İptal</option>
+                <option value="all">{{ lang.t('invoices.filterAllPayment') }}</option>
+                <option value="draft">{{ lang.t('status.draft') }}</option>
+                <option value="sent">{{ lang.t('status.sent') }}</option>
+                <option value="paid">{{ lang.t('status.paid') }}</option>
+                <option value="overdue">{{ lang.t('status.overdue') }}</option>
+                <option value="cancelled">{{ lang.t('status.cancelled') }}</option>
             </select>
 
             <!-- Vade Takibi Filtresi -->
             <select [(ngModel)]="vadeFilter" (ngModelChange)="filterInvoices()"
                 class="h-10 px-3 rounded-lg border border-amber-200 dark:border-amber-900/50 bg-amber-50/50 dark:bg-amber-950/20 text-amber-900 dark:text-amber-300 text-xs sm:text-sm font-medium focus:border-amber-500 focus:ring-2 focus:ring-amber-500/20">
-                <option value="all">📅 Tüm Vadeler</option>
-                <option value="overdue">🚨 Vadesi Geçenler</option>
-                <option value="this_week">⏰ Bu Hafta Dolanlar</option>
+                <option value="all">{{ lang.t('invoices.filterAllDue') }}</option>
+                <option value="overdue">{{ lang.t('invoices.filterOverdue') }}</option>
+                <option value="this_week">{{ lang.t('invoices.filterDueThisWeek') }}</option>
             </select>
 
             <!-- Onay Mekanizması Filtresi -->
             <select [(ngModel)]="approvalFilter" (ngModelChange)="filterInvoices()"
                 class="h-10 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-slate-100 text-xs sm:text-sm focus:border-primary focus:ring-2 focus:ring-primary/20">
-                <option value="all">🛡️ Tüm Onay Durumları</option>
-                <option value="pending_approval">⏳ Onay Bekleyenler</option>
-                <option value="approved">✅ Onaylananlar</option>
-                <option value="rejected">❌ Reddedilenler</option>
+                <option value="all">{{ lang.t('invoices.filterAllApproval') }}</option>
+                <option value="pending_approval">{{ lang.t('invoices.filterPendingApproval') }}</option>
+                <option value="approved">{{ lang.t('invoices.filterApproved') }}</option>
+                <option value="rejected">{{ lang.t('invoices.filterRejected') }}</option>
             </select>
 
             <div *ngIf="selectedIds.size > 0" class="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-800">
                 <span class="text-xs sm:text-sm text-slate-600 dark:text-slate-400">
-                    <span class="font-semibold text-primary dark:text-blue-400">{{ selectedIds.size }}</span> fatura seçildi
+                    {{ lang.t('invoices.selectedCount', { count: selectedIds.size }) }}
                 </span>
                 <button (click)="deleteSelected()"
                     class="flex items-center gap-1.5 px-3 py-1.5 text-xs sm:text-sm font-medium text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-950/40 rounded-lg hover:bg-red-100 dark:hover:bg-red-900/50 transition-colors">
@@ -90,8 +90,8 @@
             <div class="w-20 h-20 bg-slate-100 dark:bg-slate-800 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="material-symbols-outlined text-4xl text-slate-400">description</span>
             </div>
-            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">Henüz fatura yok</h3>
-            <p class="text-slate-500 dark:text-slate-400 mb-4">İlk faturanızı oluşturarak başlayın</p>
+            <h3 class="text-lg font-semibold text-slate-900 dark:text-white mb-2">{{ lang.t('invoices.emptyTitle') }}</h3>
+            <p class="text-slate-500 dark:text-slate-400 mb-4">{{ lang.t('invoices.emptyHint') }}</p>
             <button (click)="openAddModal()"
                 class="bg-primary text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-all inline-flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px]">add</span>
@@ -112,14 +112,14 @@
                             <input type="checkbox" [checked]="isAllSelected" (change)="toggleSelectAll()"
                                 class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary cursor-pointer" />
                         </th>
-                        <th class="px-5 py-4 font-semibold">Fatura No</th>
-                        <th class="px-4 py-4 font-semibold">Tür</th>
-                        <th class="px-5 py-4 font-semibold">Müşteri</th>
-                        <th class="px-4 py-4 font-semibold">Tarih</th>
-                        <th class="px-5 py-4 font-semibold">Vade</th>
-                        <th class="px-5 py-4 font-semibold text-right">Tutar</th>
-                        <th class="px-4 py-4 font-semibold">Ödeme</th>
-                        <th class="px-4 py-4 font-semibold">Onay Durumu</th>
+                        <th class="px-5 py-4 font-semibold">{{ lang.t('table.invoiceNo') }}</th>
+                        <th class="px-4 py-4 font-semibold">{{ lang.t('table.type') }}</th>
+                        <th class="px-5 py-4 font-semibold">{{ lang.t('table.customer') }}</th>
+                        <th class="px-4 py-4 font-semibold">{{ lang.t('table.date') }}</th>
+                        <th class="px-5 py-4 font-semibold">{{ lang.t('table.dueDate') }}</th>
+                        <th class="px-5 py-4 font-semibold text-right">{{ lang.t('table.amount') }}</th>
+                        <th class="px-4 py-4 font-semibold">{{ lang.t('table.payment') }}</th>
+                        <th class="px-4 py-4 font-semibold">{{ lang.t('table.approval') }}</th>
                         <th class="px-5 py-4 font-semibold text-right">{{ lang.t('common.actions') }}</th>
                     </tr>
                 </thead>
@@ -136,7 +136,7 @@
                         </td>
                         <td class="px-4 py-4">
                             <span [class]="'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ' + (invoice.invoiceType === 'proforma' ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300')">
-                                {{ invoice.invoiceType === 'proforma' ? 'Proforma' : 'Satış' }}
+                                {{ invoice.invoiceType === 'proforma' ? lang.t('invoiceType.proforma') : lang.t('invoiceType.sales') }}
                             </span>
                         </td>
                         <td class="px-5 py-4">
@@ -152,9 +152,9 @@
                                 <!-- Gecikme Uyarısı ve WhatsApp Vade Hatırlatıcı -->
                                 <div *ngIf="isOverdue(invoice)" class="flex items-center gap-1.5 mt-1">
                                     <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/60 border border-rose-200 dark:border-rose-900">
-                                        {{ getDaysOverdue(invoice.dueDate) }} gün gecikti
+                                        {{ lang.t('invoices.daysOverdue', { days: getDaysOverdue(invoice.dueDate) }) }}
                                     </span>
-                                    <button (click)="sendDueReminder(invoice)" title="WhatsApp Vade Hatırlatması Gönder"
+                                    <button (click)="sendDueReminder(invoice)" [title]="lang.t('invoices.sendReminder')"
                                         class="p-0.5 text-emerald-600 hover:text-emerald-700 dark:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/50 rounded transition-colors">
                                         <span class="material-symbols-outlined text-[15px]">send_to_mobile</span>
                                     </button>
@@ -190,11 +190,11 @@
                                 </span>
                                 <!-- Hızlı Onayla / Reddet Butonları -->
                                 <div *ngIf="invoice.approvalStatus !== 'approved'" class="flex items-center gap-1">
-                                    <button (click)="approveInvoice(invoice)" title="Onayla"
+                                    <button (click)="approveInvoice(invoice)" [title]="lang.t('invoices.approve')"
                                         class="p-1 text-emerald-600 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 rounded transition-colors">
                                         <span class="material-symbols-outlined text-[16px]">check</span>
                                     </button>
-                                    <button *ngIf="invoice.approvalStatus !== 'rejected'" (click)="rejectInvoice(invoice)" title="Reddet"
+                                    <button *ngIf="invoice.approvalStatus !== 'rejected'" (click)="rejectInvoice(invoice)" [title]="lang.t('invoices.reject')"
                                         class="p-1 text-rose-600 hover:bg-rose-50 dark:hover:bg-rose-950/40 rounded transition-colors">
                                         <span class="material-symbols-outlined text-[16px]">close</span>
                                     </button>
@@ -203,15 +203,15 @@
                         </td>
                         <td class="px-5 py-4 text-right">
                             <div class="flex justify-end gap-1">
-                                <button (click)="openPreviewModal(invoice)" title="Önizle & PDF"
+                                <button (click)="openPreviewModal(invoice)" [title]="lang.t('invoices.previewPdf')"
                                     class="p-2 text-slate-400 hover:text-emerald-600 dark:hover:text-emerald-400 hover:bg-emerald-50 dark:hover:bg-emerald-950/30 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">visibility</span>
                                 </button>
-                                <button (click)="openEditModal(invoice)" title="Düzenle"
+                                <button (click)="openEditModal(invoice)" [title]="lang.t('common.editShort')"
                                     class="p-2 text-slate-400 hover:text-primary dark:hover:text-blue-400 hover:bg-primary/10 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">edit</span>
                                 </button>
-                                <button (click)="confirmDelete(invoice.id!)" title="Sil"
+                                <button (click)="confirmDelete(invoice.id!)" [title]="lang.t('common.deleteShort')"
                                     class="p-2 text-slate-400 hover:text-red-600 dark:hover:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/30 rounded-lg transition-colors">
                                     <span class="material-symbols-outlined text-[20px]">delete</span>
                                 </button>
@@ -232,7 +232,7 @@
                             class="h-4 w-4 rounded border-slate-300 dark:border-slate-700 text-primary focus:ring-primary cursor-pointer" />
                         <span class="font-bold text-slate-900 dark:text-white text-sm">{{ invoice.invoiceNo }}</span>
                         <span [class]="'px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider ' + (invoice.invoiceType === 'proforma' ? 'bg-purple-100 dark:bg-purple-950/60 text-purple-700 dark:text-purple-300' : 'bg-blue-100 dark:bg-blue-950/60 text-blue-700 dark:text-blue-300')">
-                            {{ invoice.invoiceType === 'proforma' ? 'Proforma' : 'Satış' }}
+                            {{ invoice.invoiceType === 'proforma' ? lang.t('invoiceType.proforma') : lang.t('invoiceType.sales') }}
                         </span>
                     </div>
                     <div class="flex items-center gap-1.5">
@@ -256,20 +256,20 @@
                 </div>
                 <div class="flex items-center justify-between pt-2 border-t border-slate-100 dark:border-slate-800 text-xs">
                     <div class="flex items-center gap-1.5">
-                        <span class="text-slate-500">Vade: {{ invoice.dueDate | date:'dd.MM.yyyy' }}</span>
+                        <span class="text-slate-500">{{ lang.t('invoices.dueLabel', { date: (invoice.dueDate | date:'dd.MM.yyyy') }) }}</span>
                         <span *ngIf="isOverdue(invoice)" class="px-1.5 py-0.5 rounded text-[10px] font-bold text-rose-700 dark:text-rose-300 bg-rose-100 dark:bg-rose-950/60">
-                            {{ getDaysOverdue(invoice.dueDate) }}g
+                            {{ lang.t('invoices.daysShort', { days: getDaysOverdue(invoice.dueDate) }) }}
                         </span>
-                        <button *ngIf="isOverdue(invoice)" (click)="sendDueReminder(invoice)" title="Vade Hatırlatıcı" class="text-emerald-600">
+                        <button *ngIf="isOverdue(invoice)" (click)="sendDueReminder(invoice)" [title]="lang.t('invoices.dueReminder')" class="text-emerald-600">
                             <span class="material-symbols-outlined text-[14px]">send_to_mobile</span>
                         </button>
                     </div>
                     <div class="flex items-center gap-2">
                         <button (click)="openPreviewModal(invoice)" class="px-2.5 py-1 text-xs font-medium text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/40 rounded-lg flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[16px]">visibility</span> Önizle
+                            <span class="material-symbols-outlined text-[16px]">visibility</span> {{ lang.t('common.previewShort') }}
                         </button>
                         <button (click)="openEditModal(invoice)" class="px-2.5 py-1 text-xs font-medium text-primary dark:text-blue-400 bg-blue-50 dark:bg-blue-950/40 rounded-lg flex items-center gap-1">
-                            <span class="material-symbols-outlined text-[16px]">edit</span> Düzenle
+                            <span class="material-symbols-outlined text-[16px]">edit</span> {{ lang.t('common.editShort') }}
                         </button>
                         <button (click)="confirmDelete(invoice.id!)" class="p-1 text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-950/40 rounded-lg">
                             <span class="material-symbols-outlined text-[18px]">delete</span>
@@ -282,19 +282,17 @@
         <!-- Pagination Controls -->
         <div class="flex items-center justify-between px-6 py-4 border-t border-slate-200 dark:border-slate-800 bg-slate-50 dark:bg-slate-800/50 text-xs text-slate-500 dark:text-slate-400">
             <div>
-                Toplam <span class="font-bold text-slate-900 dark:text-white">{{ filteredInvoices.length }}</span> kayıttan
-                <span class="font-bold text-slate-900 dark:text-white">{{ (currentPage - 1) * pageSize + 1 }}</span> - 
-                <span class="font-bold text-slate-900 dark:text-white">{{ currentPage * pageSize > filteredInvoices.length ? filteredInvoices.length : currentPage * pageSize }}</span> gösteriliyor.
+                {{ lang.t('pagination.summary', { total: filteredInvoices.length, from: (currentPage - 1) * pageSize + 1, to: currentPage * pageSize > filteredInvoices.length ? filteredInvoices.length : currentPage * pageSize }) }}
             </div>
             <div class="flex items-center gap-2" *ngIf="totalPages > 1">
                 <button (click)="setPage(currentPage - 1)" [disabled]="currentPage === 1"
                     class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 transition-all font-medium">
-                    Önceki
+                    {{ lang.t('pagination.prev') }}
                 </button>
-                <span class="px-3 py-1 font-semibold text-slate-700 dark:text-slate-300">Sayfa {{ currentPage }} / {{ totalPages }}</span>
+                <span class="px-3 py-1 font-semibold text-slate-700 dark:text-slate-300">{{ lang.t('pagination.page', { page: currentPage, pages: totalPages }) }}</span>
                 <button (click)="setPage(currentPage + 1)" [disabled]="currentPage === totalPages"
                     class="px-3 py-1.5 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 disabled:opacity-40 transition-all font-medium">
-                    Sonraki
+                    {{ lang.t('pagination.next') }}
                 </button>
             </div>
         </div>
@@ -307,8 +305,8 @@
     <div class="relative bg-white dark:bg-slate-900 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[90vh] flex flex-col overflow-hidden animate-scale-in border border-slate-200 dark:border-slate-800">
         <div class="flex items-center justify-between p-6 border-b border-slate-100 dark:border-slate-800">
             <div>
-                <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ isEditing ? 'Faturayı Düzenle' : 'Yeni Fatura Oluştur' }}</h2>
-                <p class="text-slate-500 dark:text-slate-400 text-sm">Fatura detaylarını doldurun.</p>
+                <h2 class="text-xl font-bold text-slate-900 dark:text-white">{{ isEditing ? lang.t('invoices.editTitle') : lang.t('create.title') }}</h2>
+                <p class="text-slate-500 dark:text-slate-400 text-sm">{{ lang.t('invoices.formHint') }}</p>
             </div>
             <button (click)="closeModal()" class="p-2 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 rounded-lg hover:bg-slate-100 dark:hover:bg-slate-800">
                 <span class="material-symbols-outlined">close</span>
@@ -318,7 +316,7 @@
         <div class="p-6 overflow-y-auto space-y-6 flex-1 text-slate-900 dark:text-slate-100">
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fatura No</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('table.invoiceNo') }}</label>
                     <input type="text" [(ngModel)]="formData.invoiceNo"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-800 text-slate-900 dark:text-white font-mono" />
                 </div>
@@ -335,12 +333,12 @@
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Fatura Tarihi</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('create.invoiceDate') }}</label>
                     <input type="date" [(ngModel)]="formData.date"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                 </div>
                 <div>
-                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">Son Ödeme Tarihi (Vade)</label>
+                    <label class="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-1.5">{{ lang.t('invoices.dueDateFull') }}</label>
                     <input type="date" [(ngModel)]="formData.dueDate"
                         class="w-full px-4 py-2.5 rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                 </div>
@@ -348,36 +346,36 @@
 
             <div class="p-4 bg-slate-50 dark:bg-slate-800/50 rounded-xl border border-slate-200 dark:border-slate-700 space-y-4">
                 <div class="flex items-center justify-between">
-                    <h3 class="font-semibold text-slate-900 dark:text-white text-sm">Müşteri Bilgileri</h3>
+                    <h3 class="font-semibold text-slate-900 dark:text-white text-sm">{{ lang.t('create.customerInfo') }}</h3>
                     <select *ngIf="customers.length > 0" (change)="onCustomerSelect($any($event.target).value)"
                         class="px-3 py-1.5 text-xs bg-white dark:bg-slate-800 rounded-lg border border-slate-200 dark:border-slate-700 text-slate-700 dark:text-slate-200">
-                        <option value="">Kayıtlı Müşteri Seç...</option>
+                        <option value="">{{ lang.t('invoices.selectCustomer') }}</option>
                         <option *ngFor="let c of customers" [value]="c.id">{{ c.name }}</option>
                     </select>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Müşteri Adı / Ünvanı *</label>
-                        <input type="text" [(ngModel)]="formData.customerName" placeholder="Şirket adı"
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">{{ lang.t('invoices.customerNameReq') }}</label>
+                        <input type="text" [(ngModel)]="formData.customerName" [placeholder]="lang.t('invoices.companyPlaceholder')"
                             class="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">E-posta Adresi</label>
-                        <input type="email" [(ngModel)]="formData.customerEmail" placeholder="ornek@sirket.com"
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">{{ lang.t('invoices.emailAddress') }}</label>
+                        <input type="email" [(ngModel)]="formData.customerEmail" [placeholder]="lang.t('auth.emailPlaceholder')"
                             class="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                     </div>
                 </div>
 
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Vergi Numarası / TCKN</label>
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">{{ lang.t('invoices.taxIdFull') }}</label>
                         <input type="text" [(ngModel)]="formData.customerTaxId" placeholder="1234567890"
                             class="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                     </div>
                     <div>
-                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">Fatura Adresi</label>
-                        <input type="text" [(ngModel)]="formData.customerAddress" placeholder="Fatura adresi..."
+                        <label class="block text-xs font-medium text-slate-600 dark:text-slate-400 mb-1">{{ lang.t('invoices.billingAddress') }}</label>
+                        <input type="text" [(ngModel)]="formData.customerAddress" [placeholder]="lang.t('invoices.addressPlaceholder')"
                             class="w-full px-3.5 py-2 rounded-lg border border-slate-200 dark:border-slate-700 text-sm bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                     </div>
                 </div>
@@ -386,39 +384,39 @@
             <!-- Items -->
             <div>
                 <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-semibold text-slate-900 dark:text-white text-sm">Ürün ve Hizmet Kalemleri</h3>
+                    <h3 class="font-semibold text-slate-900 dark:text-white text-sm">{{ lang.t('invoices.lineItems') }}</h3>
                     <button (click)="addItem()" class="text-xs font-semibold text-primary dark:text-blue-400 hover:underline flex items-center gap-1">
-                        <span class="material-symbols-outlined text-[16px]">add</span> Kalem Ekle
+                        <span class="material-symbols-outlined text-[16px]">add</span> {{ lang.t('invoices.addItem') }}
                     </button>
                 </div>
                 <div class="space-y-3">
                     <div *ngFor="let item of formData.items; let i = index" class="p-3 bg-slate-50 dark:bg-slate-800/40 rounded-xl border border-slate-200 dark:border-slate-700 space-y-2">
                         <div class="flex flex-col sm:flex-row gap-3">
                             <div class="flex-1">
-                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Açıklama</label>
-                                <input type="text" [(ngModel)]="item.description" placeholder="Kalem açıklaması..."
+                                <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">{{ lang.t('item.description') }}</label>
+                                <input type="text" [(ngModel)]="item.description" [placeholder]="lang.t('invoices.itemPlaceholder')"
                                     class="w-full px-3 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white" />
                             </div>
                             <div class="grid grid-cols-2 sm:flex items-center gap-2 sm:gap-2.5">
                                 <div class="w-full sm:w-16">
-                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Miktar</label>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">{{ lang.t('item.quantity') }}</label>
                                     <input type="number" [(ngModel)]="item.quantity" placeholder="1" min="1"
                                         class="w-full px-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-center" />
                                 </div>
                                 <div class="w-full sm:w-24">
-                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">Birim Fiyat</label>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">{{ lang.t('item.unitPrice') }}</label>
                                     <input type="number" [(ngModel)]="item.unitPrice" placeholder="0" min="0"
                                         class="w-full px-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-right" />
                                 </div>
                                 <div class="w-full sm:w-24">
-                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">KDV Oranı</label>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">{{ lang.t('invoices.vatRate') }}</label>
                                     <select [(ngModel)]="item.taxRate"
                                         class="w-full px-2 py-1.5 text-xs rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white font-semibold">
                                         <option *ngFor="let r of availableTaxRates" [value]="r">%{{ r }} {{ taxLabel }}</option>
                                     </select>
                                 </div>
                                 <div class="w-full sm:w-16">
-                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">İnd. %</label>
+                                    <label class="block text-[10px] uppercase font-bold text-slate-400 mb-1">{{ lang.t('item.discShort') }}</label>
                                     <input type="number" [(ngModel)]="item.discount" placeholder="0" min="0" max="100"
                                         class="w-full px-2 py-1.5 text-sm rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-white text-center" />
                                 </div>
@@ -434,11 +432,11 @@
                         <!-- Canlı Otomatik KDV & Toplam Satır Hesabı -->
                         <div class="flex flex-wrap items-center justify-between text-xs pt-2 border-t border-slate-200 dark:border-slate-700/60 bg-slate-100/60 dark:bg-slate-800/80 px-3 py-1.5 rounded-lg">
                             <div class="flex items-center gap-4 text-slate-500 dark:text-slate-400">
-                                <span>Net: <strong class="text-slate-700 dark:text-slate-200">₺{{ calculateItemTotal(item) | number:'1.2-2' }}</strong></span>
-                                <span class="text-blue-600 dark:text-blue-400 font-medium">Otomatik KDV: <strong>₺{{ calculateLineTax(item) | number:'1.2-2' }}</strong></span>
+                                <span>{{ lang.t('item.net') }} <strong class="text-slate-700 dark:text-slate-200">₺{{ calculateItemTotal(item) | number:'1.2-2' }}</strong></span>
+                                <span class="text-blue-600 dark:text-blue-400 font-medium">{{ lang.t('invoices.autoVat') }} <strong>₺{{ calculateLineTax(item) | number:'1.2-2' }}</strong></span>
                             </div>
                             <div class="font-bold text-slate-900 dark:text-white">
-                                KDV Dahil Satır: <span class="text-emerald-600 dark:text-emerald-400 font-extrabold">₺{{ calculateLineTotal(item) | number:'1.2-2' }}</span>
+                                {{ lang.t('invoices.lineInclVat') }} <span class="text-emerald-600 dark:text-emerald-400 font-extrabold">₺{{ calculateLineTotal(item) | number:'1.2-2' }}</span>
                             </div>
                         </div>
                     </div>
@@ -448,23 +446,23 @@
             <!-- Summary Calculations -->
             <div class="p-4 bg-slate-900 text-white rounded-xl space-y-2 text-sm">
                 <div class="flex justify-between text-slate-400">
-                    <span>Brüt Ara Toplam</span>
+                    <span>{{ lang.t('invoices.grossSubtotal') }}</span>
                     <span>₺{{ formSubtotal | number:'1.2-2' }}</span>
                 </div>
                 <div *ngIf="formTotalDiscount > 0" class="flex justify-between text-emerald-400">
-                    <span>Toplam İndirim</span>
+                    <span>{{ lang.t('invoices.totalDiscount') }}</span>
                     <span>-₺{{ formTotalDiscount | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-slate-300">
-                    <span>Net Ara Toplam</span>
+                    <span>{{ lang.t('invoices.netSubtotal') }}</span>
                     <span>₺{{ formNetSubtotal | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-slate-300">
-                    <span>Ana Vergi ({{ taxLabel }} %{{ taxRate }})</span>
+                    <span>{{ lang.t('invoices.mainTax', { tax: taxLabel, rate: taxRate }) }}</span>
                     <span>₺{{ formTaxTotal | number:'1.2-2' }}</span>
                 </div>
                 <div class="flex justify-between text-lg font-bold pt-2 border-t border-slate-700 mt-2">
-                    <span>Genel Toplam</span>
+                    <span>{{ lang.t('invoices.grandTotal') }}</span>
                     <span class="text-emerald-400">₺{{ formTotal | number:'1.2-2' }}</span>
                 </div>
             </div>
@@ -478,12 +476,12 @@
             <div class="flex items-center justify-end gap-3">
                 <button (click)="closeModal()"
                     class="flex-1 sm:flex-none px-5 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
-                    İptal
+                    {{ lang.t('common.cancelShort') }}
                 </button>
                 <button (click)="saveInvoice()" [disabled]="isSaving || !formData.customerName || formData.items.length === 0"
                     class="flex-1 sm:flex-none justify-center px-5 py-2.5 text-sm font-semibold text-white bg-primary hover:bg-blue-700 rounded-xl transition-colors disabled:opacity-50 flex items-center gap-2">
                     <span *ngIf="isSaving" class="material-symbols-outlined text-[18px] animate-spin">progress_activity</span>
-                    {{ isSaving ? 'Kaydediliyor...' : (isEditing ? 'Güncelle' : 'Kaydet') }}
+                    {{ isSaving ? lang.t('common.saving') : (isEditing ? lang.t('common.update') : lang.t('common.saveShort')) }}
                 </button>
             </div>
         </div>
@@ -509,19 +507,19 @@
             <div class="flex items-center justify-center bg-slate-800 p-1 rounded-xl border border-slate-700">
                 <button (click)="setTemplate('classic')"
                     [class]="'px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ' + (selectedTemplateId === 'classic' ? 'bg-primary text-white shadow' : 'text-slate-300 hover:text-white')">
-                    <span>🏛️</span> Klasik
+                    <span>🏛️</span> {{ lang.t('template.classic') }}
                 </button>
                 <button (click)="setTemplate('modern')"
                     [class]="'px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ' + (selectedTemplateId === 'modern' ? 'bg-primary text-white shadow' : 'text-slate-300 hover:text-white')">
-                    <span>🎨</span> Modern
+                    <span>🎨</span> {{ lang.t('template.modern') }}
                 </button>
                 <button (click)="setTemplate('tech')"
                     [class]="'px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ' + (selectedTemplateId === 'tech' ? 'bg-indigo-600 text-white shadow' : 'text-slate-300 hover:text-white')">
-                    <span>⚡</span> Tech
+                    <span>⚡</span> {{ lang.t('template.tech') }}
                 </button>
                 <button (click)="setTemplate('formal')"
                     [class]="'px-2.5 py-1.5 rounded-lg text-xs font-semibold flex items-center gap-1.5 transition-all ' + (selectedTemplateId === 'formal' ? 'bg-slate-700 text-white shadow' : 'text-slate-300 hover:text-white')">
-                    <span>📜</span> E-Arşiv
+                    <span>📜</span> {{ lang.t('template.eArchive') }}
                 </button>
             </div>
 
@@ -531,12 +529,12 @@
                     class="bg-emerald-600 hover:bg-emerald-500 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm flex items-center gap-1.5 transition-all">
                     <span *ngIf="isGeneratingPdf" class="material-symbols-outlined text-[16px] sm:text-[18px] animate-spin">progress_activity</span>
                     <span class="material-symbols-outlined text-[16px] sm:text-[18px]">download</span>
-                    PDF İndir
+                    {{ lang.t('invoices.downloadPdfBtn') }}
                 </button>
                 <button (click)="printInvoice()"
                     class="bg-slate-700 hover:bg-slate-600 text-white px-3 sm:px-4 py-1.5 sm:py-2 rounded-lg font-medium text-xs sm:text-sm flex items-center gap-1.5 transition-all">
                     <span class="material-symbols-outlined text-[16px] sm:text-[18px]">print</span>
-                    Yazdır
+                    {{ lang.t('invoices.printBtn') }}
                 </button>
                 <button (click)="closePreviewModal()" class="text-slate-400 hover:text-white p-1 rounded-lg">
                     <span class="material-symbols-outlined">close</span>
@@ -556,17 +554,17 @@
                         <div>
                             <div class="flex items-center gap-3 mb-2">
                                 <img *ngIf="userProfile?.logoUrl" [src]="userProfile?.logoUrl" class="h-12 w-auto object-contain" alt="Logo" />
-                                <h1 class="text-2xl font-black tracking-tight text-slate-900">{{ userProfile?.companyName || 'Odivon FaturaPro Şirketi' }}</h1>
+                                <h1 class="text-2xl font-black tracking-tight text-slate-900">{{ userProfile?.companyName || lang.t('doc.defaultCompany') }}</h1>
                             </div>
                             <p class="text-slate-500 text-xs leading-relaxed">
-                                {{ userProfile?.companyAddress || 'Şirket Adresi Belirtilmemiş' }}<br />
-                                {{ userProfile?.taxOffice ? (userProfile?.taxOffice + ' V.D.') : '' }} {{ userProfile?.taxId ? ('Vergi No: ' + userProfile?.taxId) : '' }}<br />
-                                {{ userProfile?.phone ? ('Tel: ' + userProfile?.phone) : '' }}
+                                {{ userProfile?.companyAddress || lang.t('doc.noCompanyAddress') }}<br />
+                                {{ userProfile?.taxOffice ? lang.t('doc.taxOfficeSuffix', { office: userProfile?.taxOffice }) : '' }} {{ userProfile?.taxId ? lang.t('doc.taxNoValue', { id: userProfile?.taxId }) : '' }}<br />
+                                {{ userProfile?.phone ? lang.t('doc.phoneValue', { phone: userProfile?.phone }) : '' }}
                             </p>
                         </div>
                         <div class="text-right">
                             <h2 class="text-3xl font-black uppercase tracking-wider mb-1" [class.text-purple-600]="previewInvoice.invoiceType === 'proforma'" [class.text-primary]="previewInvoice.invoiceType !== 'proforma'">
-                                {{ previewInvoice.invoiceType === 'proforma' ? 'PROFORMA FATURA' : 'FATURA' }}
+                                {{ previewInvoice.invoiceType === 'proforma' ? lang.t('doc.proformaTitle') : lang.t('preview.invoiceTitle') }}
                             </h2>
                             <p class="font-mono font-bold text-slate-900 text-base mb-1">{{ previewInvoice.invoiceNo }}</p>
                             <span [class]="'inline-block px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider ' + getStatusColor(previewInvoice.status)">
@@ -578,24 +576,24 @@
                     <!-- Invoice Info Grid -->
                     <div class="grid grid-cols-2 gap-8 mb-8">
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200">
-                            <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">SAYIN / MÜŞTERİ</h3>
+                            <h3 class="text-xs font-bold uppercase text-slate-400 tracking-wider mb-2">{{ lang.t('doc.billToCustomer') }}</h3>
                             <p class="font-bold text-slate-900 text-base mb-1">{{ previewInvoice.customerName }}</p>
                             <p *ngIf="previewInvoice.customerEmail" class="text-xs text-slate-600 mb-1">{{ previewInvoice.customerEmail }}</p>
-                            <p *ngIf="previewInvoice.customerTaxId" class="text-xs text-slate-600 mb-1">Vergi / TCKN: {{ previewInvoice.customerTaxId }}</p>
+                            <p *ngIf="previewInvoice.customerTaxId" class="text-xs text-slate-600 mb-1">{{ lang.t('doc.taxIdLabel', { id: previewInvoice.customerTaxId }) }}</p>
                             <p *ngIf="previewInvoice.customerAddress" class="text-xs text-slate-500">{{ previewInvoice.customerAddress }}</p>
                         </div>
                         <div class="p-4 bg-slate-50 rounded-xl border border-slate-200 flex flex-col justify-center space-y-2 text-xs">
                             <div class="flex justify-between">
-                                <span class="text-slate-500 font-medium">Fatura Tarihi:</span>
+                                <span class="text-slate-500 font-medium">{{ lang.t('doc.invoiceDate') }}</span>
                                 <span class="font-bold text-slate-900">{{ previewInvoice.date | date:'dd.MM.yyyy' }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-slate-500 font-medium">Son Ödeme Tarihi:</span>
+                                <span class="text-slate-500 font-medium">{{ lang.t('doc.dueDate') }}</span>
                                 <span class="font-bold text-slate-900">{{ previewInvoice.dueDate | date:'dd.MM.yyyy' }}</span>
                             </div>
                             <div class="flex justify-between">
-                                <span class="text-slate-500 font-medium">Ülke / Vergi Tipi:</span>
-                                <span class="font-bold text-slate-900">{{ previewInvoice.countryCode || 'TR' }} ({{ previewInvoice.taxLabel || 'KDV' }} %{{ previewInvoice.taxRate || 20 }})</span>
+                                <span class="text-slate-500 font-medium">{{ lang.t('doc.countryTaxType') }}</span>
+                                <span class="font-bold text-slate-900">{{ previewInvoice.countryCode || 'TR' }} ({{ previewInvoice.taxLabel || lang.t('doc.vat') }} %{{ previewInvoice.taxRate || 20 }})</span>
                             </div>
                         </div>
                     </div>
@@ -604,12 +602,12 @@
                     <table class="w-full text-left mb-8 border-collapse">
                         <thead>
                             <tr class="bg-slate-900 text-white text-xs uppercase tracking-wider">
-                                <th class="py-3 px-4 rounded-l-lg font-semibold">Açıklama</th>
-                                <th class="py-3 px-4 font-semibold text-center">Miktar</th>
-                                <th class="py-3 px-4 font-semibold text-right">Birim Fiyat</th>
-                                <th class="py-3 px-4 font-semibold text-center">KDV %</th>
-                                <th class="py-3 px-4 font-semibold text-center">İndirim</th>
-                                <th class="py-3 px-4 rounded-r-lg font-semibold text-right">Toplam</th>
+                                <th class="py-3 px-4 rounded-l-lg font-semibold">{{ lang.t('item.description') }}</th>
+                                <th class="py-3 px-4 font-semibold text-center">{{ lang.t('item.quantity') }}</th>
+                                <th class="py-3 px-4 font-semibold text-right">{{ lang.t('item.unitPrice') }}</th>
+                                <th class="py-3 px-4 font-semibold text-center">{{ lang.t('doc.vatPct') }}</th>
+                                <th class="py-3 px-4 font-semibold text-center">{{ lang.t('doc.discount') }}</th>
+                                <th class="py-3 px-4 rounded-r-lg font-semibold text-right">{{ lang.t('item.total') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-200 text-xs">
@@ -628,15 +626,15 @@
                     <div class="flex justify-end mb-8">
                         <div class="w-72 space-y-2 text-xs">
                             <div class="flex justify-between text-slate-600">
-                                <span>Ara Toplam</span>
+                                <span>{{ lang.t('doc.subtotal') }}</span>
                                 <span class="font-semibold">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.subtotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between text-slate-600">
-                                <span>{{ previewInvoice.taxLabel || 'KDV' }} Toplamı</span>
+                                <span>{{ lang.t('doc.taxTotal', { tax: previewInvoice.taxLabel || lang.t('doc.vat') }) }}</span>
                                 <span class="font-semibold text-blue-600">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.taxTotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between text-base font-black text-slate-900 pt-2 border-t-2 border-slate-900">
-                                <span>GENEL TOPLAM</span>
+                                <span>{{ lang.t('doc.grandTotalCaps') }}</span>
                                 <span class="text-primary">{{ previewInvoice.currencySymbol || '₺' }}{{ previewInvoice.total | number:'1.2-2' }}</span>
                             </div>
                         </div>
@@ -646,11 +644,11 @@
                 <!-- Footer Bank & Notes -->
                 <div class="pt-6 border-t border-slate-200 text-xs text-slate-500 space-y-3">
                     <div *ngIf="userProfile?.iban" class="p-3 bg-slate-50 rounded-lg border border-slate-200">
-                        <p class="font-bold text-slate-800 mb-1">Banka Ödeme Bilgileri:</p>
+                        <p class="font-bold text-slate-800 mb-1">{{ lang.t('doc.bankInfo') }}</p>
                         <p class="font-mono text-slate-700">{{ userProfile?.bankName }} - IBAN: {{ userProfile?.iban }}</p>
                     </div>
-                    <p *ngIf="previewInvoice.notes" class="italic">Not: {{ previewInvoice.notes }}</p>
-                    <p class="text-center text-[10px] text-slate-400 pt-2">Klasik Kurumsal Taslak • Odivon FaturaPro</p>
+                    <p *ngIf="previewInvoice.notes" class="italic">{{ lang.t('doc.note', { note: previewInvoice.notes }) }}</p>
+                    <p class="text-center text-[10px] text-slate-400 pt-2">{{ lang.t('doc.classicFooter') }}</p>
                 </div>
             </div>
 
@@ -660,29 +658,29 @@
                 <div>
                     <div class="flex justify-between items-center mb-10 pb-6 border-b border-slate-100">
                         <div>
-                            <span class="text-[11px] font-bold uppercase tracking-widest text-slate-400">FATURA BİLGİSİ</span>
+                            <span class="text-[11px] font-bold uppercase tracking-widest text-slate-400">{{ lang.t('doc.invoiceInfo') }}</span>
                             <h2 class="text-4xl font-extrabold text-slate-950 mt-1 tracking-tight">{{ previewInvoice.invoiceNo }}</h2>
                         </div>
                         <div class="text-right">
                             <h1 class="text-xl font-bold text-slate-900">{{ userProfile?.companyName || 'Odivon FaturaPro' }}</h1>
-                            <p class="text-xs text-slate-400 mt-1">{{ previewInvoice.date | date:'dd MMMM yyyy' }}</p>
+                            <p class="text-xs text-slate-400 mt-1">{{ previewInvoice.date | date:'dd MMMM yyyy':'':lang.locale }}</p>
                         </div>
                     </div>
 
                     <div class="grid grid-cols-2 gap-10 mb-10">
                         <div class="bg-slate-50/70 p-6 rounded-2xl">
-                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">KİME</span>
+                            <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ lang.t('doc.to') }}</span>
                             <h3 class="text-lg font-bold text-slate-900 mt-2">{{ previewInvoice.customerName }}</h3>
-                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ previewInvoice.customerAddress || 'Adres belirtilmedi' }}</p>
-                            <p *ngIf="previewInvoice.customerTaxId" class="text-xs font-mono text-slate-500 mt-2">VN: {{ previewInvoice.customerTaxId }}</p>
+                            <p class="text-xs text-slate-500 mt-1 leading-relaxed">{{ previewInvoice.customerAddress || lang.t('doc.noAddress') }}</p>
+                            <p *ngIf="previewInvoice.customerTaxId" class="text-xs font-mono text-slate-500 mt-2">{{ lang.t('preview.taxIdShort', { id: previewInvoice.customerTaxId }) }}</p>
                         </div>
                         <div class="p-6 rounded-2xl bg-slate-50/70 flex flex-col justify-between text-xs">
                             <div>
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">SON ÖDEME TARİHİ</span>
-                                <p class="text-base font-bold text-slate-900 mt-1">{{ previewInvoice.dueDate | date:'dd MMMM yyyy' }}</p>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ lang.t('doc.dueDateCaps') }}</span>
+                                <p class="text-base font-bold text-slate-900 mt-1">{{ previewInvoice.dueDate | date:'dd MMMM yyyy':'':lang.locale }}</p>
                             </div>
                             <div class="pt-4 border-t border-slate-200/60">
-                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">DURUM</span>
+                                <span class="text-[10px] font-bold uppercase tracking-wider text-slate-400">{{ lang.t('doc.statusCaps') }}</span>
                                 <div class="mt-1">
                                     <span class="px-2.5 py-1 rounded-lg text-xs font-semibold bg-slate-900 text-white">{{ getStatusLabel(previewInvoice.status) }}</span>
                                 </div>
@@ -692,10 +690,10 @@
 
                     <div class="space-y-4 mb-10">
                         <div class="grid grid-cols-12 text-[11px] font-bold uppercase tracking-wider text-slate-400 px-4">
-                            <div class="col-span-6">Hizmet / Ürün</div>
-                            <div class="col-span-2 text-center">Adet</div>
-                            <div class="col-span-2 text-right">Birim</div>
-                            <div class="col-span-2 text-right">Toplam</div>
+                            <div class="col-span-6">{{ lang.t('doc.serviceProduct') }}</div>
+                            <div class="col-span-2 text-center">{{ lang.t('doc.qty') }}</div>
+                            <div class="col-span-2 text-right">{{ lang.t('doc.unit') }}</div>
+                            <div class="col-span-2 text-right">{{ lang.t('item.total') }}</div>
                         </div>
                         <div *ngFor="let item of previewInvoice.items" class="grid grid-cols-12 items-center px-4 py-3.5 bg-slate-50/60 rounded-xl text-xs">
                             <div class="col-span-6 font-semibold text-slate-900">{{ item.description }}</div>
@@ -708,15 +706,15 @@
                     <div class="flex justify-end mb-8">
                         <div class="w-64 space-y-2 text-xs">
                             <div class="flex justify-between text-slate-400">
-                                <span>Ara Toplam</span>
+                                <span>{{ lang.t('doc.subtotal') }}</span>
                                 <span class="font-medium text-slate-800">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.subtotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between text-slate-400">
-                                <span>{{ previewInvoice.taxLabel || 'KDV' }}</span>
+                                <span>{{ previewInvoice.taxLabel || lang.t('doc.vat') }}</span>
                                 <span class="font-medium text-slate-800">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.taxTotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between text-xl font-extrabold text-slate-950 pt-3 border-t border-slate-200">
-                                <span>Toplam</span>
+                                <span>{{ lang.t('item.total') }}</span>
                                 <span>{{ previewInvoice.currencySymbol || '₺' }}{{ previewInvoice.total | number:'1.2-2' }}</span>
                             </div>
                         </div>
@@ -724,7 +722,7 @@
                 </div>
 
                 <div class="pt-6 border-t border-slate-100 flex items-center justify-between text-xs text-slate-400">
-                    <span>Modern Minimalist Taslak</span>
+                    <span>{{ lang.t('doc.modernFooter') }}</span>
                     <span>{{ userProfile?.email || 'info@faturapro.com' }}</span>
                 </div>
             </div>
@@ -737,14 +735,14 @@
                     <div class="bg-gradient-to-r from-indigo-700 via-indigo-800 to-slate-900 text-white p-8 sm:p-10">
                         <div class="flex justify-between items-start">
                             <div>
-                                <span class="px-2.5 py-1 rounded bg-indigo-500/30 text-indigo-200 text-xs font-mono font-semibold uppercase tracking-wider">TECH &amp; SAAS INVOICE</span>
+                                <span class="px-2.5 py-1 rounded bg-indigo-500/30 text-indigo-200 text-xs font-mono font-semibold uppercase tracking-wider">{{ lang.t('doc.techTitle') }}</span>
                                 <h1 class="text-3xl font-black tracking-tight mt-2 text-white">{{ userProfile?.companyName || 'Odivon FaturaPro' }}</h1>
-                                <p class="text-indigo-200 text-xs mt-1">{{ userProfile?.companyAddress || 'Maslak, İstanbul' }}</p>
+                                <p class="text-indigo-200 text-xs mt-1">{{ userProfile?.companyAddress || lang.t('doc.sampleCity') }}</p>
                             </div>
                             <div class="text-right">
                                 <h2 class="text-2xl font-mono font-black text-emerald-400">{{ previewInvoice.invoiceNo }}</h2>
-                                <p class="text-xs text-indigo-200 mt-1">Tarih: {{ previewInvoice.date | date:'dd.MM.yyyy' }}</p>
-                                <p class="text-xs text-indigo-300 font-semibold mt-0.5">Vade: {{ previewInvoice.dueDate | date:'dd.MM.yyyy' }}</p>
+                                <p class="text-xs text-indigo-200 mt-1">{{ lang.t('doc.dateValue', { date: (previewInvoice.date | date:'dd.MM.yyyy') }) }}</p>
+                                <p class="text-xs text-indigo-300 font-semibold mt-0.5">{{ lang.t('doc.dueValue', { date: (previewInvoice.dueDate | date:'dd.MM.yyyy') }) }}</p>
                             </div>
                         </div>
                     </div>
@@ -752,14 +750,14 @@
                     <div class="p-8 sm:p-10">
                         <!-- Client Card -->
                         <div class="p-5 bg-indigo-50/50 rounded-xl border border-indigo-100 mb-8">
-                            <span class="text-[10px] font-bold font-mono uppercase text-indigo-600 tracking-wider">MÜŞTERİ HESABI</span>
+                            <span class="text-[10px] font-bold font-mono uppercase text-indigo-600 tracking-wider">{{ lang.t('doc.customerAccount') }}</span>
                             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mt-2">
                                 <div>
                                     <h3 class="text-lg font-bold text-slate-900">{{ previewInvoice.customerName }}</h3>
-                                    <p class="text-xs text-slate-500">{{ previewInvoice.customerEmail || 'eposta yok' }}</p>
+                                    <p class="text-xs text-slate-500">{{ previewInvoice.customerEmail || lang.t('doc.noEmail') }}</p>
                                 </div>
                                 <div class="text-right mt-2 sm:mt-0 font-mono text-xs text-indigo-700 bg-white px-3 py-1.5 rounded-lg border border-indigo-200">
-                                    VKN: {{ previewInvoice.customerTaxId || '1111111111' }}
+                                    {{ lang.t('doc.vknValue', { id: previewInvoice.customerTaxId || '1111111111' }) }}
                                 </div>
                             </div>
                         </div>
@@ -768,11 +766,11 @@
                         <table class="w-full text-left mb-8">
                             <thead>
                                 <tr class="bg-indigo-900 text-indigo-100 text-xs font-mono uppercase">
-                                    <th class="py-3 px-4 rounded-l-lg">Hizmet Kalemi</th>
-                                    <th class="py-3 px-4 text-center">Adet</th>
-                                    <th class="py-3 px-4 text-right">Birim Fiyat</th>
-                                    <th class="py-3 px-4 text-center">KDV</th>
-                                    <th class="py-3 px-4 rounded-r-lg text-right">Tutar</th>
+                                    <th class="py-3 px-4 rounded-l-lg">{{ lang.t('doc.serviceItem') }}</th>
+                                    <th class="py-3 px-4 text-center">{{ lang.t('doc.qty') }}</th>
+                                    <th class="py-3 px-4 text-right">{{ lang.t('item.unitPrice') }}</th>
+                                    <th class="py-3 px-4 text-center">{{ lang.t('doc.vat') }}</th>
+                                    <th class="py-3 px-4 rounded-r-lg text-right">{{ lang.t('table.amount') }}</th>
                                 </tr>
                             </thead>
                             <tbody class="divide-y divide-indigo-50 text-xs">
@@ -790,15 +788,15 @@
                         <div class="flex justify-end mb-6">
                             <div class="w-80 bg-slate-900 text-white p-5 rounded-2xl shadow-lg space-y-2 text-xs">
                                 <div class="flex justify-between text-slate-400">
-                                    <span>Net Matrah</span>
+                                    <span>{{ lang.t('doc.netBase') }}</span>
                                     <span class="font-mono">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.subtotal || 0) | number:'1.2-2' }}</span>
                                 </div>
                                 <div class="flex justify-between text-indigo-300">
-                                    <span>Hesaplanan KDV (%{{ previewInvoice.taxRate || 20 }})</span>
+                                    <span>{{ lang.t('doc.calcVat', { rate: previewInvoice.taxRate || 20 }) }}</span>
                                     <span class="font-mono">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.taxTotal || 0) | number:'1.2-2' }}</span>
                                 </div>
                                 <div class="flex justify-between text-lg font-mono font-black text-emerald-400 pt-3 border-t border-slate-700">
-                                    <span>ÖDENECEK</span>
+                                    <span>{{ lang.t('doc.payable') }}</span>
                                     <span>{{ previewInvoice.currencySymbol || '₺' }}{{ previewInvoice.total | number:'1.2-2' }}</span>
                                 </div>
                             </div>
@@ -807,7 +805,7 @@
                 </div>
 
                 <div class="p-8 sm:p-10 pt-0 text-xs text-slate-400 border-t border-slate-100 flex justify-between items-center">
-                    <span class="font-mono">Tech Indigo Şablonu • FaturaPro</span>
+                    <span class="font-mono">{{ lang.t('doc.techFooter') }}</span>
                     <span class="font-mono">ID: {{ previewInvoice.id?.substring(0, 8) }}</span>
                 </div>
             </div>
@@ -820,36 +818,36 @@
                     <div class="border-b-2 border-black pb-4 mb-4">
                         <div class="flex justify-between items-start">
                             <div class="w-1/2">
-                                <h1 class="text-base font-black uppercase text-black leading-tight">{{ userProfile?.companyName || 'ODİVON FATURAPRO LTD. ŞTİ.' }}</h1>
+                                <h1 class="text-base font-black uppercase text-black leading-tight">{{ userProfile?.companyName || lang.t('doc.defaultCompany') }}</h1>
                                 <p class="text-[11px] leading-tight text-slate-700 mt-1">
-                                    {{ userProfile?.companyAddress || 'Maslak Mah. Büyükdere Cad. No:1 Sarıyer / İstanbul' }}<br />
-                                    Vergi Dairesi: {{ userProfile?.taxOffice || 'Sarıyer' }} &nbsp; VKN: {{ userProfile?.taxId || '1234567890' }}<br />
-                                    Ticaret Sicil No: 123456 &nbsp; Mersis No: 0123456789000001
+                                    {{ userProfile?.companyAddress || lang.t('doc.noCompanyAddress') }}<br />
+                                    {{ lang.t('doc.taxOfficeVkn', { office: userProfile?.taxOffice || '-', id: userProfile?.taxId || '1234567890' }) }}<br />
+                                    {{ lang.t('doc.tradeRegistry') }}
                                 </p>
                             </div>
                             <div class="w-1/2 text-right">
                                 <div class="inline-block border border-black px-3 py-1 text-center mb-1">
-                                    <span class="text-xs font-black tracking-wider block">e-Arşiv Fatura</span>
-                                    <span class="text-[10px] text-slate-600 block">ELEKTRONİK BELGE</span>
+                                    <span class="text-xs font-black tracking-wider block">{{ lang.t('doc.eArchiveInvoice') }}</span>
+                                    <span class="text-[10px] text-slate-600 block">{{ lang.t('doc.electronicDoc') }}</span>
                                 </div>
                                 <p class="font-mono font-bold text-sm text-black mt-1">{{ previewInvoice.invoiceNo }}</p>
-                                <p class="text-[11px] text-slate-700">Düzenleme Tarihi: {{ previewInvoice.date | date:'dd.MM.yyyy' }}</p>
-                                <p class="text-[11px] text-slate-700">Düzenleme Zamanı: 14:30:00</p>
+                                <p class="text-[11px] text-slate-700">{{ lang.t('doc.issueDate', { date: (previewInvoice.date | date:'dd.MM.yyyy') }) }}</p>
+                                <p class="text-[11px] text-slate-700">{{ lang.t('doc.issueTime') }}</p>
                             </div>
                         </div>
                     </div>
 
                     <!-- Müşteri Kutusu -->
                     <div class="border border-black p-3 mb-4 bg-slate-50">
-                        <span class="font-bold uppercase text-[10px] block border-b border-slate-300 pb-1 mb-1">SAYIN (ALICI)</span>
+                        <span class="font-bold uppercase text-[10px] block border-b border-slate-300 pb-1 mb-1">{{ lang.t('doc.buyer') }}</span>
                         <div class="grid grid-cols-2 gap-4">
                             <div>
                                 <p class="font-bold text-sm text-black">{{ previewInvoice.customerName }}</p>
-                                <p class="text-[11px] text-slate-700 leading-snug">{{ previewInvoice.customerAddress || 'Müşteri adresi sistemde kayıtlıdır.' }}</p>
+                                <p class="text-[11px] text-slate-700 leading-snug">{{ previewInvoice.customerAddress || lang.t('doc.customerAddressOnFile') }}</p>
                             </div>
                             <div class="text-right">
-                                <p class="text-[11px]"><strong>VKN / TCKN:</strong> {{ previewInvoice.customerTaxId || '1111111111' }}</p>
-                                <p class="text-[11px]"><strong>Vergi Dairesi:</strong> Müşteri V.D.</p>
+                                <p class="text-[11px]"><strong>{{ lang.t('doc.vknTckn') }}</strong> {{ previewInvoice.customerTaxId || '1111111111' }}</p>
+                                <p class="text-[11px]"><strong>{{ lang.t('doc.taxOffice') }}</strong> {{ lang.t('doc.customerTaxOffice') }}</p>
                             </div>
                         </div>
                     </div>
@@ -858,20 +856,20 @@
                     <table class="w-full text-left border-collapse border border-black mb-4">
                         <thead>
                             <tr class="bg-slate-200 border-b border-black text-[11px] font-bold text-black">
-                                <th class="border-r border-black p-2 text-center w-8">S.No</th>
-                                <th class="border-r border-black p-2">Mal / Hizmet Cinsi</th>
-                                <th class="border-r border-black p-2 text-center w-14">Miktar</th>
-                                <th class="border-r border-black p-2 text-right w-24">Birim Fiyat</th>
-                                <th class="border-r border-black p-2 text-center w-14">KDV %</th>
-                                <th class="border-r border-black p-2 text-right w-20">KDV Tutarı</th>
-                                <th class="p-2 text-right w-24">Satır Toplamı</th>
+                                <th class="border-r border-black p-2 text-center w-8">{{ lang.t('doc.rowNo') }}</th>
+                                <th class="border-r border-black p-2">{{ lang.t('doc.goodsService') }}</th>
+                                <th class="border-r border-black p-2 text-center w-14">{{ lang.t('item.quantity') }}</th>
+                                <th class="border-r border-black p-2 text-right w-24">{{ lang.t('item.unitPrice') }}</th>
+                                <th class="border-r border-black p-2 text-center w-14">{{ lang.t('doc.vatPct') }}</th>
+                                <th class="border-r border-black p-2 text-right w-20">{{ lang.t('doc.vatAmount') }}</th>
+                                <th class="p-2 text-right w-24">{{ lang.t('doc.lineTotal') }}</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-300 text-[11px]">
                             <tr *ngFor="let item of previewInvoice.items; let idx = index">
                                 <td class="border-r border-black p-2 text-center font-bold">{{ idx + 1 }}</td>
                                 <td class="border-r border-black p-2">{{ item.description }}</td>
-                                <td class="border-r border-black p-2 text-center">{{ item.quantity }} Adet</td>
+                                <td class="border-r border-black p-2 text-center">{{ lang.t('doc.qtyUnits', { qty: item.quantity }) }}</td>
                                 <td class="border-r border-black p-2 text-right">{{ previewInvoice.currencySymbol || '₺' }}{{ item.unitPrice | number:'1.2-2' }}</td>
                                 <td class="border-r border-black p-2 text-center">%{{ item.taxRate || 20 }}</td>
                                 <td class="border-r border-black p-2 text-right font-medium">{{ previewInvoice.currencySymbol || '₺' }}{{ calculateLineTax(item) | number:'1.2-2' }}</td>
@@ -883,25 +881,25 @@
                     <!-- Alt Matrah / KDV Özeti -->
                     <div class="flex justify-between items-start mb-4">
                         <div class="w-1/2 p-2 border border-black bg-slate-50 text-[10px]">
-                            <p class="font-bold mb-1">NOTLAR / İRSALİYE YERİNE GEÇER:</p>
-                            <p>İşbu fatura 213 sayılı V.U.K. hükümlerine göre elektronik ortamda düzenlenmiştir.</p>
-                            <p class="font-mono mt-1 font-semibold">IBAN: {{ userProfile?.iban || 'TR00 0000 0000 0000 0000 0000 00' }}</p>
+                            <p class="font-bold mb-1">{{ lang.t('doc.notesWaybill') }}</p>
+                            <p>{{ lang.t('doc.legalNote') }}</p>
+                            <p class="font-mono mt-1 font-semibold">IBAN: {{ userProfile?.iban || lang.t('settings.ibanPlaceholder') }}</p>
                         </div>
                         <div class="w-72 border border-black divide-y divide-black text-[11px]">
                             <div class="flex justify-between p-1.5 bg-slate-100">
-                                <span>Mal/Hizmet Toplam Tutarı</span>
+                                <span>{{ lang.t('doc.goodsTotal') }}</span>
                                 <span class="font-bold">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.subtotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between p-1.5">
-                                <span>Toplam İskonto</span>
+                                <span>{{ lang.t('doc.totalDiscount') }}</span>
                                 <span>{{ previewInvoice.currencySymbol || '₺' }}0,00</span>
                             </div>
                             <div class="flex justify-between p-1.5">
-                                <span>Hesaplanan KDV (%{{ previewInvoice.taxRate || 20 }})</span>
+                                <span>{{ lang.t('doc.calcVat', { rate: previewInvoice.taxRate || 20 }) }}</span>
                                 <span class="font-bold text-blue-700">{{ previewInvoice.currencySymbol || '₺' }}{{ (previewInvoice.taxTotal || 0) | number:'1.2-2' }}</span>
                             </div>
                             <div class="flex justify-between p-2 bg-slate-200 font-bold text-xs text-black">
-                                <span>ÖDENECEK TUTAR</span>
+                                <span>{{ lang.t('doc.amountPayable') }}</span>
                                 <span class="text-sm font-black">{{ previewInvoice.currencySymbol || '₺' }}{{ previewInvoice.total | number:'1.2-2' }}</span>
                             </div>
                         </div>
@@ -912,10 +910,10 @@
                 <div class="border-t-2 border-black pt-3 flex justify-between items-center text-[10px] text-slate-700">
                     <div>
                         <p class="font-bold">ETTN: {{ previewInvoice.id || 'fatura-uuid-ettn-kodu' }}</p>
-                        <p>FaturaPro ile GİB e-Arşiv UBL-TR 1.2.1 standartlarına tam uyumludur.</p>
+                        <p>{{ lang.t('doc.gibCompliance') }}</p>
                     </div>
                     <div class="border border-black p-1 text-center font-mono text-[9px] w-20">
-                        [KAREKOD]
+                        {{ lang.t('doc.qrCode') }}
                     </div>
                 </div>
             </div>
@@ -932,16 +930,16 @@
             <div class="w-16 h-16 bg-red-100 dark:bg-red-950/50 rounded-full flex items-center justify-center mx-auto mb-4">
                 <span class="material-symbols-outlined text-3xl text-red-600 dark:text-red-400">delete</span>
             </div>
-            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">Faturayı Sil</h3>
-            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">Bu faturayı silmek istediğinizden emin misiniz?</p>
+            <h3 class="text-lg font-bold text-slate-900 dark:text-white mb-2">{{ lang.t('invoices.deleteTitle') }}</h3>
+            <p class="text-slate-500 dark:text-slate-400 text-sm mb-6">{{ lang.t('invoices.deleteConfirm') }}</p>
             <div class="flex gap-3">
                 <button (click)="cancelDelete()"
                     class="flex-1 px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 rounded-xl transition-colors">
-                    İptal
+                    {{ lang.t('common.cancelShort') }}
                 </button>
                 <button (click)="deleteInvoice()"
                     class="flex-1 px-4 py-2.5 text-sm font-semibold text-white bg-red-600 hover:bg-red-700 rounded-xl transition-colors">
-                    Sil
+                    {{ lang.t('common.deleteShort') }}
                 </button>
             </div>
         </div>

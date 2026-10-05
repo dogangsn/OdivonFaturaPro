@@ -1,3 +1,4 @@
+import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { Router } from '@angular/router';
@@ -11,7 +12,7 @@ import { LegalModalComponent, LegalDocType } from '../../shared/components/legal
 @Component({
     selector: 'app-country-select',
     standalone: true,
-    imports: [CommonModule, LegalModalComponent],
+    imports: [CommonModule, LegalModalComponent, LanguageSwitcherComponent],
     templateUrl: './country-select.component.html',
     styleUrl: './country-select.component.css'
 })

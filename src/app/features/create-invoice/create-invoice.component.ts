@@ -123,7 +123,7 @@ export class CreateInvoiceComponent implements OnInit {
                             this.invoiceForm.patchValue({ countryCode: draft.countryCode });
                         }
                         sessionStorage.removeItem('pending_invoice_draft');
-                        this.alertService.toast('Hazırladığınız taslak fatura geri yüklendi! 📝', 'success');
+                        this.alertService.toast(this.lang.t('create.draftRestored'), 'success');
                     } catch (e) {
                         console.error('Taslak fatura yüklenirken hata:', e);
                     }
@@ -177,7 +177,7 @@ export class CreateInvoiceComponent implements OnInit {
 
     addAdditionalTax() {
         const taxForm = this.fb.group({
-            name: ['Ek Vergi', Validators.required],
+            name: [this.lang.t('create.extraTaxDefault'), Validators.required],
             rate: [0, [Validators.required, Validators.min(0), Validators.max(100)]]
         });
         this.additionalTaxes.push(taxForm);
@@ -267,7 +267,7 @@ export class CreateInvoiceComponent implements OnInit {
 
     async saveInvoice() {
         if (this.invoiceForm.invalid) {
-            this.alertService.warning('Eksik Bilgi', 'Lütfen tüm zorunlu alanları doldurun.');
+            this.alertService.warning(this.lang.t('common.missingInfo'), this.lang.t('common.fillRequired'));
             return;
         }
 
@@ -283,10 +283,10 @@ export class CreateInvoiceComponent implements OnInit {
                 sessionStorage.setItem('pending_invoice_draft', JSON.stringify(draftData));
             }
             const confirmed = await this.alertService.confirm(
-                'Giriş Yapın veya Üye Olun',
-                'Faturanız hazırlandı! 🎉\n\nFaturanızı güvenle kaydetmek, PDF olarak indirmek veya müşterinize göndermek için lütfen ücretsiz giriş yapın veya kayıt olun.\n\nGirdiğiniz tüm bilgiler korunacaktır.',
-                'Giriş / Kayıt Ol',
-                'İptal'
+                this.lang.t('create.loginRequiredTitle'),
+                this.lang.t('create.loginRequiredText'),
+                this.lang.t('create.loginOrRegister'),
+                this.lang.t('common.cancelShort')
             );
             if (confirmed) {
                 this.router.navigate(['/login'], { queryParams: { returnUrl: '/create-invoice' } });
@@ -299,14 +299,14 @@ export class CreateInvoiceComponent implements OnInit {
         if (profile && (profile.plan === 'free' || !profile.plan)) {
             const existingInvoices = await firstValueFrom(this.invoiceService.getInvoices());
             if (existingInvoices.length >= (profile.monthlyInvoiceLimit || 5)) {
-                this.alertService.warning('Plan Limiti', '⚠️ Ücretsiz Plan limitine ulaştınız! (Maksimum 5 Fatura).\n\nSınırsız fatura oluşturmak için lütfen Pro Plana yükseltin.');
+                this.alertService.warning(this.lang.t('plans.limitTitle'), this.lang.t('plans.limitReached'));
                 this.router.navigate(['/pricing']);
                 return;
             }
         }
 
         this.isSaving = true;
-        this.alertService.loading('Fatura kaydediliyor...');
+        this.alertService.loading(this.lang.t('create.saving'));
         try {
             const val = this.invoiceForm.value;
             const invoiceData: InvoiceFormData = {
@@ -336,11 +336,11 @@ export class CreateInvoiceComponent implements OnInit {
             };
 
             await this.invoiceService.createInvoice(invoiceData);
-            await this.alertService.success('Başarılı', (val.invoiceType === 'proforma' ? 'Proforma Fatura' : 'Satış Faturası') + ' başarıyla kaydedildi!');
+            await this.alertService.success(this.lang.t('common.success'), this.lang.t('create.savedSuccess', { type: val.invoiceType === 'proforma' ? this.lang.t('invoiceType.proformaInvoice') : this.lang.t('invoiceType.salesInvoice') }));
             this.router.navigate(['/invoices']);
         } catch (error) {
             console.error('Fatura kaydedilirken hata:', error);
-            this.alertService.error('Hata', 'Fatura oluşturulurken bir hata oluştu.');
+            this.alertService.error(this.lang.t('common.error'), this.lang.t('create.saveError'));
         } finally {
             this.isSaving = false;
         }
@@ -389,7 +389,7 @@ export class CreateInvoiceComponent implements OnInit {
             this.scannedResult = result;
         } catch (err: any) {
             console.error('AI Invoice scanning failed:', err);
-            this.scannerError = err.message || 'Belge taranırken bir hata oluştu.';
+            this.scannerError = err.message || this.lang.t('scanner.error');
         } finally {
             this.isScanning = false;
         }
@@ -422,7 +422,7 @@ export class CreateInvoiceComponent implements OnInit {
 
             for (const item of this.scannedResult.items) {
                 const itemForm = this.fb.group({
-                    description: [item.description || 'Hizmet / Ürün Kalemi', Validators.required],
+                    description: [item.description || this.lang.t('scanner.defaultItem'), Validators.required],
                     quantity: [item.quantity || 1, [Validators.required, Validators.min(1)]],
                     unitPrice: [item.unitPrice || item.totalPrice || 0, [Validators.required, Validators.min(0)]],
                     taxRate: [item.taxRate !== undefined ? item.taxRate : this.taxRate, [Validators.required, Validators.min(0)]],
@@ -436,7 +436,7 @@ export class CreateInvoiceComponent implements OnInit {
                 this.items.removeAt(0);
             }
             const singleItem = this.fb.group({
-                description: ['Hizmet / Ürün Bedeli', Validators.required],
+                description: [this.lang.t('scanner.defaultItemTotal'), Validators.required],
                 quantity: [1, [Validators.required, Validators.min(1)]],
                 unitPrice: [this.scannedResult.totalAmount, [Validators.required, Validators.min(0)]],
                 taxRate: [this.scannedResult.taxRate || this.taxRate, [Validators.required, Validators.min(0)]],

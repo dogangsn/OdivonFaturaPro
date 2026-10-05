@@ -5,12 +5,14 @@ import { Auth } from '@angular/fire/auth';
 import { Expense, ExpenseFormData } from '../models/expense.model';
 import { Observable, of, from, switchMap } from 'rxjs';
 
+import { LanguageService } from './language.service';
 @Injectable({
     providedIn: 'root'
 })
 export class ExpenseService {
     private platformId = inject(PLATFORM_ID);
     private injector = inject(Injector);
+    private lang = inject(LanguageService);
 
     private _firestore: Firestore | null = null;
     private _auth: Auth | null = null;
@@ -228,7 +230,7 @@ export class ExpenseService {
                 {
                     id: 'sample-1',
                     userId: 'default',
-                    title: 'Ofis Kırtasiye ve Sarf Malzemeleri',
+                    title: this.lang.t('seed.exp1.title'),
                     category: 'office',
                     date: new Date().toISOString().split('T')[0],
                     amount: 650.0,
@@ -236,12 +238,12 @@ export class ExpenseService {
                     taxAmount: 108.33,
                     paymentMethod: 'credit_card',
                     supplierName: 'D&R Mağazacılık',
-                    notes: 'A4 kağıtları ve yazıcı kartuşu'
+                    notes: this.lang.t('seed.exp1.notes')
                 },
                 {
                     id: 'sample-2',
                     userId: 'default',
-                    title: 'Müşteri Görüşmesi Yemek Fişi',
+                    title: this.lang.t('seed.exp2.title'),
                     category: 'food',
                     date: new Date(Date.now() - 2 * 86400000).toISOString().split('T')[0],
                     amount: 420.0,
@@ -249,12 +251,12 @@ export class ExpenseService {
                     taxAmount: 38.18,
                     paymentMethod: 'credit_card',
                     supplierName: 'Köşebaşı Kebap',
-                    notes: 'Proje görüşmesi öğle yemeği'
+                    notes: this.lang.t('seed.exp2.notes')
                 },
                 {
                     id: 'sample-3',
                     userId: 'default',
-                    title: 'Şirket Aracı Akaryakıt',
+                    title: this.lang.t('seed.exp3.title'),
                     category: 'fuel',
                     date: new Date(Date.now() - 5 * 86400000).toISOString().split('T')[0],
                     amount: 1750.0,
@@ -262,7 +264,7 @@ export class ExpenseService {
                     taxAmount: 291.67,
                     paymentMethod: 'credit_card',
                     supplierName: 'Petrol Ofisi',
-                    notes: 'Saha ziyareti yakıt alımı'
+                    notes: this.lang.t('seed.exp3.notes')
                 }
             ];
             this.saveToLocalStorage(initial);
