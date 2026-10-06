@@ -8,7 +8,9 @@
     "deploy": "ng build && firebase deploy --only hosting",
     "watch": "ng build --watch --configuration development",
     "test": "ng test",
-    "serve:ssr:OdivonFaturaPro": "node dist/OdivonFaturaPro/server/server.mjs"
+    "serve:ssr:OdivonFaturaPro": "node dist/OdivonFaturaPro/server/server.mjs",
+    "test:rules": "firebase emulators:exec --only firestore --project demo-odivon-rules \"vitest run --config tests/vitest.config.mts tests/rules\"",
+    "test:release": "vitest run --config tests/vitest.config.mts tests/release"
   },
   "prettier": {
     "printWidth": 100,
@@ -51,6 +53,7 @@
     "@angular/build": "^20.0.0",
     "@angular/cli": "^20.0.0",
     "@angular/compiler-cli": "^20.0.0",
+    "@firebase/rules-unit-testing": "^3.0.4",
     "@types/express": "^5.0.1",
     "@types/node": "^20.17.19",
     "autoprefixer": "^10.4.22",
