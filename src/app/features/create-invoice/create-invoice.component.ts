@@ -13,6 +13,7 @@ import { AiScannerService, ScannedDocumentResult } from '../../core/services/ai-
 import { AlertService } from '../../core/services/alert.service';
 import { COUNTRIES_CONFIG, COUNTRY_MAP, CountryConfig, TaxRateOption } from '../../core/constants/countries.constant';
 import { firstValueFrom } from 'rxjs';
+import { canCreateInvoice, isFreePlan } from '../../core/utils/plan-limits';
 
 @Component({
     selector: 'app-create-invoice',
@@ -294,11 +295,11 @@ export class CreateInvoiceComponent implements OnInit {
             return;
         }
 
-        // Ücretsiz Plan Fatura Limit Kontrolü (Maks 5 Fatura)
+        // Ücretsiz Plan aylık fatura limiti (her takvim ayı sıfırlanır)
         const profile = await this.userService.getUserProfile(currentUser.uid);
-        if (profile && (profile.plan === 'free' || !profile.plan)) {
+        if (isFreePlan(profile)) {
             const existingInvoices = await firstValueFrom(this.invoiceService.getInvoices());
-            if (existingInvoices.length >= (profile.monthlyInvoiceLimit || 5)) {
+            if (!canCreateInvoice(profile, existingInvoices)) {
                 this.alertService.warning(this.lang.t('plans.limitTitle'), this.lang.t('plans.limitReached'));
                 this.router.navigate(['/pricing']);
                 return;
@@ -310,7 +311,7 @@ export class CreateInvoiceComponent implements OnInit {
         try {
             const val = this.invoiceForm.value;
             const invoiceData: InvoiceFormData = {
-                invoiceNo: this.invoiceService.generateInvoiceNumber(),
+                invoiceNo: '', // kaydederken sıralı numara atanır
                 invoiceType: val.invoiceType || 'commercial',
                 date: val.date,
                 dueDate: val.dueDate || val.date,

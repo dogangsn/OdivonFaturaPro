@@ -10,6 +10,7 @@ import { LanguageService } from '../../core/services/language.service';
 import { AlertService } from '../../core/services/alert.service';
 import { Customer, CustomerFormData, ReconciliationStatus } from '../../core/models/customer.model';
 import { Invoice } from '../../core/models/invoice.model';
+import { canAddCustomer } from '../../core/utils/plan-limits';
 
 @Component({
     selector: 'app-customer-list',
@@ -326,6 +327,17 @@ export class CustomerListComponent implements OnInit {
         if (!this.formData.name || !this.formData.email) {
             this.alertService.warning(this.lang.t('common.missingInfo'), this.lang.t('customers.fillNameEmail'));
             return;
+        }
+
+        // Ücretsiz Plan müşteri limiti
+        if (!this.isEditing) {
+            const currentUser = this.authService.currentUser;
+            const profile = currentUser ? await this.userService.getUserProfile(currentUser.uid) : null;
+            if (!canAddCustomer(profile, this.customers.length)) {
+                this.alertService.warning(this.lang.t('plans.limitTitle'), this.lang.t('plans.customerLimitReached'));
+                this.router.navigate(['/pricing']);
+                return;
+            }
         }
 
         this.isSaving = true;

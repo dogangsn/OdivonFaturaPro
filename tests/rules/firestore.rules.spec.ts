@@ -1,12 +1,12 @@
 import { readFileSync } from 'node:fs';
-import { afterAll, beforeAll, beforeEach, describe, it } from 'vitest';
+import { afterAll, beforeAll, beforeEach, describe, expect, it } from 'vitest';
 import {
   assertFails,
   assertSucceeds,
   initializeTestEnvironment,
   RulesTestEnvironment,
 } from '@firebase/rules-unit-testing';
-import { doc, getDoc, setDoc, updateDoc, deleteDoc, serverTimestamp, setLogLevel } from 'firebase/firestore';
+import { collection, doc, getDoc, setDoc, updateDoc, deleteDoc, runTransaction, serverTimestamp, setLogLevel } from 'firebase/firestore';
 
 // Gelir akışının dayandığı Firestore kuralları.
 // `gap(...)` ile işaretli testler bugün bilinen bir açığı belgeler: kural düzeltildiğinde
@@ -94,25 +94,107 @@ describe('users/{uid} — profil ve plan', () => {
     await assertSucceeds(setDoc(doc(db, 'users', 'carol'), freeProfile('carol')));
   });
 
-  gap('kullanıcı ödeme yapmadan kendi planını pro yapamamalı', async () => {
+  it('kullanıcı ödeme yapmadan kendi planını pro yapamamalı', async () => {
     await assertFails(updateDoc(doc(asAlice(), 'users', ALICE), { plan: 'pro' }));
   });
 
-  gap('kullanıcı kendi fatura limitini yükseltememeli', async () => {
+  it('kullanıcı kendi fatura limitini yükseltememeli', async () => {
     await assertFails(updateDoc(doc(asAlice(), 'users', ALICE), { monthlyInvoiceLimit: 999999 }));
   });
 
-  gap('kullanıcı kendi müşteri limitini yükseltememeli', async () => {
+  it('kullanıcı kendi müşteri limitini yükseltememeli', async () => {
     await assertFails(updateDoc(doc(asAlice(), 'users', ALICE), { customerLimit: 999999 }));
   });
 
-  gap('yeni kullanıcı doğrudan pro planla kayıt olamamalı', async () => {
+  it('yeni kullanıcı doğrudan pro planla kayıt olamamalı', async () => {
     const db = env.authenticatedContext('dave').firestore();
     await assertFails(setDoc(doc(db, 'users', 'dave'), { ...freeProfile('dave'), plan: 'enterprise' }));
   });
 
-  gap('kullanıcı profilini silip ücretsiz kotayı sıfırlayamamalı', async () => {
+  it('kullanıcı profilini silip ücretsiz kotayı sıfırlayamamalı', async () => {
     await assertFails(deleteDoc(doc(asAlice(), 'users', ALICE)));
+  });
+  it('kullanıcı ücretli plandan ücretsiz plana dönebilir', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      await updateDoc(doc(ctx.firestore(), 'users', ALICE), { plan: 'pro', monthlyInvoiceLimit: 999999, customerLimit: 999999 });
+    });
+    await assertSucceeds(
+      updateDoc(doc(asAlice(), 'users', ALICE), { plan: 'free', monthlyInvoiceLimit: 5, customerLimit: 5 }),
+    );
+  });
+
+  it('planı olmayan eski profil ücretsiz plana taşınabilir', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      await setDoc(doc(ctx.firestore(), 'users', 'legacy'), { uid: 'legacy', email: 'legacy@example.com' });
+    });
+    const db = env.authenticatedContext('legacy').firestore();
+    await assertSucceeds(updateDoc(doc(db, 'users', 'legacy'), { plan: 'free', monthlyInvoiceLimit: 5, customerLimit: 5 }));
+  });
+
+  it('Pro kullanıcı firma bilgilerini güncelleyebilir', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      await updateDoc(doc(ctx.firestore(), 'users', ALICE), { plan: 'pro', monthlyInvoiceLimit: 999999, customerLimit: 999999 });
+    });
+    await assertSucceeds(updateDoc(doc(asAlice(), 'users', ALICE), { companyName: 'Alice Pro Ltd' }));
+  });
+});
+
+describe('counters/{uid} — sıralı fatura numarası', () => {
+  const counter = (db = asAlice()) => doc(db, 'counters', ALICE);
+
+  it('sayaç 1 ile başlar', async () => {
+    await assertSucceeds(setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 }));
+  });
+
+  it('sayaç 1 dışında bir değerle başlatılamaz', async () => {
+    await assertFails(setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 7 }));
+  });
+
+  it('sayaç birer birer ilerler', async () => {
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 });
+    await assertSucceeds(setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 2 }));
+  });
+
+  it('sayaç geri alınamaz (aynı numara tekrar kullanılamaz)', async () => {
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 });
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 2 });
+    await assertFails(setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 }));
+  });
+
+  it('sayaç numara atlayamaz', async () => {
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 });
+    await assertFails(setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 3 }));
+  });
+
+  it('yeni yılda sayaç 1 den başlar', async () => {
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 });
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 2 });
+    await assertSucceeds(setDoc(counter(), { invoiceYear: 2027, invoiceSeq: 1 }));
+  });
+
+  it('başka kullanıcının sayacına dokunulamaz', async () => {
+    const bob = env.authenticatedContext(BOB).firestore();
+    await assertFails(setDoc(doc(bob, 'counters', ALICE), { invoiceYear: 2026, invoiceSeq: 1 }));
+    await assertFails(getDoc(doc(bob, 'counters', ALICE)));
+  });
+
+  it('uygulamanın yaptığı gibi fatura ve sayaç aynı işlemde yazılabilir', async () => {
+    const db = asAlice();
+    for (const expected of [1, 2]) {
+      await assertSucceeds(runTransaction(db, async tx => {
+        const snap = await tx.get(counter(db));
+        const seq = snap.exists() ? snap.data()['invoiceSeq'] + 1 : 1;
+        tx.set(counter(db), { invoiceYear: 2026, invoiceSeq: seq });
+        tx.set(doc(collection(db, 'invoices')), invoice(ALICE, { invoiceNo: `INV-2026-${String(seq).padStart(6, '0')}` }));
+      }));
+      const snap = await getDoc(counter(db));
+      expect(snap.data()?.['invoiceSeq']).toBe(expected);
+    }
+  });
+
+  it('sayaç silinemez', async () => {
+    await setDoc(counter(), { invoiceYear: 2026, invoiceSeq: 1 });
+    await assertFails(deleteDoc(counter()));
   });
 });
 

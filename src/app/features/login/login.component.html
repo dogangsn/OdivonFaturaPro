@@ -48,6 +48,12 @@
             <span *ngIf="isLoading" class="material-symbols-outlined animate-spin text-xl">progress_activity</span>
             {{ isLoading ? lang.t('auth.loggingIn') : (isRegisterMode ? lang.t('auth.registerWithGoogle') : lang.t('auth.loginWithGoogle')) }}
         </button>
+        <p class="-mt-3 mb-5 text-[11px] leading-relaxed text-slate-400 text-center">
+            {{ lang.t('auth.googleConsentPrefix') }}
+            <button type="button" (click)="openLegal('terms')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.termsOfUse') }}</button>,
+            <button type="button" (click)="openLegal('privacy')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.privacyPolicy') }}</button> {{ lang.t('auth.consentAnd') }}
+            <button type="button" (click)="openLegal('kvkk')" class="text-primary underline hover:text-blue-700">{{ lang.t('legal.kvkkNotice') }}</button>{{ lang.t('auth.googleConsentSuffix') }}
+        </p>
 
         <!-- Messages -->
         <div *ngIf="errorMessage" class="mb-4 p-3 bg-red-50 dark:bg-red-950/40 border border-red-200 dark:border-red-800 rounded-xl text-red-600 dark:text-red-400 text-xs sm:text-sm">

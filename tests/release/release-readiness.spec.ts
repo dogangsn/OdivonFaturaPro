@@ -29,7 +29,7 @@ function srcFiles(dir: string): string[] {
 const appSource = () => srcFiles('src/app').map(read).join('\n');
 
 describe('Yayın ve dağıtım', () => {
-  gap('canlı build environment.prod.ts dosyasını kullanmalı (production: true)', () => {
+  it('canlı build environment.prod.ts dosyasını kullanmalı (production: true)', () => {
     const prod = json('angular.json').projects.OdivonFaturaPro.architect.build.configurations.production;
     expect(prod.fileReplacements).toContainEqual({
       replace: 'src/environments/environment.ts',
@@ -37,11 +37,11 @@ describe('Yayın ve dağıtım', () => {
     });
   });
 
-  gap('master push Firestore kurallarını da yayınlamalı (yalnızca hosting değil)', () => {
+  it('master push Firestore kurallarını da yayınlamalı (yalnızca hosting değil)', () => {
     expect(workflow()).toMatch(/firestore/);
   });
 
-  gap('master push yayından önce testleri çalıştırmalı', () => {
+  it('master push yayından önce testleri çalıştırmalı', () => {
     expect(workflow()).toMatch(/npm (run )?test|ng test|test:rules/);
   });
 
@@ -63,7 +63,7 @@ describe('Ödeme ve plan yönetimi', () => {
     expect(existsSync(join(root, 'functions'))).toBe(true);
   });
 
-  gap('satış iletişim bilgileri gerçek olmalı (yer tutucu WhatsApp numarası değil)', () => {
+  it('satış iletişim bilgileri gerçek olmalı (yer tutucu WhatsApp numarası değil)', () => {
     expect(read('src/app/features/pricing/pricing.component.ts')).not.toContain('905000000000');
   });
 });
@@ -85,25 +85,25 @@ describe('Yasal metinler', () => {
     }
   });
 
-  gap('ücretli abonelik için mesafeli satış sözleşmesi ve ön bilgilendirme formu olmalı', () => {
+  it('ücretli abonelik için mesafeli satış sözleşmesi ve ön bilgilendirme formu olmalı', () => {
     const all = Object.values(tr).join(' ').toLocaleLowerCase('tr');
     expect(all).toContain('mesafeli satış sözleşmesi');
     expect(all).toContain('ön bilgilendirme');
   });
 
-  gap('iptal, cayma ve iade koşulları yazılı olmalı', () => {
+  it('iptal, cayma ve iade koşulları yazılı olmalı', () => {
     const legal = Object.entries(tr).filter(([k]) => k.startsWith('legalDoc.')).map(([, v]) => v).join(' ').toLocaleLowerCase('tr');
     expect(legal).toMatch(/cayma/);
     expect(legal).toMatch(/iade/);
   });
 
-  gap('satıcının tam unvanı, adresi ve vergi/MERSİS bilgisi yazılı olmalı', () => {
+  it('satıcının tam unvanı, adresi ve vergi/MERSİS bilgisi yazılı olmalı', () => {
     const legal = Object.entries(tr).filter(([k]) => k.startsWith('legalDoc.')).map(([, v]) => v).join(' ').toLocaleLowerCase('tr');
     expect(legal).toMatch(/adres/);
     expect(legal).toMatch(/mersis|vergi no|vergi numarası/);
   });
 
-  gap('gizlilik metni yapay zeka taramasında verinin Google Gemini ile paylaşıldığını belirtmeli', () => {
+  it('gizlilik metni yapay zeka taramasında verinin Google Gemini ile paylaşıldığını belirtmeli', () => {
     const privacy = Object.entries(tr).filter(([k]) => k.startsWith('legalDoc.privacy') || k.startsWith('legalDoc.kvkk')).map(([, v]) => v).join(' ');
     expect(privacy).toMatch(/Gemini|yapay zeka/i);
   });

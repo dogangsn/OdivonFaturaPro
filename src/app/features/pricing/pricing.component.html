@@ -144,7 +144,7 @@
 
                 <!-- Contact / Payment Action Buttons -->
                 <div class="space-y-2.5">
-                    <button (click)="contactViaWhatsApp()"
+                    <button *ngIf="hasWhatsApp" (click)="contactViaWhatsApp()"
                         class="w-full py-3 px-4 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-600/20 transition-all">
                         <span class="material-symbols-outlined text-lg">chat</span>
                         {{ lang.t('pricing.whatsapp') }}
@@ -157,15 +157,13 @@
                     </button>
                 </div>
 
-                <!-- Developer / Test Bypass -->
-                <div class="pt-3 border-t border-slate-100 dark:border-slate-800 flex items-center justify-between text-xs text-slate-400">
-                    <span>{{ lang.t('pricing.devAccess') }}</span>
-                    <button (click)="targetPlanId && applyPlanChange(targetPlanId)" [disabled]="isUpdating"
-                        class="text-primary hover:underline font-medium text-xs bg-transparent border-0 cursor-pointer">
-                        {{ lang.t('pricing.testActivate') }}
-                    </button>
-                </div>
+                <p class="text-[11px] text-slate-400 leading-relaxed">
+                    {{ lang.t('pricing.salesConsentPrefix') }}
+                    <button type="button" (click)="showLegalModal = true" class="text-primary underline hover:text-blue-700 bg-transparent border-0 p-0 cursor-pointer">{{ lang.t('legal.salesTerms') }}</button>{{ lang.t('pricing.salesConsentSuffix') }}
+                </p>
             </div>
         </div>
     </div>
 </div>
+
+<app-legal-modal [isOpen]="showLegalModal" activeTab="sales" (closed)="showLegalModal = false"></app-legal-modal>

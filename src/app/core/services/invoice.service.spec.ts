@@ -20,8 +20,6 @@ describe('InvoiceService', () => {
     totals = (data) => (service as any).calculateTotals(data);
   });
 
-  afterEach(() => vi.restoreAllMocks());
-
   describe('tutar hesaplama', () => {
     it('satır KDV, iskonto ve genel toplamı doğru hesaplar', () => {
       const result = totals(form({
@@ -54,7 +52,7 @@ describe('InvoiceService', () => {
       expect(totals(form({ items: [] as any }))).toEqual({ subtotal: 0, taxTotal: 0, total: 0 });
     });
 
-    gap('kaydedilen tutarlar kuruşa (2 ondalık) yuvarlanmalı', () => {
+    it('kaydedilen tutarlar kuruşa (2 ondalık) yuvarlanmalı', () => {
       const result = totals(form({ items: [{ description: 'A', quantity: 3, unitPrice: 0.1, taxRate: 18 }] as any }));
       expect(result.taxTotal).toBe(0.05);
       expect(result.total).toBe(0.35);
@@ -62,14 +60,15 @@ describe('InvoiceService', () => {
   });
 
   describe('fatura numarası', () => {
-    it('INV-YYYY-NNNN biçiminde ve içinde bulunulan yılla üretilir', () => {
-      const no = service.generateInvoiceNumber();
-      expect(no).toMatch(new RegExp(`^INV-${new Date().getFullYear()}-\\d{4}$`));
+    it('yıl ve 6 haneli sıra numarasıyla biçimlenir', () => {
+      expect(service.formatInvoiceNumber(2026, 1)).toBe('INV-2026-000001');
+      expect(service.formatInvoiceNumber(2026, 1234)).toBe('INV-2026-001234');
     });
 
-    gap('art arda kesilen iki fatura asla aynı numarayı almamalı', () => {
-      vi.spyOn(Math, 'random').mockReturnValue(0.4242);
-      expect(service.generateInvoiceNumber()).not.toBe(service.generateInvoiceNumber());
+    it('ardışık sıra numaraları farklı ve sıralı numara üretir', () => {
+      const numbers = [1, 2, 3].map(seq => service.formatInvoiceNumber(2026, seq));
+      expect(new Set(numbers).size).toBe(3);
+      expect([...numbers].sort()).toEqual(numbers);
     });
   });
 });

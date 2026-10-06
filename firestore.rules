@@ -20,9 +20,43 @@ service cloud.firestore {
       return isAuthenticated() && request.auth.uid == request.resource.data.userId;
     }
 
+    // Plan ve limit alanları ödeme doğrulandıktan sonra yalnızca sunucu (Admin SDK) tarafından yazılır.
+    // İstemci bu alanları sadece ücretsiz plan değerlerine (5 fatura / 5 müşteri) ayarlayabilir.
+    function planFields() {
+      return ['plan', 'monthlyInvoiceLimit', 'customerLimit'];
+    }
+
+    function isFreePlanData(data) {
+      return data.plan == 'free' && data.monthlyInvoiceLimit == 5 && data.customerLimit == 5;
+    }
+
     // 1. Users / Profiles
     match /users/{userId} {
-      allow read, write: if isOwner(userId);
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId) && isFreePlanData(request.resource.data);
+      allow update: if isOwner(userId) && (
+        !request.resource.data.diff(resource.data).affectedKeys().hasAny(planFields())
+        || isFreePlanData(request.resource.data)
+      );
+      // Profil silinip yeniden oluşturularak ücretsiz kota sıfırlanamaz.
+      allow delete: if false;
+    }
+
+    // 1b. Fatura numarası sayaçları: numara sadece birer birer ilerler, geri alınamaz.
+    match /counters/{userId} {
+      allow read: if isOwner(userId);
+      allow create: if isOwner(userId)
+        && request.resource.data.invoiceSeq == 1
+        && request.resource.data.invoiceYear is int;
+      allow update: if isOwner(userId)
+        && request.resource.data.invoiceYear is int
+        && (
+          (request.resource.data.invoiceYear == resource.data.invoiceYear
+            && request.resource.data.invoiceSeq == resource.data.invoiceSeq + 1)
+          || (request.resource.data.invoiceYear > resource.data.invoiceYear
+            && request.resource.data.invoiceSeq == 1)
+        );
+      allow delete: if false;
     }
 
     // 2. Invoices (Satış & Proforma Faturalar)

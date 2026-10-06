@@ -1,8 +1,9 @@
 import { Component, Input, Output, EventEmitter, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { LanguageService } from '../../../core/services/language.service';
+import { BUSINESS } from '../../../core/constants/business.constant';
 
-export type LegalDocType = 'kvkk' | 'privacy' | 'terms';
+export type LegalDocType = 'kvkk' | 'privacy' | 'terms' | 'sales';
 
 @Component({
     selector: 'app-legal-modal',
@@ -23,7 +24,7 @@ export type LegalDocType = 'kvkk' | 'privacy' | 'terms';
             </div>
 
             <!-- Tabs -->
-            <div class="flex border-b border-slate-200 dark:border-slate-800 px-6 bg-slate-50 dark:bg-slate-800/50">
+            <div class="flex border-b border-slate-200 dark:border-slate-800 px-6 bg-slate-50 dark:bg-slate-800/50 overflow-x-auto whitespace-nowrap">
                 <button (click)="activeTab = 'terms'"
                     [class.border-primary]="activeTab === 'terms'"
                     [class.text-primary]="activeTab === 'terms'"
@@ -45,16 +46,23 @@ export type LegalDocType = 'kvkk' | 'privacy' | 'terms';
                     class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 transition-colors cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
                     {{ lang.t('legal.kvkk') }}
                 </button>
+                <button (click)="activeTab = 'sales'"
+                    [class.border-primary]="activeTab === 'sales'"
+                    [class.text-primary]="activeTab === 'sales'"
+                    [class.border-transparent]="activeTab !== 'sales'"
+                    class="py-3 px-4 font-semibold text-xs sm:text-sm border-b-2 transition-colors cursor-pointer text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white">
+                    {{ lang.t('legalDoc.salesTab') }}
+                </button>
             </div>
 
             <!-- Content Area -->
             <div class="flex-1 overflow-y-auto p-6 text-xs sm:text-sm text-slate-600 dark:text-slate-300 space-y-4 leading-relaxed">
                 <div class="space-y-3">
                     <h4 class="font-bold text-slate-900 dark:text-white text-base">{{ lang.t('legalDoc.' + activeTab + '.title') }}</h4>
-                    <p>{{ lang.t('legalDoc.' + activeTab + '.intro') }}</p>
+                    <p>{{ lang.t('legalDoc.' + activeTab + '.intro', sellerParams) }}</p>
                     <ng-container *ngFor="let n of sectionNumbers">
                         <h5 class="font-semibold text-slate-800 dark:text-slate-100 mt-3">{{ lang.t('legalDoc.' + activeTab + '.h' + n) }}</h5>
-                        <p>{{ lang.t('legalDoc.' + activeTab + '.p' + n) }}</p>
+                        <p class="whitespace-pre-line">{{ lang.t('legalDoc.' + activeTab + '.p' + n, sellerParams) }}</p>
                     </ng-container>
                 </div>
             </div>
@@ -76,7 +84,22 @@ export class LegalModalComponent {
     lang = inject(LanguageService);
 
     get sectionNumbers(): number[] {
-        return this.activeTab === 'kvkk' ? [1, 2] : [1, 2, 3];
+        if (this.activeTab === 'kvkk') return [1, 2];
+        if (this.activeTab === 'sales') return [1, 2, 3, 4];
+        return [1, 2, 3];
+    }
+
+    /** Satıcı bilgileri; boş alanlar "belirtilecek" olarak gösterilir. */
+    get sellerParams(): Record<string, string> {
+        const pending = this.lang.t('legalDoc.pending');
+        return {
+            legalName: BUSINESS.legalName || pending,
+            address: BUSINESS.address || pending,
+            taxOffice: BUSINESS.taxOffice || pending,
+            taxNumber: BUSINESS.taxNumber || pending,
+            mersisNo: BUSINESS.mersisNo || pending,
+            supportEmail: BUSINESS.supportEmail || pending
+        };
     }
 
     close(): void {

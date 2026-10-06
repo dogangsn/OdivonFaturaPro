@@ -45,7 +45,7 @@ describe('PricingComponent — ücretli plana geçiş', () => {
     expect(userService.updateUserProfile).not.toHaveBeenCalled();
   });
 
-  gap('canlı sürümde ödeme penceresi ödemesiz "test modunda aktif et" seçeneği sunmamalı', () => {
+  it('canlı sürümde ödeme penceresi ödemesiz "test modunda aktif et" seçeneği sunmamalı', () => {
     const fixture = TestBed.createComponent(PricingComponent);
     const lang = TestBed.inject(LanguageService);
     fixture.componentInstance.targetPlanId = 'pro';
@@ -53,5 +53,23 @@ describe('PricingComponent — ücretli plana geçiş', () => {
     fixture.detectChanges();
     const text = (fixture.nativeElement as HTMLElement).textContent ?? '';
     expect(text).not.toContain(lang.t('pricing.testActivate'));
+  });
+
+  it('ücretsiz plan reklamlı, ücretli planlar reklamsız olarak belirtilir', () => {
+    const fixture = TestBed.createComponent(PricingComponent);
+    const lang = TestBed.inject(LanguageService);
+    const [free, pro, ent] = fixture.componentInstance.plans;
+    expect(free.features).toContain(lang.t('pricing.f.withAds'));
+    expect(pro.features).toContain(lang.t('pricing.f.adFree'));
+    expect(ent.features).toContain(lang.t('pricing.f.adFree'));
+  });
+
+  it('ödeme penceresinde reklam alanı yok', () => {
+    const fixture = TestBed.createComponent(PricingComponent);
+    fixture.componentInstance.targetPlanId = 'pro';
+    fixture.componentInstance.showUpgradeModal = true;
+    fixture.detectChanges();
+    const el = fixture.nativeElement as HTMLElement;
+    expect(el.querySelector('app-ad-slot, ins.adsbygoogle')).toBeNull();
   });
 });

@@ -1,11 +1,17 @@
 import { Injectable, inject, PLATFORM_ID, Injector } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Firestore, collection, collectionData, doc, addDoc, updateDoc, deleteDoc, getDoc, query, where, serverTimestamp, onSnapshot } from '@angular/fire/firestore';
+import { Firestore, collection, doc, updateDoc, deleteDoc, getDoc, query, where, serverTimestamp, onSnapshot, runTransaction } from '@angular/fire/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Invoice, InvoiceFormData, InvoiceItem } from '../models/invoice.model';
 import { Observable, map, of, from, switchMap } from 'rxjs';
 
 import { LanguageService } from './language.service';
+
+/** Tutarları kuruşa (2 ondalık) yuvarlar. */
+export function roundMoney(value: number): number {
+    return Math.round((value + Number.EPSILON) * 100) / 100;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -119,20 +125,31 @@ export class InvoiceService {
         if (!userId) throw new Error(this.lang.t('err.notLoggedIn'));
 
         const { subtotal, taxTotal, total } = this.calculateTotals(data);
-        const invoicesCol = collection(this.firestore, 'invoices');
+        const firestore = this.firestore;
+        const counterRef = doc(firestore, 'counters', userId);
+        const invoiceRef = doc(collection(firestore, 'invoices'));
 
-        const invoiceData = this.removeUndefinedFields({
-            ...data,
-            subtotal,
-            taxTotal,
-            total,
-            userId,
-            createdAt: serverTimestamp(),
-            updatedAt: serverTimestamp()
+        // Fatura numarası kullanıcı bazlı sayaçtan, fatura ile aynı işlemde atanır: çakışma ve boşluk olmaz.
+        await runTransaction(firestore, async tx => {
+            const counterSnap = await tx.get(counterRef);
+            const year = new Date().getFullYear();
+            const current = counterSnap.exists() ? counterSnap.data() as { invoiceYear: number; invoiceSeq: number } : null;
+            const seq = current && current.invoiceYear === year ? current.invoiceSeq + 1 : 1;
+
+            tx.set(counterRef, { invoiceYear: year, invoiceSeq: seq });
+            tx.set(invoiceRef, this.removeUndefinedFields({
+                ...data,
+                invoiceNo: this.formatInvoiceNumber(year, seq),
+                subtotal,
+                taxTotal,
+                total,
+                userId,
+                createdAt: serverTimestamp(),
+                updatedAt: serverTimestamp()
+            }));
         });
 
-        const docRef = await addDoc(invoicesCol, invoiceData);
-        return docRef.id;
+        return invoiceRef.id;
     }
 
     /**
@@ -206,12 +223,10 @@ export class InvoiceService {
     }
 
     /**
-     * Yeni fatura numarası üretir
+     * Sıralı fatura numarası biçimi: INV-2026-000001
      */
-    generateInvoiceNumber(): string {
-        const year = new Date().getFullYear();
-        const random = Math.floor(Math.random() * 10000).toString().padStart(4, '0');
-        return `INV-${year}-${random}`;
+    formatInvoiceNumber(year: number, seq: number): string {
+        return `INV-${year}-${seq.toString().padStart(6, '0')}`;
     }
 
     /**
@@ -247,36 +262,36 @@ export class InvoiceService {
         items.forEach(item => {
             const quantity = item.quantity || 0;
             const unitPrice = item.unitPrice || 0;
-            const gross = quantity * unitPrice;
-            const discount = gross * ((item.discount || 0) / 100);
-            const net = gross - discount;
+            const gross = roundMoney(quantity * unitPrice);
+            const discount = roundMoney(gross * ((item.discount || 0) / 100));
+            const net = roundMoney(gross - discount);
 
             subtotal += gross;
             totalDiscount += discount;
 
             const itemTaxRate = item.taxRate !== undefined ? item.taxRate : (data.taxRate !== undefined ? data.taxRate : 20);
-            const lineTax = net * (itemTaxRate / 100);
+            const lineTax = roundMoney(net * (itemTaxRate / 100));
             item.taxAmount = lineTax;
             item.total = net;
-            item.totalWithTax = net + lineTax;
+            item.totalWithTax = roundMoney(net + lineTax);
 
             mainTaxTotal += lineTax;
         });
 
-        const netSubtotal = subtotal - totalDiscount;
+        const netSubtotal = roundMoney(subtotal - totalDiscount);
 
         let additionalTaxTotal = 0;
         if (data.additionalTaxes) {
             data.additionalTaxes.forEach(tax => {
-                additionalTaxTotal += netSubtotal * ((tax.rate || 0) / 100);
+                additionalTaxTotal += roundMoney(netSubtotal * ((tax.rate || 0) / 100));
             });
         }
 
-        const taxTotal = mainTaxTotal + additionalTaxTotal;
-        const total = netSubtotal + taxTotal;
+        const taxTotal = roundMoney(mainTaxTotal + additionalTaxTotal);
+        const total = roundMoney(netSubtotal + taxTotal);
 
         return {
-            subtotal,
+            subtotal: roundMoney(subtotal),
             taxTotal,
             total
         };

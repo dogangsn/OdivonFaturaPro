@@ -16,6 +16,7 @@ export interface UserProfile {
     plan: 'free' | 'pro' | 'enterprise';
     monthlyInvoiceLimit?: number;
     customerLimit?: number;
+    termsAcceptedAt?: Date;
     createdAt: Date;
     updatedAt: Date;
 }

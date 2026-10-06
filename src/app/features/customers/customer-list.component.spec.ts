@@ -1,6 +1,6 @@
 import { TestBed } from '@angular/core/testing';
 import { PLATFORM_ID } from '@angular/core';
-import { provideRouter } from '@angular/router';
+import { provideRouter, Router } from '@angular/router';
 import { of } from 'rxjs';
 import { CustomerListComponent } from './customer-list.component';
 import { CustomerService } from '../../core/services/customer.service';
@@ -40,6 +40,7 @@ describe('CustomerListComponent — müşteri limiti', () => {
     })
       .overrideComponent(CustomerListComponent, { set: { template: '' } })
       .compileComponents();
+    vi.spyOn(TestBed.inject(Router), 'navigate').mockResolvedValue(true);
   });
 
   it('ücretsiz kullanıcı limitin altındayken müşteri ekleyebilir', async () => {
@@ -47,8 +48,23 @@ describe('CustomerListComponent — müşteri limiti', () => {
     expect(customerService.addCustomer).toHaveBeenCalledTimes(1);
   });
 
-  gap('ücretsiz kullanıcı 5 müşteriden sonra yeni müşteri ekleyememeli', async () => {
+  it('ücretsiz kullanıcı 5 müşteriden sonra yeni müşteri ekleyememeli', async () => {
     await addWithExisting(5);
     expect(customerService.addCustomer).not.toHaveBeenCalled();
+    expect(TestBed.inject(Router).navigate).toHaveBeenCalledWith(['/pricing']);
+  });
+
+  it('mevcut müşteriyi düzenlemek limite takılmaz', async () => {
+    const existing = Array.from({ length: 5 }, (_, i) => ({ id: `c${i}`, name: `C${i}`, userId: 'u1' }));
+    customerService.getCustomers.mockReturnValue(of(existing));
+    const updateCustomer = vi.fn().mockResolvedValue(undefined);
+    (customerService as any).updateCustomer = updateCustomer;
+    const cmp = TestBed.createComponent(CustomerListComponent).componentInstance;
+    cmp.customers = existing as any;
+    cmp.isEditing = true;
+    cmp.editingCustomerId = 'c0';
+    cmp.formData = { ...cmp.formData, name: 'C0', email: 'c0@example.com' };
+    await cmp.saveCustomer();
+    expect(updateCustomer).toHaveBeenCalledTimes(1);
   });
 });

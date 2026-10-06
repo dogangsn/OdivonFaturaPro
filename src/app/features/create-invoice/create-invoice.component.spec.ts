@@ -15,7 +15,7 @@ function invoicesOn(count: number, date: Date) {
 }
 
 describe('CreateInvoiceComponent — plan limiti', () => {
-  let invoiceService: { getInvoices: ReturnType<typeof vi.fn>; createInvoice: ReturnType<typeof vi.fn>; generateInvoiceNumber: () => string };
+  let invoiceService: { getInvoices: ReturnType<typeof vi.fn>; createInvoice: ReturnType<typeof vi.fn> };
   let profile: Record<string, unknown>;
 
   async function save(existing: unknown[]) {
@@ -32,7 +32,6 @@ describe('CreateInvoiceComponent — plan limiti', () => {
     invoiceService = {
       getInvoices: vi.fn(),
       createInvoice: vi.fn().mockResolvedValue('new-id'),
-      generateInvoiceNumber: () => 'INV-2026-0001',
     };
     await TestBed.configureTestingModule({
       imports: [CreateInvoiceComponent],
@@ -70,7 +69,7 @@ describe('CreateInvoiceComponent — plan limiti', () => {
     expect(invoiceService.createInvoice).toHaveBeenCalledTimes(1);
   });
 
-  gap('aylık limit her ay sıfırlanmalı: geçen ayki 5 fatura bu ayı engellememeli', async () => {
+  it('aylık limit her ay sıfırlanmalı: geçen ayki 5 fatura bu ayı engellememeli', async () => {
     const lastMonth = new Date();
     lastMonth.setMonth(lastMonth.getMonth() - 1);
     await save(invoicesOn(5, lastMonth));

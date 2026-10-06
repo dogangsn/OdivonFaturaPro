@@ -82,6 +82,8 @@ export class UserService {
                 plan: 'free',
                 monthlyInvoiceLimit: 5,
                 customerLimit: 5,
+                // Kayıt sırasında kullanım koşulları/KVKK onayı alındı (e-postada onay kutusu, Google'da bilgilendirme notu)
+                termsAcceptedAt: serverTimestamp(),
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             };

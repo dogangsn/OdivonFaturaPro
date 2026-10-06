@@ -16,6 +16,7 @@ import { UserService } from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
 import { Router } from '@angular/router';
 import { COUNTRIES_CONFIG, COUNTRY_MAP } from '../../core/constants/countries.constant';
+import { canCreateInvoice, isFreePlan } from '../../core/utils/plan-limits';
 
 @Component({
     selector: 'app-invoice-list',
@@ -317,8 +318,8 @@ export class InvoiceListComponent implements OnInit {
         const currentUser = this.authService.currentUser;
         if (currentUser) {
             const profile = await this.userService.getUserProfile(currentUser.uid);
-            if (profile && (profile.plan === 'free' || !profile.plan)) {
-                if (this.invoices.length >= (profile.monthlyInvoiceLimit || 5)) {
+            if (isFreePlan(profile)) {
+                if (!canCreateInvoice(profile, this.invoices)) {
                     this.alertService.warning(this.lang.t('plans.limitTitle'), this.lang.t('plans.limitReachedShort'));
                     this.router.navigate(['/pricing']);
                     return;
@@ -327,7 +328,7 @@ export class InvoiceListComponent implements OnInit {
         }
 
         this.formData = this.getEmptyForm();
-        this.formData.invoiceNo = this.invoiceService.generateInvoiceNumber();
+        this.formData.invoiceNo = ''; // kaydederken sıralı numara atanır
         this.isEditing = false;
         this.editingInvoiceId = null;
         this.setCountryDetails('TR');
