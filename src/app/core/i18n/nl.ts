@@ -894,4 +894,13 @@ export const nl: Record<string, string> = {
     "ads.label": "Advertentie",
     "ads.removeCta": "Upgrade naar Pro om advertenties te verwijderen",
     "plans.customerLimitReached": "⚠️ U heeft de klantlimiet van het gratis abonnement bereikt (max. 5 klanten).\n\nUpgrade naar Pro voor onbeperkt klanten.",
+    "pricing.payWithCard": "Veilig betalen met iyzico",
+    "pricing.paymentInfoCard": "Uw betaling wordt verwerkt door iyzico; kaartgegevens worden nooit op onze servers opgeslagen. Het abonnement wordt geactiveerd zodra de betaling is bevestigd.",
+    "pricing.preparingPayment": "Beveiligde betaalpagina wordt voorbereid...",
+    "pricing.paymentStartFailedTitle": "Betaling kon niet worden gestart",
+    "pricing.paymentStartFailed": "Probeer het opnieuw of neem contact op met support.",
+    "pricing.paymentSuccessTitle": "Betaling ontvangen 🎉",
+    "pricing.paymentSuccess": "Uw abonnement is nu actief op uw account.",
+    "pricing.paymentFailedTitle": "Betaling niet voltooid",
+    "pricing.paymentFailed": "Er is niets van uw kaart afgeschreven. Controleer de gegevens en probeer het opnieuw.",
 };

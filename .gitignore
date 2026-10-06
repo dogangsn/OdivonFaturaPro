@@ -45,3 +45,8 @@ Thumbs.db
 # Firebase emulator logs
 firestore-debug.log
 firebase-debug.log
+
+# Cloud Functions
+/functions/lib
+/functions/node_modules
+/functions/.env*

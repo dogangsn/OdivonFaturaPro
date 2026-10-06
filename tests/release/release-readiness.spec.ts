@@ -51,14 +51,14 @@ describe('Yayın ve dağıtım', () => {
 });
 
 describe('Ödeme ve plan yönetimi', () => {
-  gap('bir ödeme sağlayıcısı entegre olmalı (iyzico, PayTR, Stripe, Paddle...)', () => {
+  it('bir ödeme sağlayıcısı entegre olmalı (iyzico, PayTR, Stripe, Paddle...)', () => {
     const deps = Object.keys({ ...json('package.json').dependencies });
     const hasSdk = deps.some(d => /iyzi|paytr|stripe|paddle|lemon/i.test(d));
     const hasCheckout = /checkout|iyzipay|paytr\.com|stripe\.com|paddle\.com/i.test(appSource());
     expect(hasSdk || hasCheckout).toBe(true);
   });
 
-  gap('plan değişikliği sunucu tarafında (Cloud Functions) yapılmalı', () => {
+  it('plan değişikliği sunucu tarafında (Cloud Functions) yapılmalı', () => {
     expect(json('firebase.json').functions).toBeDefined();
     expect(existsSync(join(root, 'functions'))).toBe(true);
   });

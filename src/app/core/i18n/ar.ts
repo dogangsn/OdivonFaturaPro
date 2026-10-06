@@ -894,4 +894,13 @@ export const ar: Record<string, string> = {
     "ads.label": "إعلان",
     "ads.removeCta": "انتقل إلى الباقة الاحترافية لإزالة الإعلانات",
     "plans.customerLimitReached": "⚠️ لقد بلغت حد العملاء في الباقة المجانية (5 عملاء كحد أقصى).\n\nيرجى الترقية إلى الباقة الاحترافية لإضافة عملاء بلا حدود.",
+    "pricing.payWithCard": "ادفع بأمان عبر iyzico",
+    "pricing.paymentInfoCard": "تتم معالجة الدفع عبر iyzico ولا تُحفظ بيانات بطاقتك على خوادمنا. تُفعَّل الباقة فور تأكيد الدفع.",
+    "pricing.preparingPayment": "جارٍ تجهيز صفحة الدفع الآمنة...",
+    "pricing.paymentStartFailedTitle": "تعذر بدء الدفع",
+    "pricing.paymentStartFailed": "يرجى المحاولة مرة أخرى أو التواصل مع الدعم.",
+    "pricing.paymentSuccessTitle": "تم استلام الدفع 🎉",
+    "pricing.paymentSuccess": "أصبحت باقتك مفعلة على حسابك.",
+    "pricing.paymentFailedTitle": "لم يكتمل الدفع",
+    "pricing.paymentFailed": "لم يتم خصم أي مبلغ من بطاقتك. يرجى التحقق من البيانات والمحاولة مرة أخرى.",
 };

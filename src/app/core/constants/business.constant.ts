@@ -17,3 +17,9 @@ export const ADSENSE = {
     clientId: '',
     slotId: '',
 };
+
+// iyzico ile kartla ödeme (functions/ altındaki Cloud Functions). Fonksiyonlar ve iyzico anahtarları
+// yayınlanmadan açmayın; ayrıntılar docs/iyzico-sandbox.md.
+export const PAYMENTS = {
+    enabled: false,
+};

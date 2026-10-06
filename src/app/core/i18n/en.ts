@@ -894,4 +894,13 @@ export const en: Record<string, string> = {
     "ads.label": "Advertisement",
     "ads.removeCta": "Upgrade to Pro to remove ads",
     "plans.customerLimitReached": "⚠️ You have reached the Free Plan customer limit (max. 5 customers).\n\nPlease upgrade to Pro to add unlimited customers.",
+    "pricing.payWithCard": "Pay securely with iyzico",
+    "pricing.paymentInfoCard": "Your payment is processed by iyzico; card details are never stored on our servers. Your plan is activated as soon as the payment is confirmed.",
+    "pricing.preparingPayment": "Preparing the secure payment page...",
+    "pricing.paymentStartFailedTitle": "Payment could not be started",
+    "pricing.paymentStartFailed": "Please try again or contact support.",
+    "pricing.paymentSuccessTitle": "Payment received 🎉",
+    "pricing.paymentSuccess": "Your plan is now active on your account.",
+    "pricing.paymentFailedTitle": "Payment not completed",
+    "pricing.paymentFailed": "Your card was not charged. Please check the details and try again.",
 };

@@ -1,5 +1,6 @@
 export const environment = {
     production: true,
+    functionsBaseUrl: 'https://europe-west1-generateinvoiceweb.cloudfunctions.net',
     firebase: {
         apiKey: "AIzaSyDIYb2hZ0Vgra1E8vF9DgpJ1K9dEYXqQXM",
         authDomain: "generateinvoiceweb.firebaseapp.com",

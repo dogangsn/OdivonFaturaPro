@@ -1,6 +1,6 @@
 import { Component, inject, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
+import { ActivatedRoute, Router, RouterModule } from '@angular/router';
 import { UserService } from '../../core/services/user.service';
 import { AuthService } from '../../core/services/auth.service';
 import { UserProfile } from '../../core/models/user.model';
@@ -8,7 +8,8 @@ import { LanguageService } from '../../core/services/language.service';
 import { AlertService } from '../../core/services/alert.service';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { LegalModalComponent } from '../../shared/components/legal-modal/legal-modal.component';
-import { BUSINESS } from '../../core/constants/business.constant';
+import { BUSINESS, PAYMENTS } from '../../core/constants/business.constant';
+import { PaymentService } from '../../core/services/payment.service';
 import { FREE_CUSTOMER_LIMIT, FREE_INVOICE_LIMIT } from '../../core/utils/plan-limits';
 
 @Component({
@@ -22,6 +23,9 @@ export class PricingComponent implements OnInit {
     private userService = inject(UserService);
     private authService = inject(AuthService);
     private alertService = inject(AlertService);
+    private paymentService = inject(PaymentService);
+    private route = inject(ActivatedRoute);
+    private router = inject(Router);
     lang = inject(LanguageService);
 
     userProfile: UserProfile | null = null;
@@ -30,6 +34,7 @@ export class PricingComponent implements OnInit {
     showUpgradeModal = false;
     showLegalModal = false;
     readonly hasWhatsApp = !!BUSINESS.salesWhatsApp;
+    readonly paymentsEnabled = PAYMENTS.enabled;
 
     get isLoggedIn(): boolean {
         return !!this.authService.currentUser;
@@ -86,6 +91,17 @@ export class PricingComponent implements OnInit {
     }
 
     ngOnInit() {
+        // iyzico ödeme dönüşü: /pricing?payment=success|failed
+        const payment = this.route.snapshot.queryParamMap.get('payment');
+        if (payment === 'success') {
+            this.alertService.success(this.lang.t('pricing.paymentSuccessTitle'), this.lang.t('pricing.paymentSuccess'));
+        } else if (payment === 'failed') {
+            this.alertService.error(this.lang.t('pricing.paymentFailedTitle'), this.lang.t('pricing.paymentFailed'));
+        }
+        if (payment) {
+            this.router.navigate([], { queryParams: {}, replaceUrl: true });
+        }
+
         this.authService.user$.subscribe(async user => {
             if (user) {
                 const profile = await this.userService.getUserProfile(user.uid);
@@ -141,6 +157,23 @@ export class PricingComponent implements OnInit {
         } catch (error) {
             console.error('Failed to change plan:', error);
             this.alertService.error(this.lang.t('common.error'), this.lang.t('pricing.updateError'));
+        } finally {
+            this.isUpdating = false;
+        }
+    }
+
+    async startIyzicoPayment(): Promise<void> {
+        const currentUser = this.authService.currentUser;
+        if (!currentUser || !this.targetPlanId || this.targetPlanId === 'free') return;
+
+        this.isUpdating = true;
+        this.alertService.loading(this.lang.t('pricing.preparingPayment'));
+        try {
+            const checkout = await this.paymentService.initializeCheckoutForm(this.targetPlanId);
+            window.location.assign(checkout.paymentPageUrl);
+        } catch (error) {
+            console.error('iyzico ödeme başlatma hatası:', error);
+            this.alertService.error(this.lang.t('pricing.paymentStartFailedTitle'), this.lang.t('pricing.paymentStartFailed'));
         } finally {
             this.isUpdating = false;
         }

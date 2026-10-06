@@ -6,13 +6,16 @@ import { AuthService } from '../../core/services/auth.service';
 import { UserService } from '../../core/services/user.service';
 import { AlertService } from '../../core/services/alert.service';
 import { LanguageService } from '../../core/services/language.service';
+import { PaymentService } from '../../core/services/payment.service';
 
 const gap = it.fails;
 
 describe('PricingComponent — ücretli plana geçiş', () => {
+  let paymentService: { initializeCheckoutForm: ReturnType<typeof vi.fn> };
   let userService: { getUserProfile: ReturnType<typeof vi.fn>; updateUserProfile: ReturnType<typeof vi.fn> };
 
   beforeEach(async () => {
+    paymentService = { initializeCheckoutForm: vi.fn().mockRejectedValue(new Error('down')) };
     userService = {
       getUserProfile: vi.fn().mockResolvedValue({ uid: 'u1', plan: 'free' }),
       updateUserProfile: vi.fn().mockResolvedValue(undefined),
@@ -23,6 +26,7 @@ describe('PricingComponent — ücretli plana geçiş', () => {
         provideRouter([]),
         { provide: AuthService, useValue: { currentUser: { uid: 'u1', email: 'u1@example.com' }, user$: of(null) } },
         { provide: UserService, useValue: userService },
+        { provide: PaymentService, useValue: paymentService },
         {
           provide: AlertService,
           useValue: { warning: vi.fn(), error: vi.fn(), loading: vi.fn(), success: vi.fn().mockResolvedValue(true), confirm: vi.fn().mockResolvedValue(true) },
@@ -71,5 +75,23 @@ describe('PricingComponent — ücretli plana geçiş', () => {
     fixture.detectChanges();
     const el = fixture.nativeElement as HTMLElement;
     expect(el.querySelector('app-ad-slot, ins.adsbygoogle')).toBeNull();
+  });
+
+  it('kart ödemesi kapalıyken iyzico düğmesi gösterilmez', () => {
+    const fixture = TestBed.createComponent(PricingComponent);
+    const lang = TestBed.inject(LanguageService);
+    fixture.componentInstance.targetPlanId = 'pro';
+    fixture.componentInstance.showUpgradeModal = true;
+    fixture.detectChanges();
+    expect((fixture.nativeElement as HTMLElement).textContent).not.toContain(lang.t('pricing.payWithCard'));
+  });
+
+  it('iyzico ödemesi seçilen planla başlatılır, hata olursa kullanıcı uyarılır', async () => {
+    const fixture = TestBed.createComponent(PricingComponent);
+    fixture.componentInstance.targetPlanId = 'enterprise';
+    await fixture.componentInstance.startIyzicoPayment();
+    expect(paymentService.initializeCheckoutForm).toHaveBeenCalledWith('enterprise');
+    expect(TestBed.inject(AlertService).error).toHaveBeenCalled();
+    expect(userService.updateUserProfile).not.toHaveBeenCalled();
   });
 });

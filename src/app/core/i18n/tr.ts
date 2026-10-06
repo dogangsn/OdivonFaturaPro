@@ -894,4 +894,13 @@ export const tr: Record<string, string> = {
     "ads.label": "Reklam",
     "ads.removeCta": "Reklamları kaldırmak için Pro'ya geçin",
     "plans.customerLimitReached": "⚠️ Ücretsiz Plan müşteri limitine ulaştınız (en fazla 5 müşteri).\n\nSınırsız müşteri eklemek için lütfen Pro Plana yükseltin.",
+    "pricing.payWithCard": "iyzico ile Güvenli Öde",
+    "pricing.paymentInfoCard": "Ödemeniz iyzico güvencesiyle alınır; kart bilgileriniz bizim sunucularımızda saklanmaz. Ödeme onaylanınca paketiniz hemen açılır.",
+    "pricing.preparingPayment": "Güvenli ödeme sayfası hazırlanıyor...",
+    "pricing.paymentStartFailedTitle": "Ödeme başlatılamadı",
+    "pricing.paymentStartFailed": "Lütfen tekrar deneyin veya destek ekibine ulaşın.",
+    "pricing.paymentSuccessTitle": "Ödeme alındı 🎉",
+    "pricing.paymentSuccess": "Paketiniz hesabınıza tanımlandı. İyi çalışmalar!",
+    "pricing.paymentFailedTitle": "Ödeme tamamlanamadı",
+    "pricing.paymentFailed": "Kartınızdan çekim yapılmadı. Lütfen bilgileri kontrol edip tekrar deneyin.",
 };
