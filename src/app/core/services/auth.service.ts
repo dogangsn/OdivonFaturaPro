@@ -8,6 +8,12 @@ import { UserProfile } from '../models/user.model';
 
 const USER_PROFILE_CACHE_KEY = 'userProfile';
 
+export interface SignInResult {
+    user: User;
+    /** Kullanıcı kullanım şartlarını henüz onaylamadı; panele geçmeden önce onay alınmalı. */
+    needsTerms: boolean;
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -81,7 +87,11 @@ export class AuthService {
         this.userProfileSubject.next(null);
     }
 
-    async loginWithGoogle(): Promise<User | null> {
+    /**
+     * Google ile giriş. Hesabı olmayan kullanıcı için profil yalnızca şartlar onaylandıysa (acceptTerms) oluşturulur;
+     * aksi hâlde needsTerms döner ve giriş ekranı onayı ister.
+     */
+    async loginWithGoogle(acceptTerms = false): Promise<SignInResult | null> {
         if (!isPlatformBrowser(this.platformId)) return null;
         
         const provider = new GoogleAuthProvider();
@@ -90,23 +100,26 @@ export class AuthService {
         });
         
         const result = await signInWithPopup(this.auth, provider);
-        if (result?.user) {
-            // Kullanıcıyı Firestore'a kaydet ve cache'le
-            const profile = await this.userService.createOrUpdateUserProfile(result.user);
-            this.cacheProfile(profile);
-            return result.user;
+        if (!result?.user) return null;
+
+        if (!acceptTerms && !(await this.userService.getUserProfile(result.user.uid))) {
+            return { user: result.user, needsTerms: true };
         }
-        return null;
+        // Kullanıcıyı Firestore'a kaydet ve cache'le
+        const profile = await this.userService.createOrUpdateUserProfile(result.user, { acceptTerms });
+        this.cacheProfile(profile);
+        return { user: result.user, needsTerms: !profile.termsAcceptedAt };
     }
 
-    async loginWithEmail(email: string, password: string) {
+    async loginWithEmail(email: string, password: string): Promise<SignInResult> {
         const result = await signInWithEmailAndPassword(this.auth, email, password);
         // Kullanıcıyı Firestore'a kaydet ve cache'le
         const profile = await this.userService.createOrUpdateUserProfile(result.user);
         this.cacheProfile(profile);
-        return result.user;
+        return { user: result.user, needsTerms: !profile.termsAcceptedAt };
     }
 
+    /** Kayıt formunda şartlar onay kutusu zorunludur, bu yüzden onay profille birlikte kaydedilir. */
     async registerWithEmail(email: string, password: string, displayName?: string) {
         const result = await createUserWithEmailAndPassword(this.auth, email, password);
         if (displayName && result.user) {
@@ -117,13 +130,32 @@ export class AuthService {
             }
         }
         // Yeni kullanıcıyı Firestore'a kaydet ve cache'le
-        const profile = await this.userService.createOrUpdateUserProfile(result.user);
+        const profile = await this.userService.createOrUpdateUserProfile(result.user, { acceptTerms: true });
         if (displayName) {
             profile.displayName = displayName;
             await this.userService.updateUserProfile(result.user.uid, { displayName });
         }
         this.cacheProfile(profile);
         return result.user;
+    }
+
+    /** Girişli kullanıcının kullanım şartları onayını kaydeder (profili yoksa oluşturur). */
+    async acceptTerms(): Promise<void> {
+        const current = this.currentUser;
+        if (!current) throw new Error('Not signed in');
+        const profile = await this.userService.createOrUpdateUserProfile(current, { acceptTerms: true });
+        this.cacheProfile(profile);
+    }
+
+    /** Girişli kullanıcı kullanım şartlarını onaylamış mı? Önce önbelleğe, yoksa Firestore'a bakar. */
+    async hasAcceptedTerms(): Promise<boolean> {
+        const current = this.currentUser;
+        if (!current) return false;
+        const cached = this.userProfile;
+        if (cached?.uid === current.uid && cached.termsAcceptedAt) return true;
+        const profile = await this.userService.getUserProfile(current.uid);
+        if (profile) this.cacheProfile(profile);
+        return !!profile?.termsAcceptedAt;
     }
 
     async resetPassword(email: string): Promise<void> {

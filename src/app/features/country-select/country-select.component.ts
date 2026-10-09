@@ -7,12 +7,12 @@ import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { User } from '@angular/fire/auth';
 import { COUNTRIES_CONFIG, CountryConfig } from '../../core/constants/countries.constant';
-import { LegalModalComponent, LegalDocType } from '../../shared/components/legal-modal/legal-modal.component';
+import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 
 @Component({
     selector: 'app-country-select',
     standalone: true,
-    imports: [CommonModule, LegalModalComponent, LanguageSwitcherComponent],
+    imports: [CommonModule, SiteFooterComponent, LanguageSwitcherComponent],
     templateUrl: './country-select.component.html',
     styleUrl: './country-select.component.css'
 })
@@ -26,10 +26,6 @@ export class CountrySelectComponent implements OnInit {
     user = signal<User | null>(null);
     isLoggedIn = signal(false);
     isLoading = signal(true);
-
-    // Legal modal
-    showLegalModal = false;
-    legalModalTab: LegalDocType = 'terms';
 
     countries: CountryConfig[] = COUNTRIES_CONFIG;
 
@@ -71,11 +67,6 @@ export class CountrySelectComponent implements OnInit {
 
     goToDashboard() {
         this.router.navigate(['/dashboard']);
-    }
-
-    openLegal(tab: LegalDocType) {
-        this.legalModalTab = tab;
-        this.showLegalModal = true;
     }
 
     logout() {

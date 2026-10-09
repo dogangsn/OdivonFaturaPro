@@ -9,6 +9,7 @@ import { es } from '../../src/app/core/i18n/es';
 import { it as itLang } from '../../src/app/core/i18n/it';
 import { nl } from '../../src/app/core/i18n/nl';
 import { ar } from '../../src/app/core/i18n/ar';
+import { LEGAL_DOCS } from '../../src/app/core/constants/legal.constant';
 
 // Canlıda para kazanmaya hazır olmak için gereken yapılandırma ve içerik kontrolleri.
 // `gap(...)`: bugün eksik olan bir şeyi belgeler. Giderildiğinde test kırmızıya döner; o zaman `it` yapın.
@@ -108,3 +109,72 @@ describe('Yasal metinler', () => {
     expect(privacy).toMatch(/Gemini|yapay zeka/i);
   });
 });
+
+describe('Çerez onayı, yasal sayfalar ve SEO', () => {
+  const languages = { tr, en, de, fr, es, it: itLang, nl, ar };
+
+  it('çerez onay bandı her sayfada (kök bileşende) yer alır', () => {
+    expect(read('src/app/app.component.html')).toContain('<app-cookie-banner>');
+  });
+
+  it('AdSense betiği yalnızca reklam çerezi onayıyla yüklenir', () => {
+    const ad = read('src/app/shared/components/ad-slot/ad-slot.component.ts');
+    expect(ad).toMatch(/adsAllowed\(\)/);
+    // Başka hiçbir yerde AdSense betiği eklenmemeli.
+    const others = srcFiles('src').filter(f => !f.includes('ad-slot')).map(read).join('\n');
+    expect(others).not.toMatch(/adsbygoogle\.js/);
+  });
+
+  it('her yasal metnin herkese açık bir sayfası ve sitemap kaydı var', () => {
+    expect(read('src/app/app.routes.ts')).toMatch(/LEGAL_DOCS\.map/);
+    const sitemap = read('public/sitemap.xml');
+    for (const doc of LEGAL_DOCS) expect(sitemap, doc.path).toContain(`/${doc.path}<`);
+  });
+
+  it('yasal metinlerin tüm bölümleri her dilde dolu', () => {
+    for (const [code, table] of Object.entries(languages)) {
+      for (const doc of LEGAL_DOCS) {
+        const keys = ['title', 'intro', ...Array.from({ length: doc.sections }, (_, i) => [`h${i + 1}`, `p${i + 1}`]).flat()];
+        for (const k of keys) expect(table[`legalDoc.${doc.type}.${k}`]?.trim().length, `${code}:${doc.type}.${k}`).toBeGreaterThan(0);
+        expect(table[`legalDoc.${doc.type}.h${doc.sections + 1}`], `${code}:${doc.type} fazladan bölüm`).toBeUndefined();
+      }
+    }
+  });
+
+  it('çerez politikası reklam çerezlerini ve onayın geri alınmasını anlatır', () => {
+    const cookies = Object.entries(tr).filter(([k]) => k.startsWith('legalDoc.cookies.')).map(([, v]) => v).join(' ');
+    expect(cookies).toMatch(/AdSense/);
+    expect(cookies).toMatch(/geri al/);
+  });
+
+  it('index.html meta açıklama, Open Graph ve canonical içerir', () => {
+    const html = read('src/index.html');
+    expect(html).toMatch(/<meta name="description" content=".{50,160}">/);
+    expect(html).toContain('property="og:title"');
+    expect(html).toContain('property="og:description"');
+    expect(html).toContain('rel="canonical"');
+  });
+
+  it('herkese açık her sayfanın çevrili başlığı ve açıklaması var', () => {
+    for (const key of ['home', 'login', 'pricing', 'createInvoice', ...LEGAL_DOCS.map(d => d.type)]) {
+      for (const [code, table] of Object.entries(languages)) {
+        expect(table[`seo.${key}.title`]?.length, `${code}:${key}.title`).toBeGreaterThan(0);
+        const d = table[`seo.${key}.description`] ?? '';
+        expect(d.length, `${code}:${key}.description`).toBeGreaterThan(50);
+        expect(d.length, `${code}:${key}.description`).toBeLessThanOrEqual(170);
+      }
+    }
+  });
+
+  it('robots.txt panel sayfalarını dizinden çıkarır ve sitemap gösterir', () => {
+    const robots = read('public/robots.txt');
+    expect(robots).toMatch(/Disallow: \/dashboard/);
+    expect(robots).toMatch(/Sitemap: https:\/\//);
+  });
+
+  it('tanımsız adresler ana sayfaya sessizce yönlenmez, "bulunamadı" sayfası açılır', () => {
+    expect(read('src/app/app.routes.ts')).not.toMatch(/redirectTo: ''/);
+    expect(read('src/app/app.routes.ts')).toContain('not-found.component');
+  });
+});
+

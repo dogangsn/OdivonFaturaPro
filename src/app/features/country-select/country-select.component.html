@@ -80,18 +80,5 @@
         </div>
     </main>
 
-    <!-- Footer -->
-    <footer class="py-6 text-center text-xs sm:text-sm text-slate-400 border-t border-slate-200 bg-white space-y-2">
-        <div class="flex items-center justify-center gap-4 text-xs">
-            <button (click)="openLegal('terms')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.terms') }}</button>
-            <span>•</span>
-            <button (click)="openLegal('privacy')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.privacyCookies') }}</button>
-            <span>•</span>
-            <button (click)="openLegal('kvkk')" class="hover:text-primary transition-colors cursor-pointer bg-transparent border-0">{{ lang.t('legal.kvkk') }}</button>
-        </div>
-        <p>{{ lang.t('legal.copyright') }}</p>
-    </footer>
-
-    <!-- Legal Modal -->
-    <app-legal-modal [isOpen]="showLegalModal" [activeTab]="legalModalTab" (closed)="showLegalModal = false"></app-legal-modal>
+    <app-site-footer></app-site-footer>
 </div>

@@ -1,0 +1,11 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /invoices
+Disallow: /expenses
+Disallow: /customers
+Disallow: /reports
+Disallow: /settings
+Disallow: /ai-assistant
+
+Sitemap: https://generateinvoiceweb.web.app/sitemap.xml

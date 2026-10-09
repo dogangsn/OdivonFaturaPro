@@ -3,6 +3,7 @@ import { Firestore, doc, setDoc, getDoc, updateDoc, serverTimestamp } from '@ang
 import { User } from '@angular/fire/auth';
 import { UserProfile } from '../models/user.model';
 import { BehaviorSubject, Observable } from 'rxjs';
+import { TERMS_VERSION } from '../constants/legal.constant';
 
 @Injectable({
     providedIn: 'root'
@@ -38,9 +39,11 @@ export class UserService {
     }
 
     /**
-     * Yeni kullanıcı profili oluşturur veya mevcut profili günceller
+     * Yeni kullanıcı profili oluşturur veya mevcut profili günceller.
+     * acceptTerms: kullanıcı kullanım şartlarını bu adımda açıkça onayladı; onay zamanı ve sürümü kaydedilir.
      */
-    async createOrUpdateUserProfile(user: User): Promise<UserProfile> {
+    async createOrUpdateUserProfile(user: User, opts: { acceptTerms?: boolean } = {}): Promise<UserProfile> {
+        const termsFields = opts.acceptTerms ? { termsAcceptedAt: serverTimestamp(), termsVersion: TERMS_VERSION } : {};
         const userRef = doc(this.firestore, 'users', user.uid);
         const userSnap = await getDoc(userRef);
 
@@ -49,6 +52,7 @@ export class UserService {
             const updates: any = {
                 displayName: user.displayName || '',
                 photoURL: user.photoURL || null,
+                ...termsFields,
                 updatedAt: serverTimestamp()
             };
 
@@ -82,8 +86,8 @@ export class UserService {
                 plan: 'free',
                 monthlyInvoiceLimit: 5,
                 customerLimit: 5,
-                // Kayıt sırasında kullanım koşulları/KVKK onayı alındı (e-postada onay kutusu, Google'da bilgilendirme notu)
-                termsAcceptedAt: serverTimestamp(),
+                // Onay yoksa giriş ekranı şartları onaylatmadan panele geçirmez (authGuard)
+                ...termsFields,
                 createdAt: serverTimestamp(),
                 updatedAt: serverTimestamp()
             };

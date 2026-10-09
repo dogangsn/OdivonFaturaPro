@@ -17,6 +17,8 @@ export interface UserProfile {
     monthlyInvoiceLimit?: number;
     customerLimit?: number;
     termsAcceptedAt?: Date;
+    /** Onaylanan kullanım şartları sürümü (TERMS_VERSION). */
+    termsVersion?: string;
     createdAt: Date;
     updatedAt: Date;
 }
