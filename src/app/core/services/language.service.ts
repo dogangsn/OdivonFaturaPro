@@ -111,6 +111,5 @@ export class LanguageService {
         const html = this.document.documentElement;
         html.lang = this.currentLang();
         html.dir = this.current.dir;
-        this.document.title = this.t('app.title');
     }
 }

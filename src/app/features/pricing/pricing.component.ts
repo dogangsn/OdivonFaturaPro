@@ -8,6 +8,7 @@ import { LanguageService } from '../../core/services/language.service';
 import { AlertService } from '../../core/services/alert.service';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { LegalModalComponent } from '../../shared/components/legal-modal/legal-modal.component';
+import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { BUSINESS, PAYMENTS } from '../../core/constants/business.constant';
 import { PaymentService } from '../../core/services/payment.service';
 import { FREE_CUSTOMER_LIMIT, FREE_INVOICE_LIMIT } from '../../core/utils/plan-limits';
@@ -15,7 +16,7 @@ import { FREE_CUSTOMER_LIMIT, FREE_INVOICE_LIMIT } from '../../core/utils/plan-l
 @Component({
     selector: 'app-pricing',
     standalone: true,
-    imports: [CommonModule, RouterModule, LanguageSwitcherComponent, LegalModalComponent],
+    imports: [CommonModule, RouterModule, LanguageSwitcherComponent, LegalModalComponent, SiteFooterComponent],
     templateUrl: './pricing.component.html',
     styles: [`:host { display: block; }`]
 })

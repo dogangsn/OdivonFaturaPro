@@ -3,11 +3,12 @@ import { CommonModule } from '@angular/common';
 import { RouterOutlet } from '@angular/router';
 import { SidebarComponent } from '../../components/sidebar/sidebar.component';
 import { AdSlotComponent } from '../../../shared/components/ad-slot/ad-slot.component';
+import { SiteFooterComponent } from '../../../shared/components/site-footer/site-footer.component';
 
 @Component({
     selector: 'app-main-layout',
     standalone: true,
-    imports: [CommonModule, RouterOutlet, SidebarComponent, AdSlotComponent],
+    imports: [CommonModule, RouterOutlet, SidebarComponent, AdSlotComponent, SiteFooterComponent],
     template: `
     <div class="flex flex-col md:flex-row h-screen h-[100dvh] w-full bg-slate-50 dark:bg-slate-950 text-slate-800 dark:text-slate-100 overflow-hidden">
       <!-- Mobile Topbar -->
@@ -29,6 +30,7 @@ import { AdSlotComponent } from '../../../shared/components/ad-slot/ad-slot.comp
         <router-outlet></router-outlet>
         <!-- Ücretsiz plan reklamı (fiyatlandırma/abonelik ekranları bu düzenin dışında, orada reklam yok) -->
         <app-ad-slot></app-ad-slot>
+        <app-site-footer [compact]="true"></app-site-footer>
       </main>
     </div>
   `,
