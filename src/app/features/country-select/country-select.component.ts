@@ -29,6 +29,13 @@ export class CountrySelectComponent implements OnInit {
 
     countries: CountryConfig[] = COUNTRIES_CONFIG;
 
+    readonly features = [
+        { icon: 'account_balance', title: 'home.f1Title', text: 'home.f1Text' },
+        { icon: 'language', title: 'home.f2Title', text: 'home.f2Text' },
+        { icon: 'picture_as_pdf', title: 'home.f3Title', text: 'home.f3Text' },
+        { icon: 'insights', title: 'home.f4Title', text: 'home.f4Text' },
+    ];
+
     async ngOnInit() {
         if (isPlatformBrowser(this.platformId)) {
             // Auth state'inin yüklenmesini bekle

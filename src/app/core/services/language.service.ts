@@ -33,6 +33,20 @@ export const SUPPORTED_LANGUAGES: LanguageOption[] = [
 
 const translations: Record<Language, Record<string, string>> = { tr, en, de, fr, es, it, nl, ar };
 
+export function isLanguage(code: string | null | undefined): code is Language {
+    return !!code && code in translations;
+}
+
+/** Ziyaretçinin tarayıcı dillerinden desteklenen ilki; hiçbiri yoksa İngilizce (küresel varsayılan). */
+function browserLanguage(): Language {
+    const preferred = typeof navigator === 'undefined' ? [] : (navigator.languages?.length ? navigator.languages : [navigator.language]);
+    for (const tag of preferred) {
+        const code = tag?.toLowerCase().split('-')[0];
+        if (isLanguage(code)) return code;
+    }
+    return 'en';
+}
+
 @Injectable({
     providedIn: 'root'
 })
@@ -46,9 +60,14 @@ export class LanguageService {
 
     constructor() {
         if (isPlatformBrowser(this.platformId)) {
-            const saved = localStorage.getItem('lang') as Language;
-            if (saved && saved in translations) {
-                this.currentLang.set(saved);
+            // Öncelik: ?lang= (paylaşılan/arama motoru bağlantısı) > kayıtlı seçim > tarayıcı dili > İngilizce.
+            const fromUrl = new URLSearchParams(this.document.location?.search ?? '').get('lang');
+            if (isLanguage(fromUrl)) {
+                this.currentLang.set(fromUrl);
+                localStorage.setItem('lang', fromUrl);
+            } else {
+                const saved = localStorage.getItem('lang');
+                this.currentLang.set(isLanguage(saved) ? saved : browserLanguage());
             }
             this.applyDocumentLang();
         }

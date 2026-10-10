@@ -2,6 +2,7 @@ import { TestBed } from '@angular/core/testing';
 import { ActivatedRoute, Router, provideRouter } from '@angular/router';
 import { LoginComponent } from './login.component';
 import { AuthService } from '../../core/services/auth.service';
+import { LanguageService } from '../../core/services/language.service';
 
 describe('LoginComponent — kullanım şartları onayı', () => {
   let auth: {
@@ -24,6 +25,8 @@ describe('LoginComponent — kullanım şartları onayı', () => {
     });
     navigateByUrl = vi.fn().mockResolvedValue(true);
     TestBed.inject(Router).navigateByUrl = navigateByUrl as any;
+    // Varsayılan dil tarayıcıdan gelir; metin kontrolleri Türkçe.
+    TestBed.inject(LanguageService).currentLang.set('tr');
     const fixture = TestBed.createComponent(LoginComponent);
     fixture.detectChanges();
     return fixture;

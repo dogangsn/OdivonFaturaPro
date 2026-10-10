@@ -166,6 +166,21 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     }
   });
 
+  it('ana sayfa tüm diller için hreflang, sitemap dil alternatifleri ve yapılandırılmış veri sunar', () => {
+    const html = read('src/index.html');
+    const sitemap = read('public/sitemap.xml');
+    for (const code of Object.keys(languages)) {
+      expect(html, code).toContain(`hreflang="${code}" href="https://generateinvoiceweb.web.app/?lang=${code}"`);
+      expect(sitemap, code).toContain(`<loc>https://generateinvoiceweb.web.app/?lang=${code}</loc>`);
+      for (const k of ['whyTitle', 'whyText', 'f1Title', 'f1Text', 'f2Title', 'f2Text', 'f3Title', 'f3Text', 'f4Title', 'f4Text']) {
+        expect(languages[code as keyof typeof languages][`home.${k}`]?.trim().length, `${code}:home.${k}`).toBeGreaterThan(0);
+      }
+    }
+    expect(html).toContain('hreflang="x-default"');
+    expect(html).toContain('application/ld+json');
+    expect(read('src/app/core/services/seo.service.ts')).toMatch(/hreflang/);
+  });
+
   it('robots.txt panel sayfalarını dizinden çıkarır ve sitemap gösterir', () => {
     const robots = read('public/robots.txt');
     expect(robots).toMatch(/Disallow: \/dashboard/);

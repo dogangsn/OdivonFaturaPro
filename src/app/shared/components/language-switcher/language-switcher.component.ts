@@ -1,5 +1,6 @@
 import { Component, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { Router } from '@angular/router';
 import { Language, LanguageService } from '../../../core/services/language.service';
 
 @Component({
@@ -34,6 +35,7 @@ import { Language, LanguageService } from '../../../core/services/language.servi
 export class LanguageSwitcherComponent {
     lang = inject(LanguageService);
     private host = inject(ElementRef);
+    private router = inject(Router);
 
     @Input() direction: 'up' | 'down' = 'down';
     @Input() fullWidth = false;
@@ -42,6 +44,10 @@ export class LanguageSwitcherComponent {
 
     select(code: Language) {
         this.lang.setLanguage(code);
+        // Adres ?lang= taşıyorsa onu da güncelle; yoksa yenilemede eski dil geri gelir.
+        if (this.router.parseUrl(this.router.url).queryParamMap.has('lang')) {
+            this.router.navigate([], { queryParams: { lang: code }, queryParamsHandling: 'merge', replaceUrl: true });
+        }
         this.open = false;
     }
 
