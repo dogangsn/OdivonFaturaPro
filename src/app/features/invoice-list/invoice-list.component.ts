@@ -17,6 +17,7 @@ import { AlertService } from '../../core/services/alert.service';
 import { Router } from '@angular/router';
 import { COUNTRIES_CONFIG, COUNTRY_MAP } from '../../core/constants/countries.constant';
 import { canCreateInvoice, isFreePlan } from '../../core/utils/plan-limits';
+import { AnalyticsService } from '../../core/services/analytics.service';
 
 @Component({
     selector: 'app-invoice-list',
@@ -31,6 +32,7 @@ export class InvoiceListComponent implements OnInit {
     private authService = inject(AuthService);
     private userService = inject(UserService);
     private alertService = inject(AlertService);
+    private analytics = inject(AnalyticsService);
     private router = inject(Router);
     private platformId = inject(PLATFORM_ID);
     lang = inject(LanguageService);
@@ -536,6 +538,7 @@ export class InvoiceListComponent implements OnInit {
             
             pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, Math.min(imgHeight, pageHeight));
             pdf.save(`${this.previewInvoice.invoiceNo}.pdf`);
+            this.analytics.event('download_pdf', { country: this.previewInvoice.countryCode });
         } catch (error) {
             console.error('PDF oluşturma hatası:', error);
         } finally {

@@ -128,6 +128,18 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     expect(others).not.toMatch(/adsbygoogle\.js/);
   });
 
+  it('Google Analytics yalnızca analitik çerez onayıyla ve canlı ortamda yüklenir', () => {
+    const ga = read('src/app/core/services/analytics.service.ts');
+    expect(ga).toMatch(/analyticsAllowed\(\)/);
+    expect(ga).toMatch(/environment\.production/);
+    const others = srcFiles('src').filter(f => !f.includes('analytics.service')).map(read).join('\n');
+    expect(others).not.toMatch(/googletagmanager\.com/);
+    for (const [code, table] of Object.entries(languages)) {
+      expect(table['legalDoc.cookies.p2'], code).toMatch(/Google Analytics/);
+      expect(table['cookie.analyticsTitle']?.length, code).toBeGreaterThan(0);
+    }
+  });
+
   it('her yasal metnin herkese açık bir sayfası ve sitemap kaydı var', () => {
     expect(read('src/app/app.routes.ts')).toMatch(/LEGAL_DOCS\.map/);
     const sitemap = read('public/sitemap.xml');

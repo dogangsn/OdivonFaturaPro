@@ -21,6 +21,7 @@ describe('CookieConsentService — çerez onayı', () => {
     const next = create();
     expect(next.bannerOpen()).toBe(false);
     expect(next.adsAllowed()).toBe(true);
+    expect(next.analyticsAllowed()).toBe(true);
   });
 
   it('ret kalıcıdır ve reklam çerezine izin vermez', () => {
@@ -28,6 +29,14 @@ describe('CookieConsentService — çerez onayı', () => {
     const next = create();
     expect(next.bannerOpen()).toBe(false);
     expect(next.adsAllowed()).toBe(false);
+    expect(next.analyticsAllowed()).toBe(false);
+  });
+
+  it('analitik ve reklam ayrı ayrı seçilebilir', () => {
+    create().save(false, true);
+    const next = create();
+    expect(next.adsAllowed()).toBe(false);
+    expect(next.analyticsAllowed()).toBe(true);
   });
 
   it('12 aydan eski veya eski sürümlü karar yeniden sorulur', () => {

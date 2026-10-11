@@ -6,6 +6,7 @@ import { Invoice, InvoiceFormData, InvoiceItem } from '../models/invoice.model';
 import { Observable, map, of, from, switchMap } from 'rxjs';
 
 import { LanguageService } from './language.service';
+import { AnalyticsService } from './analytics.service';
 
 /** Tutarları kuruşa (2 ondalık) yuvarlar. */
 export function roundMoney(value: number): number {
@@ -19,6 +20,7 @@ export class InvoiceService {
     private platformId = inject(PLATFORM_ID);
     private injector = inject(Injector);
     private lang = inject(LanguageService);
+    private analytics = inject(AnalyticsService);
 
     // Lazy injection - sadece browser'da kullanılacak
     private _firestore: Firestore | null = null;
@@ -149,6 +151,7 @@ export class InvoiceService {
             }));
         });
 
+        this.analytics.event('create_invoice', { country: data.countryCode, currency: data.currency, document_type: data.invoiceType });
         return invoiceRef.id;
     }
 

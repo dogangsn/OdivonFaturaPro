@@ -10,6 +10,7 @@ import { COUNTRIES_CONFIG, CountryConfig } from '../../core/constants/countries.
 import { COUNTRY_GUIDES, countryGuide } from '../../core/constants/country-guides.constant';
 import { HOME_FAQ } from '../../core/constants/home.constant';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
+import { AnalyticsService } from '../../core/services/analytics.service';
 
 @Component({
     selector: 'app-country-select',
@@ -23,6 +24,7 @@ export class CountrySelectComponent implements OnInit {
     private auth = inject(Auth);
     private authService = inject(AuthService);
     private platformId = inject(PLATFORM_ID);
+    private analytics = inject(AnalyticsService);
     lang = inject(LanguageService);
 
     user = signal<User | null>(null);
@@ -61,7 +63,7 @@ export class CountrySelectComponent implements OnInit {
     }
 
     selectCountry(country: CountryConfig) {
-        console.log('Selected country:', country);
+        this.analytics.event('select_country', { country: country.code });
         this.router.navigate(['/create-invoice'], { queryParams: { taxRate: country.defaultRate, countryCode: country.code } });
     }
 

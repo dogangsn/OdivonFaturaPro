@@ -1,10 +1,11 @@
 import { Injectable, inject, PLATFORM_ID } from '@angular/core';
 import { isPlatformBrowser } from '@angular/common';
-import { Auth, GoogleAuthProvider, signInWithPopup, signOut, user, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, sendPasswordResetEmail, updateProfile } from '@angular/fire/auth';
+import { Auth, GoogleAuthProvider, signInWithPopup, signOut, user, User, signInWithEmailAndPassword, createUserWithEmailAndPassword, getAdditionalUserInfo, sendPasswordResetEmail, updateProfile } from '@angular/fire/auth';
 import { Router } from '@angular/router';
 import { Observable, BehaviorSubject } from 'rxjs';
 import { UserService } from './user.service';
 import { UserProfile } from '../models/user.model';
+import { AnalyticsService } from './analytics.service';
 
 const USER_PROFILE_CACHE_KEY = 'userProfile';
 
@@ -22,6 +23,7 @@ export class AuthService {
     private router: Router = inject(Router);
     private userService = inject(UserService);
     private platformId = inject(PLATFORM_ID);
+    private analytics = inject(AnalyticsService);
 
     user$: Observable<User | null> = user(this.auth);
     
@@ -108,6 +110,7 @@ export class AuthService {
         // Kullanıcıyı Firestore'a kaydet ve cache'le
         const profile = await this.userService.createOrUpdateUserProfile(result.user, { acceptTerms });
         this.cacheProfile(profile);
+        this.analytics.event(getAdditionalUserInfo(result)?.isNewUser ? 'sign_up' : 'login', { method: 'google' });
         return { user: result.user, needsTerms: !profile.termsAcceptedAt };
     }
 
@@ -116,6 +119,7 @@ export class AuthService {
         // Kullanıcıyı Firestore'a kaydet ve cache'le
         const profile = await this.userService.createOrUpdateUserProfile(result.user);
         this.cacheProfile(profile);
+        this.analytics.event('login', { method: 'email' });
         return { user: result.user, needsTerms: !profile.termsAcceptedAt };
     }
 
@@ -136,6 +140,7 @@ export class AuthService {
             await this.userService.updateUserProfile(result.user.uid, { displayName });
         }
         this.cacheProfile(profile);
+        this.analytics.event('sign_up', { method: 'email' });
         return result.user;
     }
 

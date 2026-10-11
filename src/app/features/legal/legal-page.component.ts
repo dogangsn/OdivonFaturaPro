@@ -7,7 +7,7 @@ import { LanguageService } from '../../core/services/language.service';
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { LegalDocumentComponent } from '../../shared/components/legal-document/legal-document.component';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
-import { LEGAL_LAST_UPDATED, LegalDocType } from '../../core/constants/legal.constant';
+import { LEGAL_LAST_UPDATED, LegalDocType, legalDoc } from '../../core/constants/legal.constant';
 
 /** Yasal metinlerin herkese açık, bağlantı verilebilir sayfası (ör. /gizlilik-politikasi). */
 @Component({
@@ -44,6 +44,6 @@ export class LegalPageComponent {
     });
 
     lastUpdated(): string {
-        return formatDate(LEGAL_LAST_UPDATED, 'longDate', this.lang.locale);
+        return formatDate(legalDoc(this.type()).updated ?? LEGAL_LAST_UPDATED, 'longDate', this.lang.locale);
     }
 }

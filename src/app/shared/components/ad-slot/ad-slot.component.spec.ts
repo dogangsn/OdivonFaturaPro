@@ -18,7 +18,7 @@ describe('AdSlotComponent — ücretsiz plan reklamı', () => {
         { provide: UserService, useValue: { getUserProfile: vi.fn().mockResolvedValue(plan === null ? null : { uid: 'u1', plan }) } },
       ],
     });
-    if (adsConsent !== null) TestBed.inject(CookieConsentService).save(adsConsent);
+    if (adsConsent !== null) TestBed.inject(CookieConsentService).save(adsConsent, false);
     const fixture = TestBed.createComponent(AdSlotComponent);
     await fixture.componentInstance.ngOnInit();
     fixture.detectChanges();

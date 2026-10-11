@@ -6,7 +6,7 @@ import { CookieConsentService } from '../../../core/services/cookie-consent.serv
 
 /**
  * KVKK çerez rehberine uygun onay bandı: kabul ve ret eşit ağırlıkta, reklam çerezi varsayılan kapalı.
- * Karar verilene kadar reklam betiği yüklenmez (bkz. AdSlotComponent).
+ * Karar verilene kadar reklam ve ölçüm betiği yüklenmez (bkz. AdSlotComponent, AnalyticsService).
  */
 @Component({
     selector: 'app-cookie-banner',
@@ -37,6 +37,14 @@ import { CookieConsentService } from '../../../core/services/cookie-consent.serv
                 </div>
                 <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 p-3 cursor-pointer">
                     <div>
+                        <p class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">{{ lang.t('cookie.analyticsTitle') }}</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">{{ lang.t('cookie.analyticsDesc') }}</p>
+                    </div>
+                    <input type="checkbox" name="analyticsConsent" [checked]="analyticsChoice" (change)="analyticsChoice = $any($event.target).checked"
+                        class="w-5 h-5 rounded border-slate-300 dark:border-slate-600 text-primary focus:ring-primary shrink-0">
+                </label>
+                <label class="flex items-center justify-between gap-3 rounded-xl border border-slate-200 dark:border-slate-700 p-3 cursor-pointer">
+                    <div>
                         <p class="text-xs sm:text-sm font-semibold text-slate-900 dark:text-white">{{ lang.t('cookie.adsTitle') }}</p>
                         <p class="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400">{{ lang.t('cookie.adsDesc') }}</p>
                     </div>
@@ -50,7 +58,7 @@ import { CookieConsentService } from '../../../core/services/cookie-consent.serv
                     class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary">
                     {{ lang.t('cookie.customize') }}
                 </button>
-                <button *ngIf="showDetails" type="button" (click)="consent.save(adsChoice)"
+                <button *ngIf="showDetails" type="button" (click)="consent.save(adsChoice, analyticsChoice)"
                     class="px-4 py-2 rounded-xl text-xs sm:text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary">
                     {{ lang.t('cookie.save') }}
                 </button>
@@ -73,6 +81,7 @@ export class CookieBannerComponent {
     consent = inject(CookieConsentService);
     showDetails = false;
     adsChoice = false;
+    analyticsChoice = false;
 
     constructor() {
         // Tercihler yeniden açıldığında mevcut kararı göster.
@@ -80,6 +89,7 @@ export class CookieBannerComponent {
             if (this.consent.bannerOpen()) {
                 const current = this.consent.consent();
                 this.adsChoice = current?.ads ?? false;
+                this.analyticsChoice = current?.analytics ?? false;
                 this.showDetails = current !== null;
             }
         });

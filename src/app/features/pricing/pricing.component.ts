@@ -12,6 +12,7 @@ import { SiteFooterComponent } from '../../shared/components/site-footer/site-fo
 import { BUSINESS, PAYMENTS } from '../../core/constants/business.constant';
 import { PaymentService } from '../../core/services/payment.service';
 import { FREE_CUSTOMER_LIMIT, FREE_INVOICE_LIMIT } from '../../core/utils/plan-limits';
+import { AnalyticsService } from '../../core/services/analytics.service';
 
 @Component({
     selector: 'app-pricing',
@@ -25,6 +26,7 @@ export class PricingComponent implements OnInit {
     private authService = inject(AuthService);
     private alertService = inject(AlertService);
     private paymentService = inject(PaymentService);
+    private analytics = inject(AnalyticsService);
     private route = inject(ActivatedRoute);
     private router = inject(Router);
     lang = inject(LanguageService);
@@ -95,6 +97,7 @@ export class PricingComponent implements OnInit {
         // iyzico ödeme dönüşü: /pricing?payment=success|failed
         const payment = this.route.snapshot.queryParamMap.get('payment');
         if (payment === 'success') {
+            this.analytics.event('payment_success');
             this.alertService.success(this.lang.t('pricing.paymentSuccessTitle'), this.lang.t('pricing.paymentSuccess'));
         } else if (payment === 'failed') {
             this.alertService.error(this.lang.t('pricing.paymentFailedTitle'), this.lang.t('pricing.paymentFailed'));
@@ -171,6 +174,7 @@ export class PricingComponent implements OnInit {
         this.alertService.loading(this.lang.t('pricing.preparingPayment'));
         try {
             const checkout = await this.paymentService.initializeCheckoutForm(this.targetPlanId);
+            this.analytics.event('begin_checkout', { plan: this.targetPlanId });
             window.location.assign(checkout.paymentPageUrl);
         } catch (error) {
             console.error('iyzico ödeme başlatma hatası:', error);
