@@ -11,9 +11,9 @@ import { Language, LanguageService } from '../../../core/services/language.servi
         <div class="relative" [class.w-full]="fullWidth">
             <button type="button" (click)="open = !open"
                 class="flex items-center gap-2 h-9 px-3 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-700 dark:text-slate-200 text-sm font-medium hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors"
-                [class.w-full]="fullWidth" [attr.aria-expanded]="open" aria-haspopup="listbox">
+                [class.w-full]="fullWidth" [attr.aria-expanded]="open" aria-haspopup="listbox" [attr.aria-label]="lang.current.nativeName">
                 <img [src]="lang.current.flagUrl" alt="" class="w-5 h-3.5 rounded-sm object-cover">
-                <span class="flex-1 text-start">{{ lang.current.nativeName }}</span>
+                <span class="flex-1 text-start" [ngClass]="fullWidth ? '' : 'hidden sm:inline'">{{ lang.current.nativeName }}</span>
                 <span class="material-symbols-outlined text-[18px] text-slate-400">expand_more</span>
             </button>
             <ul *ngIf="open" role="listbox"

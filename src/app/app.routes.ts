@@ -16,6 +16,9 @@ export const routes: Routes = [
     { path: 'create-invoice', component: CreateInvoiceComponent, data: { seo: 'createInvoice' } },
     { path: 'pricing', loadComponent: () => import('./features/pricing/pricing.component').then(m => m.PricingComponent), data: { seo: 'pricing' } },
 
+    // Ülke fatura rehberleri: /invoice/germany, /invoice/turkey ... (COUNTRY_GUIDES)
+    { path: 'invoice/:country', loadComponent: () => import('./features/country-guide/country-guide.component').then(m => m.CountryGuideComponent), data: { seo: 'countryGuide' } },
+
     // Yasal metinler: /kullanim-sartlari, /gizlilik-politikasi, /kvkk-aydinlatma-metni, /cerez-politikasi, /mesafeli-satis-sozlesmesi
     ...LEGAL_DOCS.map(doc => ({
         path: doc.path,

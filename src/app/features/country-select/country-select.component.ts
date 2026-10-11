@@ -1,18 +1,20 @@
 import { LanguageSwitcherComponent } from '../../shared/components/language-switcher/language-switcher.component';
 import { Component, inject, OnInit, PLATFORM_ID, signal } from '@angular/core';
 import { CommonModule, isPlatformBrowser } from '@angular/common';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Auth } from '@angular/fire/auth';
 import { AuthService } from '../../core/services/auth.service';
 import { LanguageService } from '../../core/services/language.service';
 import { User } from '@angular/fire/auth';
 import { COUNTRIES_CONFIG, CountryConfig } from '../../core/constants/countries.constant';
+import { COUNTRY_GUIDES, countryGuide } from '../../core/constants/country-guides.constant';
+import { HOME_FAQ } from '../../core/constants/home.constant';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 
 @Component({
     selector: 'app-country-select',
     standalone: true,
-    imports: [CommonModule, SiteFooterComponent, LanguageSwitcherComponent],
+    imports: [CommonModule, RouterModule, SiteFooterComponent, LanguageSwitcherComponent],
     templateUrl: './country-select.component.html',
     styleUrl: './country-select.component.css'
 })
@@ -28,6 +30,9 @@ export class CountrySelectComponent implements OnInit {
     isLoading = signal(true);
 
     countries: CountryConfig[] = COUNTRIES_CONFIG;
+
+    readonly guides = COUNTRY_GUIDES.map(g => countryGuide(g.slug)!);
+    readonly faq = HOME_FAQ;
 
     readonly features = [
         { icon: 'account_balance', title: 'home.f1Title', text: 'home.f1Text' },

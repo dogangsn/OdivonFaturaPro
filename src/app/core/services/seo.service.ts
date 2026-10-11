@@ -5,6 +5,8 @@ import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
 import { LanguageService, SUPPORTED_LANGUAGES, isLanguage } from './language.service';
 import { COUNTRIES_CONFIG } from '../constants/countries.constant';
+import { countryGuide } from '../constants/country-guides.constant';
+import { HOME_FAQ } from '../constants/home.constant';
 
 const OG_LOCALES: Record<string, string> = {
     tr: 'tr_TR', en: 'en_GB', de: 'de_DE', fr: 'fr_FR', es: 'es_ES', it: 'it_IT', nl: 'nl_NL', ar: 'ar_AE'
@@ -38,18 +40,25 @@ export class SeoService {
 
     apply(): void {
         const data = this.deepestData(this.router.routerState.snapshot.root);
-        const key: string = data['seo'] ?? 'home';
+        let key: string = data['seo'] ?? 'home';
         const siteName = this.lang.t('seo.siteName');
 
-        const pageTitle = this.translated(`seo.${key}.title`);
+        // Ülke rehberi: başlık ve açıklama ülke adı/vergi adıyla doldurulur; bilinmeyen ülke dizine girmez.
+        const guide = key === 'countryGuide' ? countryGuide(this.deepestParam('country')) : undefined;
+        if (key === 'countryGuide' && !guide) key = 'notFound';
+        const params = guide
+            ? { country: this.lang.t(guide.country.nameKey), tax: guide.country.taxLabel, currency: guide.country.currency }
+            : undefined;
+
+        const pageTitle = this.translated(`seo.${key}.title`, params);
         const fullTitle = key === 'home' || !pageTitle ? this.lang.t('seo.home.title') : `${pageTitle} | ${siteName}`;
-        const description = this.translated(`seo.${key}.description`) ?? this.lang.t('seo.home.description');
+        const description = this.translated(`seo.${key}.description`, params) ?? this.lang.t('seo.home.description');
         const url = this.canonicalUrl();
-        const indexable = !data['noindex'];
+        const indexable = !data['noindex'] && key !== 'notFound';
 
         this.title.setTitle(fullTitle);
         this.meta.updateTag({ name: 'description', content: description });
-        this.meta.updateTag({ name: 'robots', content: data['noindex'] ? 'noindex, nofollow' : 'index, follow' });
+        this.meta.updateTag({ name: 'robots', content: indexable ? 'index, follow' : 'noindex, nofollow' });
         this.meta.updateTag({ property: 'og:title', content: fullTitle });
         this.meta.updateTag({ property: 'og:description', content: description });
         this.meta.updateTag({ property: 'og:url', content: url });
@@ -66,9 +75,19 @@ export class SeoService {
     }
 
     /** Çevirisi yoksa undefined (t() anahtarın kendisini döndürür). */
-    private translated(key: string): string | undefined {
-        const value = this.lang.t(key);
+    private translated(key: string, params?: Record<string, string>): string | undefined {
+        const value = this.lang.t(key, params);
         return value === key ? undefined : value;
+    }
+
+    private deepestParam(name: string): string | null {
+        let route: ActivatedRouteSnapshot | null = this.router.routerState.snapshot.root;
+        let value: string | null = null;
+        while (route) {
+            value = route.paramMap.get(name) ?? value;
+            route = route.firstChild;
+        }
+        return value;
     }
 
     private deepestData(route: ActivatedRouteSnapshot): Record<string, any> {
@@ -134,6 +153,15 @@ export class SeoService {
                     availableLanguage: languages,
                     areaServed: AREA_SERVED,
                     offers: { '@type': 'Offer', price: '0', priceCurrency: 'USD' }
+                },
+                {
+                    '@type': 'FAQPage',
+                    inLanguage: this.lang.lang,
+                    mainEntity: HOME_FAQ.map(n => ({
+                        '@type': 'Question',
+                        name: this.lang.t(`home.faq.q${n}`),
+                        acceptedAnswer: { '@type': 'Answer', text: this.lang.t(`home.faq.a${n}`) }
+                    }))
                 }
             ]
         };

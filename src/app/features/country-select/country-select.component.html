@@ -1,12 +1,12 @@
 <div class="min-h-screen bg-slate-50 flex flex-col">
     <!-- Header -->
-    <header class="flex items-center justify-between px-6 py-4 bg-white border-b border-slate-200 shadow-sm">
+    <header class="flex items-center justify-between gap-2 px-4 sm:px-6 py-4 bg-white border-b border-slate-200 shadow-sm">
         <div class="flex items-center gap-2 text-primary">
-            <img src="/odivon-violet-loop.png" alt="" class="w-8 h-8 object-contain">
-            <span class="text-xl font-black tracking-tight">Odivon <span class="text-slate-900">FaturaPro</span></span>
+            <img src="/odivon-violet-loop.png" alt="" class="w-7 h-7 sm:w-8 sm:h-8 object-contain">
+            <span class="text-base sm:text-xl font-black tracking-tight whitespace-nowrap">Odivon <span class="text-slate-900">FaturaPro</span></span>
         </div>
         
-        <div class="flex items-center gap-3">
+        <div class="flex items-center gap-2 sm:gap-3">
             <!-- Dil Seçici -->
             <app-language-switcher></app-language-switcher>
             
@@ -18,15 +18,15 @@
             <!-- Kullanıcı giriş yapmamışsa -->
             <ng-container *ngIf="!isLoading() && !isLoggedIn()">
                 <button (click)="goToPricing()"
-                    class="text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm">
+                    class="hidden sm:inline-block text-slate-600 dark:text-slate-300 hover:text-primary px-3 py-2 rounded-lg font-medium transition-colors text-xs sm:text-sm">
                     {{ lang.t('common.pricing') }}
                 </button>
                 <button (click)="goToRegister()"
-                    class="bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 transition-colors text-xs sm:text-sm">
+                    class="hidden sm:inline-block bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 px-4 py-2 rounded-lg font-semibold hover:bg-slate-200 transition-colors text-xs sm:text-sm">
                     {{ lang.t('auth.register') }}
                 </button>
                 <button (click)="goToLogin()"
-                    class="bg-primary text-white px-5 py-2 rounded-lg font-semibold hover:bg-blue-700 transition-colors text-xs sm:text-sm shadow-sm">
+                    class="bg-primary text-white px-4 sm:px-5 py-2 rounded-lg whitespace-nowrap font-semibold hover:bg-blue-700 transition-colors text-xs sm:text-sm shadow-sm">
                     {{ lang.t('auth.login') }}
                 </button>
             </ng-container>
@@ -92,6 +92,32 @@
                     <h3 class="font-semibold text-slate-900 mb-1">{{ lang.t(f.title) }}</h3>
                     <p class="text-sm text-slate-500">{{ lang.t(f.text) }}</p>
                 </div>
+            </div>
+        </section>
+
+        <!-- Ülke rehberleri: arama motorlarına iç bağlantı, ziyaretçiye ülkesine özel bilgi -->
+        <nav class="w-full max-w-5xl mt-16 text-center" [attr.aria-label]="lang.t('home.guidesTitle')">
+            <h2 class="text-2xl font-bold text-slate-900 mb-2">{{ lang.t('home.guidesTitle') }}</h2>
+            <p class="text-slate-500 mb-5">{{ lang.t('home.guidesText') }}</p>
+            <div class="flex flex-wrap justify-center gap-2">
+                <a *ngFor="let g of guides" [routerLink]="['/invoice', g.slug]"
+                    class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-primary hover:text-primary">
+                    {{ lang.t('home.guideLink', { country: lang.t(g.country.nameKey) }) }}
+                </a>
+            </div>
+        </nav>
+
+        <!-- Sık sorulan sorular (SeoService aynı soruları FAQPage yapılandırılmış verisi olarak da yayınlar) -->
+        <section class="w-full max-w-3xl mt-16" aria-labelledby="home-faq-title">
+            <h2 id="home-faq-title" class="text-2xl font-bold text-slate-900 mb-5 text-center">{{ lang.t('home.faqTitle') }}</h2>
+            <div class="space-y-3">
+                <details *ngFor="let n of faq" class="group rounded-xl bg-white border border-slate-100 p-4">
+                    <summary class="flex items-center justify-between gap-4 cursor-pointer font-semibold text-slate-900 list-none">
+                        {{ lang.t('home.faq.q' + n) }}
+                        <span class="material-symbols-outlined text-slate-400 group-open:rotate-180 transition-transform" aria-hidden="true">expand_more</span>
+                    </summary>
+                    <p class="mt-3 text-sm text-slate-600 leading-relaxed">{{ lang.t('home.faq.a' + n) }}</p>
+                </details>
             </div>
         </section>
     </main>

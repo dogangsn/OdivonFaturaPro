@@ -10,6 +10,9 @@ import { it as itLang } from '../../src/app/core/i18n/it';
 import { nl } from '../../src/app/core/i18n/nl';
 import { ar } from '../../src/app/core/i18n/ar';
 import { LEGAL_DOCS } from '../../src/app/core/constants/legal.constant';
+import { COUNTRY_GUIDES } from '../../src/app/core/constants/country-guides.constant';
+import { COUNTRY_MAP } from '../../src/app/core/constants/countries.constant';
+import { HOME_FAQ } from '../../src/app/core/constants/home.constant';
 
 // Canlıda para kazanmaya hazır olmak için gereken yapılandırma ve içerik kontrolleri.
 // `gap(...)`: bugün eksik olan bir şeyi belgeler. Giderildiğinde test kırmızıya döner; o zaman `it` yapın.
@@ -179,6 +182,24 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     expect(html).toContain('hreflang="x-default"');
     expect(html).toContain('application/ld+json');
     expect(read('src/app/core/services/seo.service.ts')).toMatch(/hreflang/);
+  });
+
+  it('her ülke rehberinin sitemap kaydı, çevrili notu ve SSS metinleri var', () => {
+    const sitemap = read('public/sitemap.xml');
+    for (const g of COUNTRY_GUIDES) {
+      expect(COUNTRY_MAP[g.code], g.slug).toBeDefined();
+      expect(sitemap, g.slug).toContain(`<loc>https://generateinvoiceweb.web.app/invoice/${g.slug}</loc>`);
+      for (const [code, table] of Object.entries(languages)) {
+        expect(table[`guide.note.${g.slug}`]?.trim().length, `${code}:${g.slug}`).toBeGreaterThan(0);
+      }
+    }
+    for (const [code, table] of Object.entries(languages)) {
+      for (const n of HOME_FAQ) {
+        expect(table[`home.faq.q${n}`]?.trim().length, `${code}:q${n}`).toBeGreaterThan(0);
+        expect(table[`home.faq.a${n}`]?.trim().length, `${code}:a${n}`).toBeGreaterThan(0);
+      }
+    }
+    expect(read('public/robots.txt')).not.toMatch(/Disallow: \/invoice\s*$/m);
   });
 
   it('robots.txt panel sayfalarını dizinden çıkarır ve sitemap gösterir', () => {
