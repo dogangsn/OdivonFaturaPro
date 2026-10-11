@@ -172,7 +172,7 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     for (const code of Object.keys(languages)) {
       expect(html, code).toContain(`hreflang="${code}" href="https://generateinvoiceweb.web.app/?lang=${code}"`);
       expect(sitemap, code).toContain(`<loc>https://generateinvoiceweb.web.app/?lang=${code}</loc>`);
-      for (const k of ['whyTitle', 'whyText', 'f1Title', 'f1Text', 'f2Title', 'f2Text', 'f3Title', 'f3Text', 'f4Title', 'f4Text']) {
+      for (const k of ['h1', 'whyTitle', 'whyText', 'f1Title', 'f1Text', 'f2Title', 'f2Text', 'f3Title', 'f3Text', 'f4Title', 'f4Text']) {
         expect(languages[code as keyof typeof languages][`home.${k}`]?.trim().length, `${code}:home.${k}`).toBeGreaterThan(0);
       }
     }
