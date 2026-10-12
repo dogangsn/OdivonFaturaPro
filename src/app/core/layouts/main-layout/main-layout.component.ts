@@ -14,7 +14,7 @@ import { SiteFooterComponent } from '../../../shared/components/site-footer/site
       <!-- Mobile Topbar -->
       <header class="flex md:hidden items-center justify-between h-14 px-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 z-30 shrink-0">
         <div class="flex items-center gap-2 text-primary">
-          <img src="/odivon-violet-loop.png" alt="" class="w-7 h-7 object-contain">
+          <img src="/logo-128.webp" alt="" class="w-7 h-7 object-contain">
           <span class="text-lg font-black tracking-tight text-slate-900 dark:text-white">Odivon <span class="text-primary">FaturaPro</span></span>
         </div>
         <button (click)="isMobileMenuOpen = !isMobileMenuOpen" class="p-2 min-h-[44px] min-w-[44px] flex items-center justify-center text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-800 rounded-lg transition-colors">

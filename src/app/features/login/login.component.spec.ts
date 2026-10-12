@@ -14,7 +14,7 @@ describe('LoginComponent — kullanım şartları onayı', () => {
   };
   let navigateByUrl: ReturnType<typeof vi.fn>;
 
-  function create(queryParams: Record<string, string> = {}) {
+  async function create(queryParams: Record<string, string> = {}) {
     TestBed.configureTestingModule({
       imports: [LoginComponent],
       providers: [
@@ -26,7 +26,7 @@ describe('LoginComponent — kullanım şartları onayı', () => {
     navigateByUrl = vi.fn().mockResolvedValue(true);
     TestBed.inject(Router).navigateByUrl = navigateByUrl as any;
     // Varsayılan dil tarayıcıdan gelir; metin kontrolleri Türkçe.
-    TestBed.inject(LanguageService).currentLang.set('tr');
+    await TestBed.inject(LanguageService).setLanguage('tr');
     const fixture = TestBed.createComponent(LoginComponent);
     fixture.detectChanges();
     return fixture;
@@ -44,7 +44,7 @@ describe('LoginComponent — kullanım şartları onayı', () => {
 
   it('Google ile ilk girişte şartlar onaylanmadan panele geçmez', async () => {
     auth.loginWithGoogle.mockResolvedValue({ user: { uid: 'u1' }, needsTerms: true });
-    const fixture = create();
+    const fixture = await create();
     await fixture.componentInstance.loginWithGoogle();
     fixture.detectChanges();
 
@@ -55,7 +55,7 @@ describe('LoginComponent — kullanım şartları onayı', () => {
   });
 
   it('onay kutusu işaretlenip kabul edilince onayı kaydeder ve devam eder', async () => {
-    const fixture = create({ consent: '1', returnUrl: '/invoices' });
+    const fixture = await create({ consent: '1', returnUrl: '/invoices' });
     const c = fixture.componentInstance;
     expect(c.pendingTerms).toBe(true);
 
@@ -69,13 +69,13 @@ describe('LoginComponent — kullanım şartları onayı', () => {
   });
 
   it('onayı reddeden kullanıcının oturumu kapatılır', async () => {
-    const fixture = create({ consent: '1' });
+    const fixture = await create({ consent: '1' });
     await fixture.componentInstance.declinePendingTerms();
     expect(auth.logout).toHaveBeenCalled();
   });
 
   it('kayıt sekmesinde onay kutusu işaretlenmeden Google ile kayıt başlamaz', async () => {
-    const fixture = create({ mode: 'register' });
+    const fixture = await create({ mode: 'register' });
     await fixture.componentInstance.loginWithGoogle();
     expect(auth.loginWithGoogle).not.toHaveBeenCalled();
 
@@ -85,14 +85,14 @@ describe('LoginComponent — kullanım şartları onayı', () => {
   });
 
   it('sorgu parametreli dönüş adresini bozmadan açar, dış adrese yönlendirmez', async () => {
-    let fixture = create({ returnUrl: '/invoices?status=paid' });
+    let fixture = await create({ returnUrl: '/invoices?status=paid' });
     fixture.componentInstance.email = 'a@b.co';
     fixture.componentInstance.password = 'secret1';
     await fixture.componentInstance.login();
     expect(navigateByUrl).toHaveBeenCalledWith('/invoices?status=paid');
 
     TestBed.resetTestingModule();
-    fixture = create({ returnUrl: '//evil.example' });
+    fixture = await create({ returnUrl: '//evil.example' });
     expect(fixture.componentInstance.returnUrl).toBe('/dashboard');
   });
 });

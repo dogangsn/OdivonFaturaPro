@@ -1,13 +1,5 @@
 import { Injectable, signal, PLATFORM_ID, inject } from '@angular/core';
 import { isPlatformBrowser, DOCUMENT } from '@angular/common';
-import { tr } from '../i18n/tr';
-import { en } from '../i18n/en';
-import { de } from '../i18n/de';
-import { fr } from '../i18n/fr';
-import { es } from '../i18n/es';
-import { it } from '../i18n/it';
-import { nl } from '../i18n/nl';
-import { ar } from '../i18n/ar';
 
 export type Language = 'tr' | 'en' | 'de' | 'fr' | 'es' | 'it' | 'nl' | 'ar';
 
@@ -31,10 +23,24 @@ export const SUPPORTED_LANGUAGES: LanguageOption[] = [
     { code: 'ar', nativeName: 'العربية', flagUrl: '/flags/ae.svg', locale: 'ar', dir: 'rtl' },
 ];
 
-const translations: Record<Language, Record<string, string>> = { tr, en, de, fr, es, it, nl, ar };
+type Table = Record<string, string>;
+
+// Çeviri tabloları dil başına ayrı dosyada yüklenir; ziyaretçi yalnızca kendi dilini indirir (8 dilin hepsi ~660 KB).
+const LOADERS: Record<Language, () => Promise<Table>> = {
+    tr: () => import('../i18n/tr').then(m => m.tr),
+    en: () => import('../i18n/en').then(m => m.en),
+    de: () => import('../i18n/de').then(m => m.de),
+    fr: () => import('../i18n/fr').then(m => m.fr),
+    es: () => import('../i18n/es').then(m => m.es),
+    it: () => import('../i18n/it').then(m => m.it),
+    nl: () => import('../i18n/nl').then(m => m.nl),
+    ar: () => import('../i18n/ar').then(m => m.ar),
+};
+
+const LANGUAGE_CODES = new Set<string>(SUPPORTED_LANGUAGES.map(l => l.code));
 
 export function isLanguage(code: string | null | undefined): code is Language {
-    return !!code && code in translations;
+    return !!code && LANGUAGE_CODES.has(code);
 }
 
 /** Dil önekli adresin dili (ör. /de/invoice/germany → de); önek yoksa null. */
@@ -62,7 +68,10 @@ export class LanguageService {
 
     readonly languages = SUPPORTED_LANGUAGES;
     currentLang = signal<Language>('tr');
+    private tables = signal<Partial<Record<Language, Table>>>({});
     private cache = new Map<string, { lang: Language; value: unknown }>();
+    /** Başlangıç dilinin tablosu yüklendiğinde çözülür; uygulama bundan önce çizilmez (app.config). */
+    readonly ready: Promise<void>;
 
     constructor() {
         // Dil önekli sayfalar (/de, /de/invoice/germany) sunucuda önceden render edilir; dil adresten gelir.
@@ -81,9 +90,12 @@ export class LanguageService {
             }
         }
         this.applyDocumentLang();
+        this.ready = this.load(this.currentLang());
     }
 
-    setLanguage(lang: Language) {
+    /** Dilin tablosunu indirir, sonra arayüzü o dile geçirir (yarım çevrili ekran görünmez). */
+    async setLanguage(lang: Language): Promise<void> {
+        await this.load(lang);
         this.currentLang.set(lang);
         this.applyDocumentLang();
         if (isPlatformBrowser(this.platformId)) {
@@ -91,12 +103,19 @@ export class LanguageService {
         }
     }
 
+    private async load(lang: Language): Promise<void> {
+        if (this.tables()[lang]) return;
+        const table = await LOADERS[lang]();
+        this.tables.update(t => ({ ...t, [lang]: table }));
+    }
+
     /**
      * Returns the translation for key, filling {name} placeholders from params.
-     * Falls back to English, then Turkish, then the key itself.
+     * Falls back to English, then Turkish (when already loaded), then the key itself.
      */
     t(key: string, params?: Record<string, string | number | null | undefined>): string {
-        let text = translations[this.currentLang()][key] ?? translations.en[key] ?? translations.tr[key] ?? key;
+        const tables = this.tables();
+        let text = tables[this.currentLang()]?.[key] ?? tables.en?.[key] ?? tables.tr?.[key] ?? key;
         if (params) {
             for (const [name, value] of Object.entries(params)) {
                 text = text.split(`{${name}}`).join(String(value ?? ''));
@@ -126,7 +145,8 @@ export class LanguageService {
         const hit = this.cache.get(key);
         if (hit && hit.lang === this.currentLang()) return hit.value as T;
         const value = build();
-        this.cache.set(key, { lang: this.currentLang(), value });
+        // Tablo henüz yüklenmediyse çeviriler anahtar olarak döner; önbelleğe alma.
+        if (this.tables()[this.currentLang()]) this.cache.set(key, { lang: this.currentLang(), value });
         return value;
     }
 

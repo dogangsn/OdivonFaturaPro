@@ -1,10 +1,11 @@
-import { ApplicationConfig, provideBrowserGlobalErrorListeners } from '@angular/core';
+import { ApplicationConfig, inject, provideAppInitializer, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { provideRouter } from '@angular/router';
 import { provideFirebaseApp, initializeApp } from '@angular/fire/app';
 import { provideAuth, getAuth } from '@angular/fire/auth';
 import { provideFirestore, getFirestore } from '@angular/fire/firestore';
 import { provideHttpClient } from '@angular/common/http';
 import { environment } from '../environments/environment';
+import { LanguageService } from './core/services/language.service';
 
 import { routes } from './app.routes';
 import { registerLocaleData } from '@angular/common';
@@ -24,6 +25,8 @@ import { provideClientHydration, withEventReplay } from '@angular/platform-brows
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
+    // Arayüz dilinin çeviri tablosu inmeden ilk çizim yapılmaz (önceden render edilen sayfayla aynı metin).
+    provideAppInitializer(() => inject(LanguageService).ready),
     provideRouter(routes),
     provideClientHydration(withEventReplay()),
     provideHttpClient(),
