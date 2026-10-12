@@ -11,11 +11,12 @@ import { COUNTRY_GUIDES, countryGuide } from '../../core/constants/country-guide
 import { HOME_FAQ } from '../../core/constants/home.constant';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AnalyticsService } from '../../core/services/analytics.service';
+import { FeedbackWidgetComponent } from '../../shared/components/feedback-widget/feedback-widget.component';
 
 @Component({
     selector: 'app-country-select',
     standalone: true,
-    imports: [CommonModule, RouterModule, SiteFooterComponent, LanguageSwitcherComponent],
+    imports: [CommonModule, RouterModule, SiteFooterComponent, LanguageSwitcherComponent, FeedbackWidgetComponent],
     templateUrl: './country-select.component.html',
     styleUrl: './country-select.component.css'
 })

@@ -7,6 +7,8 @@ export const BUSINESS = {
     taxNumber: '',
     mersisNo: '',
     supportEmail: 'destek@odivon.com',
+    /** Ana sayfadaki geri bildirim formunun gönderildiği adres. firestore.rules'taki /mail kuralıyla aynı olmalı. */
+    feedbackEmail: 'info@odivon.com',
     /** Ülke koduyla, başında + olmadan (ör. 905321234567). Boşsa WhatsApp butonu gizlenir. */
     salesWhatsApp: '',
 };

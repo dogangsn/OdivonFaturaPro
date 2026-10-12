@@ -258,3 +258,45 @@ describe('customers ve expenses', () => {
     await assertFails(setDoc(doc(asAlice(), 'payments', 'p1'), { userId: ALICE }));
   });
 });
+
+describe('mail/{id} — geri bildirim e-postası', () => {
+  function feedbackMail(extra: Record<string, unknown> = {}) {
+    return {
+      to: 'info@odivon.com',
+      replyTo: 'ziyaretci@example.com',
+      message: { subject: 'Odivon geri bildirim (tr)', text: 'Harika uygulama' },
+      source: 'feedback',
+      createdAt: serverTimestamp(),
+      ...extra,
+    };
+  }
+
+  it('girişsiz ziyaretçi info@odivon.com adresine geri bildirim bırakabilir', async () => {
+    await assertSucceeds(setDoc(doc(anon(), 'mail', 'm1'), feedbackMail()));
+  });
+
+  it('e-posta adresi olmadan da gönderilebilir', async () => {
+    const { replyTo, ...withoutReply } = feedbackMail();
+    await assertSucceeds(setDoc(doc(asAlice(), 'mail', 'm2'), withoutReply));
+  });
+
+  it('başka bir alıcıya e-posta gönderilemez', async () => {
+    await assertFails(setDoc(doc(anon(), 'mail', 'm3'), feedbackMail({ to: 'kurban@example.com' })));
+    await assertFails(setDoc(doc(anon(), 'mail', 'm4'), feedbackMail({ bcc: 'kurban@example.com' })));
+  });
+
+  it('geçersiz yanıt adresi, HTML ve çok uzun mesaj reddedilir', async () => {
+    await assertFails(setDoc(doc(anon(), 'mail', 'm5'), feedbackMail({ replyTo: 'gecersiz' })));
+    await assertFails(setDoc(doc(anon(), 'mail', 'm6'), feedbackMail({ message: { subject: 'x', text: 'y', html: '<a>z</a>' } })));
+    await assertFails(setDoc(doc(anon(), 'mail', 'm7'), feedbackMail({ message: { subject: 'x', text: 'a'.repeat(3001) } })));
+  });
+
+  it('kimse geri bildirimleri okuyamaz veya değiştiremez', async () => {
+    await env.withSecurityRulesDisabled(async ctx => {
+      await setDoc(doc(ctx.firestore(), 'mail', 'm8'), feedbackMail());
+    });
+    await assertFails(getDoc(doc(asAlice(), 'mail', 'm8')));
+    await assertFails(updateDoc(doc(anon(), 'mail', 'm8'), { to: 'kurban@example.com' }));
+    await assertFails(deleteDoc(doc(anon(), 'mail', 'm8')));
+  });
+});

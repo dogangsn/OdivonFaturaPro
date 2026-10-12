@@ -80,6 +80,27 @@ service cloud.firestore {
       allow update: if isResourceOwner() && isIncomingOwner();
     }
 
+    // 5. Geri bildirim e-postaları ("Trigger Email from Firestore" eklentisi bu koleksiyonu okuyup gönderir).
+    // Herkes (girişsiz de) yalnızca info@odivon.com adresine, sınırlı boyutta mesaj bırakabilir; kimse okuyamaz.
+    // Alıcı sabit olmalı, yoksa koleksiyon başkalarına e-posta göndermek için kullanılabilir.
+    match /mail/{mailId} {
+      allow create: if request.resource.data.keys().hasOnly(['to', 'replyTo', 'message', 'source', 'createdAt'])
+        && request.resource.data.to == 'info@odivon.com'
+        && request.resource.data.source == 'feedback'
+        && request.resource.data.createdAt == request.time
+        && (!('replyTo' in request.resource.data)
+          || (request.resource.data.replyTo is string
+            && request.resource.data.replyTo.size() <= 200
+            && request.resource.data.replyTo.matches('^[^@\\s]+@[^@\\s]+\\.[^@\\s]+$')))
+        && request.resource.data.message.keys().hasOnly(['subject', 'text'])
+        && request.resource.data.message.subject is string
+        && request.resource.data.message.subject.size() <= 100
+        && request.resource.data.message.text is string
+        && request.resource.data.message.text.size() > 0
+        && request.resource.data.message.text.size() <= 3000;
+      allow read, update, delete: if false;
+    }
+
     // Default deny for all other paths
     match /{document=**} {
       allow read, write: if false;
