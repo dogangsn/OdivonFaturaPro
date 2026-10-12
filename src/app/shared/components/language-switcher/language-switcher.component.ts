@@ -1,7 +1,7 @@
 import { Component, ElementRef, HostListener, Input, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
-import { Language, LanguageService } from '../../../core/services/language.service';
+import { Language, LanguageService, langFromPath } from '../../../core/services/language.service';
 
 @Component({
     selector: 'app-language-switcher',
@@ -44,6 +44,12 @@ export class LanguageSwitcherComponent {
 
     select(code: Language) {
         this.lang.setLanguage(code);
+        // Dil önekli sayfada (/de/...) aynı sayfanın seçilen dildeki sürümüne geç.
+        if (langFromPath(this.router.url)) {
+            this.router.navigateByUrl(this.router.url.replace(/^\/[a-z]{2}(?=\/|\?|#|$)/, `/${code}`), { replaceUrl: true });
+            this.open = false;
+            return;
+        }
         // Adres ?lang= taşıyorsa onu da güncelle; yoksa yenilemede eski dil geri gelir.
         if (this.router.parseUrl(this.router.url).queryParamMap.has('lang')) {
             this.router.navigate([], { queryParams: { lang: code }, queryParamsHandling: 'merge', replaceUrl: true });

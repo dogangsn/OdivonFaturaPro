@@ -8,4 +8,4 @@ Disallow: /reports
 Disallow: /settings
 Disallow: /ai-assistant
 
-Sitemap: https://generateinvoiceweb.web.app/sitemap.xml
+Sitemap: https://faturapro.odivon.com/sitemap.xml

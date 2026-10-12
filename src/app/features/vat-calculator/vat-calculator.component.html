@@ -1,0 +1,114 @@
+<div class="min-h-screen min-h-[100dvh] flex flex-col bg-slate-50 dark:bg-slate-950">
+    <header class="flex items-center justify-between px-4 sm:px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <a [routerLink]="['/', lang.lang]" class="flex items-center gap-2 text-primary" [attr.aria-label]="lang.t('legal.backHome')">
+            <img src="/odivon-violet-loop.png" alt="" class="w-8 h-8 object-contain">
+            <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white">Odivon <span class="text-primary">FaturaPro</span></span>
+        </a>
+        <app-language-switcher></app-language-switcher>
+    </header>
+
+    <main class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-8 space-y-8">
+        <section class="text-center">
+            <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight mb-3">{{ lang.t('tool.vat.h1') }}</h1>
+            <p class="text-slate-500 text-lg">{{ lang.t('tool.vat.intro') }}</p>
+        </section>
+
+        <section class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-5">
+            <div class="grid sm:grid-cols-2 gap-4">
+                <label class="block">
+                    <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ lang.t('tool.vat.country') }}</span>
+                    <select name="vatCountry" [ngModel]="countryCode()" (ngModelChange)="setCountry($event)"
+                        class="mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm">
+                        <option *ngFor="let c of countries" [value]="c.code">{{ lang.t(c.nameKey) }} ({{ c.taxLabel }})</option>
+                    </select>
+                </label>
+                <label class="block">
+                    <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ lang.t('tool.vat.rate') }}</span>
+                    <select name="vatRate" [ngModel]="rate()" (ngModelChange)="rate.set(+$event)"
+                        class="mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-sm">
+                        <option *ngFor="let r of country().rates" [ngValue]="r.rate">{{ pct(r.rate) }} · {{ lang.t(r.labelKey) }}</option>
+                    </select>
+                </label>
+            </div>
+
+            <label class="block">
+                <span class="text-sm font-semibold text-slate-700 dark:text-slate-300">{{ lang.t('tool.vat.amount') }} ({{ country().currency }})</span>
+                <input name="vatAmount" type="number" inputmode="decimal" min="0" step="0.01" [ngModel]="amount()" (ngModelChange)="amount.set($event)"
+                    class="mt-1 w-full rounded-xl border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-3 py-2.5 text-lg font-semibold">
+            </label>
+
+            <div class="grid grid-cols-2 gap-2" role="radiogroup">
+                <button type="button" role="radio" [attr.aria-checked]="mode() === 'add'" (click)="mode.set('add')"
+                    class="px-3 py-2.5 rounded-xl border-2 text-sm font-semibold"
+                    [ngClass]="mode() === 'add' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'">
+                    {{ lang.t('tool.vat.addTax') }}
+                </button>
+                <button type="button" role="radio" [attr.aria-checked]="mode() === 'remove'" (click)="mode.set('remove')"
+                    class="px-3 py-2.5 rounded-xl border-2 text-sm font-semibold"
+                    [ngClass]="mode() === 'remove' ? 'border-primary bg-primary/5 text-primary' : 'border-slate-200 dark:border-slate-700 text-slate-600 dark:text-slate-300'">
+                    {{ lang.t('tool.vat.removeTax') }}
+                </button>
+            </div>
+
+            <dl class="rounded-xl bg-slate-50 dark:bg-slate-800 divide-y divide-slate-200 dark:divide-slate-700" aria-live="polite">
+                <div class="flex justify-between px-4 py-3 text-sm">
+                    <dt class="text-slate-600 dark:text-slate-300">{{ lang.t('tool.vat.net') }}</dt>
+                    <dd class="font-semibold text-slate-900 dark:text-white">{{ money(result().net) }}</dd>
+                </div>
+                <div class="flex justify-between px-4 py-3 text-sm">
+                    <dt class="text-slate-600 dark:text-slate-300">{{ country().taxLabel }} ({{ pct(rate()) }})</dt>
+                    <dd class="font-semibold text-slate-900 dark:text-white">{{ money(result().tax) }}</dd>
+                </div>
+                <div class="flex justify-between px-4 py-3">
+                    <dt class="font-bold text-slate-900 dark:text-white">{{ lang.t('tool.vat.gross') }}</dt>
+                    <dd class="text-lg font-black text-primary">{{ money(result().gross) }}</dd>
+                </div>
+            </dl>
+
+            <div class="text-center">
+                <button type="button" (click)="createInvoice()"
+                    class="bg-primary text-white px-6 py-3 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-sm">
+                    {{ lang.t('tool.vat.cta') }}
+                </button>
+                <p class="mt-2 text-xs text-slate-400">{{ lang.t('guide.ctaNote') }}</p>
+            </div>
+        </section>
+
+        <section class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-3">{{ lang.t('tool.vat.formulaTitle') }}</h2>
+            <ul class="space-y-2 text-sm text-slate-600 dark:text-slate-300">
+                <li>{{ lang.t('tool.vat.formulaAdd') }}</li>
+                <li>{{ lang.t('tool.vat.formulaRemove') }}</li>
+            </ul>
+        </section>
+
+        <section class="rounded-2xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-5 sm:p-6">
+            <h2 class="text-xl font-bold text-slate-900 dark:text-white mb-4">{{ lang.t('tool.vat.allRatesTitle') }}</h2>
+            <div class="overflow-x-auto">
+                <table class="w-full text-sm">
+                    <thead>
+                        <tr class="text-start text-slate-500 border-b border-slate-200 dark:border-slate-700">
+                            <th class="py-2 text-start font-semibold">{{ lang.t('tool.vat.colCountry') }}</th>
+                            <th class="py-2 text-start font-semibold">{{ lang.t('tool.vat.colStandard') }}</th>
+                            <th class="py-2 text-start font-semibold">{{ lang.t('tool.vat.colOther') }}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr *ngFor="let c of countries" class="border-b last:border-0 border-slate-100 dark:border-slate-800">
+                            <td class="py-2">
+                                <a *ngIf="guideSlug(c.code) as slug; else plainName" [routerLink]="['/', lang.lang, 'invoice', slug]" class="text-primary hover:underline">{{ lang.t(c.nameKey) }}</a>
+                                <ng-template #plainName>{{ lang.t(c.nameKey) }}</ng-template>
+                            </td>
+                            <td class="py-2 font-semibold text-slate-900 dark:text-white">{{ c.taxLabel }} {{ pct(c.defaultRate) }}</td>
+                            <td class="py-2 text-slate-600 dark:text-slate-300">{{ otherRates(c) }}</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <p class="text-xs text-slate-400">{{ lang.t('guide.disclaimer') }}</p>
+    </main>
+
+    <app-site-footer></app-site-footer>
+</div>

@@ -171,7 +171,7 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
   });
 
   it('herkese açık her sayfanın çevrili başlığı ve açıklaması var', () => {
-    for (const key of ['home', 'login', 'pricing', 'createInvoice', ...LEGAL_DOCS.map(d => d.type)]) {
+    for (const key of ['home', 'login', 'pricing', 'createInvoice', 'vatCalculator', ...LEGAL_DOCS.map(d => d.type)]) {
       for (const [code, table] of Object.entries(languages)) {
         expect(table[`seo.${key}.title`]?.length, `${code}:${key}.title`).toBeGreaterThan(0);
         const d = table[`seo.${key}.description`] ?? '';
@@ -185,8 +185,8 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     const html = read('src/index.html');
     const sitemap = read('public/sitemap.xml');
     for (const code of Object.keys(languages)) {
-      expect(html, code).toContain(`hreflang="${code}" href="https://generateinvoiceweb.web.app/?lang=${code}"`);
-      expect(sitemap, code).toContain(`<loc>https://generateinvoiceweb.web.app/?lang=${code}</loc>`);
+      expect(html, code).toContain(`hreflang="${code}" href="https://faturapro.odivon.com/${code}"`);
+      expect(sitemap, code).toContain(`<loc>https://faturapro.odivon.com/${code}</loc>`);
       for (const k of ['h1', 'whyTitle', 'whyText', 'f1Title', 'f1Text', 'f2Title', 'f2Text', 'f3Title', 'f3Text', 'f4Title', 'f4Text']) {
         expect(languages[code as keyof typeof languages][`home.${k}`]?.trim().length, `${code}:home.${k}`).toBeGreaterThan(0);
       }
@@ -200,7 +200,10 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
     const sitemap = read('public/sitemap.xml');
     for (const g of COUNTRY_GUIDES) {
       expect(COUNTRY_MAP[g.code], g.slug).toBeDefined();
-      expect(sitemap, g.slug).toContain(`<loc>https://generateinvoiceweb.web.app/invoice/${g.slug}</loc>`);
+      expect(sitemap, g.slug).toContain(`<loc>https://faturapro.odivon.com/invoice/${g.slug}</loc>`);
+      for (const code of Object.keys(languages)) {
+        expect(sitemap, `${code}/${g.slug}`).toContain(`<loc>https://faturapro.odivon.com/${code}/invoice/${g.slug}</loc>`);
+      }
       for (const [code, table] of Object.entries(languages)) {
         expect(table[`guide.note.${g.slug}`]?.trim().length, `${code}:${g.slug}`).toBeGreaterThan(0);
       }
@@ -212,6 +215,35 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
       }
     }
     expect(read('public/robots.txt')).not.toMatch(/Disallow: \/invoice\s*$/m);
+  });
+
+  it('dil önekli ana sayfa ve rehberler önceden render edilir, diğer adresler tarayıcıda çizilir', () => {
+    const angular = JSON.parse(read('angular.json'));
+    const build = angular.projects.OdivonFaturaPro.architect.build.options;
+    expect(build.outputMode).toBe('static');
+    expect(build.server).toBe('src/main.server.ts');
+    const serverRoutes = read('src/app/app.routes.server.ts');
+    expect(serverRoutes).toContain('RenderMode.Prerender');
+    expect(serverRoutes).toContain('COUNTRY_GUIDES');
+    // Statik çıktıda tarayıcıda çizilen sayfaların kabuğu index.csr.html'dir; index.html önceden render edilmiş sayfadır.
+    const hosting = JSON.parse(read('firebase.json')).hosting;
+    expect(hosting.rewrites).toEqual([{ source: '**', destination: '/index.csr.html' }]);
+    expect(hosting.trailingSlash).toBe(false);
+    // Önceden render edilen sayfalarda tarayıcı adresi yok; canonical/hreflang sabit site adresiyle yazılır.
+    expect(read('src/app/core/services/seo.service.ts')).not.toContain('location');
+    expect(read('src/app/core/constants/site.constant.ts')).toContain("SITE_URL = 'https://faturapro.odivon.com'");
+    const generator = read('scripts/generate-sitemap.mjs');
+    for (const g of COUNTRY_GUIDES) expect(generator, g.slug).toContain(`'${g.slug}'`);
+    for (const doc of LEGAL_DOCS) expect(generator, doc.path).toContain(`'${doc.path}'`);
+    for (const code of Object.keys(languages)) expect(generator, code).toContain(`'${code}'`);
+    expect(serverRoutes).toContain('tools/vat-calculator');
+    const sitemap = read('public/sitemap.xml');
+    for (const code of Object.keys(languages)) {
+      expect(sitemap, code).toContain(`<loc>https://faturapro.odivon.com/${code}/tools/vat-calculator</loc>`);
+      for (const k of ['h1', 'intro', 'addTax', 'removeTax', 'formulaAdd', 'formulaRemove', 'cta']) {
+        expect(languages[code as keyof typeof languages][`tool.vat.${k}`]?.trim().length, `${code}:tool.vat.${k}`).toBeGreaterThan(0);
+      }
+    }
   });
 
   it('robots.txt panel sayfalarını dizinden çıkarır ve sitemap gösterir', () => {

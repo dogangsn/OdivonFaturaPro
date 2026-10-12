@@ -21,20 +21,26 @@ export interface LanguageOption {
 
 // Languages of every country the app issues invoices for.
 export const SUPPORTED_LANGUAGES: LanguageOption[] = [
-    { code: 'tr', nativeName: 'Türkçe', flagUrl: 'https://flagcdn.com/w40/tr.png', locale: 'tr', dir: 'ltr' },
-    { code: 'en', nativeName: 'English', flagUrl: 'https://flagcdn.com/w40/gb.png', locale: 'en-GB', dir: 'ltr' },
-    { code: 'de', nativeName: 'Deutsch', flagUrl: 'https://flagcdn.com/w40/de.png', locale: 'de', dir: 'ltr' },
-    { code: 'fr', nativeName: 'Français', flagUrl: 'https://flagcdn.com/w40/fr.png', locale: 'fr', dir: 'ltr' },
-    { code: 'es', nativeName: 'Español', flagUrl: 'https://flagcdn.com/w40/es.png', locale: 'es', dir: 'ltr' },
-    { code: 'it', nativeName: 'Italiano', flagUrl: 'https://flagcdn.com/w40/it.png', locale: 'it', dir: 'ltr' },
-    { code: 'nl', nativeName: 'Nederlands', flagUrl: 'https://flagcdn.com/w40/nl.png', locale: 'nl', dir: 'ltr' },
-    { code: 'ar', nativeName: 'العربية', flagUrl: 'https://flagcdn.com/w40/ae.png', locale: 'ar', dir: 'rtl' },
+    { code: 'tr', nativeName: 'Türkçe', flagUrl: '/flags/tr.svg', locale: 'tr', dir: 'ltr' },
+    { code: 'en', nativeName: 'English', flagUrl: '/flags/gb.svg', locale: 'en-GB', dir: 'ltr' },
+    { code: 'de', nativeName: 'Deutsch', flagUrl: '/flags/de.svg', locale: 'de', dir: 'ltr' },
+    { code: 'fr', nativeName: 'Français', flagUrl: '/flags/fr.svg', locale: 'fr', dir: 'ltr' },
+    { code: 'es', nativeName: 'Español', flagUrl: '/flags/es.svg', locale: 'es', dir: 'ltr' },
+    { code: 'it', nativeName: 'Italiano', flagUrl: '/flags/it.svg', locale: 'it', dir: 'ltr' },
+    { code: 'nl', nativeName: 'Nederlands', flagUrl: '/flags/nl.svg', locale: 'nl', dir: 'ltr' },
+    { code: 'ar', nativeName: 'العربية', flagUrl: '/flags/ae.svg', locale: 'ar', dir: 'rtl' },
 ];
 
 const translations: Record<Language, Record<string, string>> = { tr, en, de, fr, es, it, nl, ar };
 
 export function isLanguage(code: string | null | undefined): code is Language {
     return !!code && code in translations;
+}
+
+/** Dil önekli adresin dili (ör. /de/invoice/germany → de); önek yoksa null. */
+export function langFromPath(path: string | null | undefined): Language | null {
+    const first = (path ?? '').split(/[?#]/)[0].split('/').filter(Boolean)[0];
+    return isLanguage(first) ? first : null;
 }
 
 /** Ziyaretçinin tarayıcı dillerinden desteklenen ilki; hiçbiri yoksa İngilizce (küresel varsayılan). */
@@ -59,9 +65,13 @@ export class LanguageService {
     private cache = new Map<string, { lang: Language; value: unknown }>();
 
     constructor() {
-        if (isPlatformBrowser(this.platformId)) {
-            // Öncelik: ?lang= (paylaşılan/arama motoru bağlantısı) > kayıtlı seçim > tarayıcı dili > İngilizce.
-            const fromUrl = new URLSearchParams(this.document.location?.search ?? '').get('lang');
+        // Dil önekli sayfalar (/de, /de/invoice/germany) sunucuda önceden render edilir; dil adresten gelir.
+        const fromPath = langFromPath(this.document.location?.pathname);
+        if (!isPlatformBrowser(this.platformId)) {
+            this.currentLang.set(fromPath ?? 'en');
+        } else {
+            // Öncelik: adres öneki (/de/...) > ?lang= (paylaşılan/arama motoru bağlantısı) > kayıtlı seçim > tarayıcı dili > İngilizce.
+            const fromUrl = fromPath ?? new URLSearchParams(this.document.location?.search ?? '').get('lang');
             if (isLanguage(fromUrl)) {
                 this.currentLang.set(fromUrl);
                 localStorage.setItem('lang', fromUrl);
@@ -69,15 +79,15 @@ export class LanguageService {
                 const saved = localStorage.getItem('lang');
                 this.currentLang.set(isLanguage(saved) ? saved : browserLanguage());
             }
-            this.applyDocumentLang();
         }
+        this.applyDocumentLang();
     }
 
     setLanguage(lang: Language) {
         this.currentLang.set(lang);
+        this.applyDocumentLang();
         if (isPlatformBrowser(this.platformId)) {
             localStorage.setItem('lang', lang);
-            this.applyDocumentLang();
         }
     }
 

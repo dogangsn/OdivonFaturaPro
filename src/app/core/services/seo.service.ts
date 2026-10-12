@@ -3,7 +3,8 @@ import { DOCUMENT } from '@angular/common';
 import { Meta, Title } from '@angular/platform-browser';
 import { ActivatedRouteSnapshot, NavigationEnd, Router } from '@angular/router';
 import { filter } from 'rxjs';
-import { LanguageService, SUPPORTED_LANGUAGES, isLanguage } from './language.service';
+import { LanguageService, SUPPORTED_LANGUAGES, isLanguage, langFromPath } from './language.service';
+import { SITE_URL } from '../constants/site.constant';
 import { COUNTRIES_CONFIG } from '../constants/countries.constant';
 import { countryGuide } from '../constants/country-guides.constant';
 import { HOME_FAQ } from '../constants/home.constant';
@@ -18,7 +19,8 @@ const AREA_SERVED = COUNTRIES_CONFIG.map(c => (c.code === 'UK' ? 'GB' : c.code))
 /**
  * Her rotada sayfa başlığını, meta açıklamayı, Open Graph/Twitter etiketlerini ve canonical adresi günceller.
  * Rota verisi: `seo` (seo.<anahtar>.title / .description çevirileri) ve isteğe bağlı `noindex`.
- * Dizine açık sayfalara her dil için hreflang bağlantısı (?lang=xx, x-default: parametresiz adres) ekler;
+ * Dizine açık sayfalara her dil için hreflang bağlantısı ekler: `localized` sayfalarda dil önekli adres (/de/...),
+ * diğerlerinde ?lang=xx; x-default önieksiz, parametresiz adrestir.
  * ana sayfaya yapılandırılmış veri (JSON-LD) koyar.
  */
 @Injectable({ providedIn: 'root' })
@@ -39,6 +41,12 @@ export class SeoService {
     }
 
     apply(): void {
+        // Dil önekli sayfaya uygulama içinden geçildiyse arayüz de o dile geçer (effect apply'ı yeniden çağırır).
+        const pathLang = langFromPath(this.router.url);
+        if (pathLang && pathLang !== this.lang.lang) {
+            this.lang.setLanguage(pathLang);
+            return;
+        }
         const data = this.deepestData(this.router.routerState.snapshot.root);
         let key: string = data['seo'] ?? 'home';
         const siteName = this.lang.t('seo.siteName');
@@ -53,7 +61,8 @@ export class SeoService {
         const pageTitle = this.translated(`seo.${key}.title`, params);
         const fullTitle = key === 'home' || !pageTitle ? this.lang.t('seo.home.title') : `${pageTitle} | ${siteName}`;
         const description = this.translated(`seo.${key}.description`, params) ?? this.lang.t('seo.home.description');
-        const url = this.canonicalUrl();
+        const localized = !!data['localized'];
+        const url = this.canonicalUrl(localized);
         const indexable = !data['noindex'] && key !== 'notFound';
 
         this.title.setTitle(fullTitle);
@@ -70,7 +79,7 @@ export class SeoService {
         this.meta.updateTag({ name: 'twitter:title', content: fullTitle });
         this.meta.updateTag({ name: 'twitter:description', content: description });
         this.setCanonical(url);
-        this.setAlternates(indexable ? this.pageUrl() : null);
+        this.setAlternates(indexable ? this.basePath() : null, localized);
         this.setStructuredData(key === 'home' && indexable ? this.homeSchema(description) : null);
     }
 
@@ -100,24 +109,36 @@ export class SeoService {
         return data;
     }
 
-    /** Parametresiz sayfa adresi; x-default ve dil sürümlerinin tabanı. */
-    private pageUrl(): string {
-        const origin = this.document.location?.origin ?? '';
-        return origin + this.router.url.split(/[?#]/)[0];
+    /** Dil öneki ve parametreler olmadan sayfa yolu ('' = ana sayfa, 'invoice/germany'). */
+    private basePath(): string {
+        const segments = this.router.url.split(/[?#]/)[0].split('/').filter(Boolean);
+        if (isLanguage(segments[0])) segments.shift();
+        return segments.join('/');
     }
 
-    /** Kendine işaret eden canonical: dil sürümü (?lang=xx) açıldıysa o sürüm, yoksa parametresiz adres. */
-    private canonicalUrl(): string {
-        const lang = this.router.parseUrl(this.router.url).queryParamMap.get('lang');
-        return isLanguage(lang) ? `${this.pageUrl()}?lang=${this.lang.lang}` : this.pageUrl();
+    /** Bir dil sürümünün tam adresi; `lang` yoksa x-default (önieksiz, parametresiz). */
+    private versionUrl(path: string, localized: boolean, lang?: string): string {
+        if (!lang) return `${SITE_URL}/${path}`;
+        if (localized) return `${SITE_URL}/${lang}${path ? '/' + path : ''}`;
+        return `${SITE_URL}/${path}?lang=${lang}`;
     }
 
-    private setAlternates(baseUrl: string | null): void {
+    /**
+     * Kendine işaret eden canonical. Dil önekli adres ya da ?lang=xx ile açılan sayfa o dil sürümünü gösterir
+     * (localized sayfalarda ?lang=xx, önekli /xx/ sürümüne bağlanır); ikisi de yoksa önieksiz adres.
+     */
+    private canonicalUrl(localized: boolean): string {
+        const query = this.router.parseUrl(this.router.url).queryParamMap.get('lang');
+        const chosen = langFromPath(this.router.url) ?? (isLanguage(query) ? this.lang.lang : undefined);
+        return this.versionUrl(this.basePath(), localized, chosen);
+    }
+
+    private setAlternates(path: string | null, localized: boolean): void {
         this.document.head.querySelectorAll('link[rel="alternate"][hreflang]').forEach(link => link.remove());
-        if (!baseUrl) return;
+        if (path === null) return;
         const links = [
-            ...SUPPORTED_LANGUAGES.map(l => ({ hreflang: l.code, href: `${baseUrl}?lang=${l.code}` })),
-            { hreflang: 'x-default', href: baseUrl }
+            ...SUPPORTED_LANGUAGES.map(l => ({ hreflang: l.code, href: this.versionUrl(path, localized, l.code) })),
+            { hreflang: 'x-default', href: this.versionUrl(path, localized) }
         ];
         for (const { hreflang, href } of links) {
             const link = this.document.createElement('link');
@@ -129,7 +150,7 @@ export class SeoService {
     }
 
     private homeSchema(description: string): object {
-        const origin = this.document.location?.origin ?? '';
+        const origin = SITE_URL;
         const languages = SUPPORTED_LANGUAGES.map(l => l.code);
         return {
             '@context': 'https://schema.org',

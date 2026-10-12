@@ -15,9 +15,10 @@
     "rewrites": [
       {
         "source": "**",
-        "destination": "/index.html"
+        "destination": "/index.csr.html"
       }
-    ]
+    ],
+    "trailingSlash": false
   },
   "firestore": {
     "rules": "firestore.rules",

@@ -100,11 +100,16 @@
             <h2 class="text-2xl font-bold text-slate-900 mb-2">{{ lang.t('home.guidesTitle') }}</h2>
             <p class="text-slate-500 mb-5">{{ lang.t('home.guidesText') }}</p>
             <div class="flex flex-wrap justify-center gap-2">
-                <a *ngFor="let g of guides" [routerLink]="['/invoice', g.slug]"
+                <a *ngFor="let g of guides" [routerLink]="['/', lang.lang, 'invoice', g.slug]"
                     class="px-3 py-1.5 rounded-lg bg-white border border-slate-200 text-sm text-slate-700 hover:border-primary hover:text-primary">
                     {{ lang.t('home.guideLink', { country: lang.t(g.country.nameKey) }) }}
                 </a>
             </div>
+            <a [routerLink]="['/', lang.lang, 'tools', 'vat-calculator']"
+                class="inline-flex items-center gap-2 mt-6 px-4 py-2.5 rounded-xl bg-primary/10 text-primary font-semibold hover:bg-primary/15">
+                <span class="material-symbols-outlined text-[20px]" aria-hidden="true">calculate</span>
+                {{ lang.t('home.vatToolLink') }}
+            </a>
         </nav>
 
         <!-- Sık sorulan sorular (SeoService aynı soruları FAQPage yapılandırılmış verisi olarak da yayınlar) -->
