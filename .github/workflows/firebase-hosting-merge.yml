@@ -46,3 +46,6 @@ jobs:
           firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_GENERATEINVOICEWEB }}
           channelId: live
           projectId: generateinvoiceweb
+      # Bing/Yandex'e yeni sayfaları hemen bildir; başarısız olursa yayın etkilenmez.
+      - run: node scripts/indexnow.mjs
+        continue-on-error: true
