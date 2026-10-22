@@ -13,6 +13,8 @@ import { LEGAL_DOCS } from '../../src/app/core/constants/legal.constant';
 import { COUNTRY_GUIDES } from '../../src/app/core/constants/country-guides.constant';
 import { COUNTRY_MAP } from '../../src/app/core/constants/countries.constant';
 import { HOME_FAQ } from '../../src/app/core/constants/home.constant';
+import { ARTICLES } from '../../src/app/core/constants/articles.constant';
+import { ARTICLE_BODIES } from '../../src/app/features/articles/article-content';
 
 // Canlıda para kazanmaya hazır olmak için gereken yapılandırma ve içerik kontrolleri.
 // `gap(...)`: bugün eksik olan bir şeyi belgeler. Giderildiğinde test kırmızıya döner; o zaman `it` yapın.
@@ -243,6 +245,22 @@ describe('Çerez onayı, yasal sayfalar ve SEO', () => {
       for (const k of ['h1', 'intro', 'addTax', 'removeTax', 'formulaAdd', 'formulaRemove', 'cta']) {
         expect(languages[code as keyof typeof languages][`tool.vat.${k}`]?.trim().length, `${code}:tool.vat.${k}`).toBeGreaterThan(0);
       }
+    }
+  });
+
+  it('her Türkçe rehber yazısının gövdesi, meta açıklaması, sitemap kaydı ve önceden render edilen sayfası var', () => {
+    const sitemap = read('public/sitemap.xml');
+    const generator = read('scripts/generate-sitemap.mjs');
+    expect(read('src/app/app.routes.server.ts')).toContain('tr/rehber/:slug');
+    expect(sitemap).toContain('<loc>https://faturapro.odivon.com/tr/rehber</loc>');
+    expect(new Set(ARTICLES.map(a => a.slug)).size).toBe(ARTICLES.length);
+    for (const a of ARTICLES) {
+      expect(a.description.length, a.slug).toBeGreaterThan(50);
+      expect(a.description.length, a.slug).toBeLessThanOrEqual(160);
+      const body = ARTICLE_BODIES[a.slug];
+      expect(body?.sections.length, a.slug).toBeGreaterThanOrEqual(3);
+      expect(generator, a.slug).toContain(`'${a.slug}'`);
+      expect(sitemap, a.slug).toContain(`<loc>https://faturapro.odivon.com/tr/rehber/${a.slug}</loc>`);
     }
   });
 

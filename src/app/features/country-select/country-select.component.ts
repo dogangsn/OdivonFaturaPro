@@ -9,6 +9,7 @@ import { User } from '@angular/fire/auth';
 import { COUNTRIES_CONFIG, CountryConfig } from '../../core/constants/countries.constant';
 import { COUNTRY_GUIDES, countryGuide } from '../../core/constants/country-guides.constant';
 import { HOME_FAQ } from '../../core/constants/home.constant';
+import { ARTICLES } from '../../core/constants/articles.constant';
 import { SiteFooterComponent } from '../../shared/components/site-footer/site-footer.component';
 import { AnalyticsService } from '../../core/services/analytics.service';
 import { FeedbackWidgetComponent } from '../../shared/components/feedback-widget/feedback-widget.component';
@@ -34,6 +35,7 @@ export class CountrySelectComponent implements OnInit {
 
     countries: CountryConfig[] = COUNTRIES_CONFIG;
 
+    readonly articles = ARTICLES;
     readonly guides = COUNTRY_GUIDES.map(g => countryGuide(g.slug)!);
     readonly faq = HOME_FAQ;
 

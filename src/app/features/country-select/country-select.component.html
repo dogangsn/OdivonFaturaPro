@@ -112,6 +112,21 @@
             </a>
         </nav>
 
+        <!-- Türkçe rehber yazıları: yalnızca Türkçe arayüzde -->
+        <nav *ngIf="lang.lang === 'tr'" class="w-full max-w-5xl mt-16" aria-labelledby="home-articles-title">
+            <h2 id="home-articles-title" class="text-2xl font-bold text-slate-900 mb-2 text-center">Fatura ve KDV rehberleri</h2>
+            <p class="text-slate-500 mb-5 text-center">Fatura kesme, KDV, e-Fatura ve yurt dışı faturası hakkında pratik bilgiler.</p>
+            <ul class="grid sm:grid-cols-2 gap-3">
+                <li *ngFor="let a of articles">
+                    <a [routerLink]="['/tr/rehber', a.slug]"
+                        class="block h-full rounded-xl bg-white border border-slate-200 p-4 hover:border-primary transition-colors">
+                        <span class="font-semibold text-slate-900">{{ a.title }}</span>
+                        <span class="block mt-1 text-sm text-slate-500 line-clamp-2">{{ a.description }}</span>
+                    </a>
+                </li>
+            </ul>
+        </nav>
+
         <!-- Sık sorulan sorular (SeoService aynı soruları FAQPage yapılandırılmış verisi olarak da yayınlar) -->
         <section class="w-full max-w-3xl mt-16" aria-labelledby="home-faq-title">
             <h2 id="home-faq-title" class="text-2xl font-bold text-slate-900 mb-5 text-center">{{ lang.t('home.faqTitle') }}</h2>

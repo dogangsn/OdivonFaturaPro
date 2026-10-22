@@ -8,6 +8,7 @@ import { SITE_URL } from '../constants/site.constant';
 import { COUNTRIES_CONFIG } from '../constants/countries.constant';
 import { countryGuide } from '../constants/country-guides.constant';
 import { HOME_FAQ } from '../constants/home.constant';
+import { ARTICLES_INDEX, ArticleMeta, articleMeta } from '../constants/articles.constant';
 
 const OG_LOCALES: Record<string, string> = {
     tr: 'tr_TR', en: 'en_GB', de: 'de_DE', fr: 'fr_FR', es: 'es_ES', it: 'it_IT', nl: 'nl_NL', ar: 'ar_AE'
@@ -54,15 +55,20 @@ export class SeoService {
         // Ülke rehberi: başlık ve açıklama ülke adı/vergi adıyla doldurulur; bilinmeyen ülke dizine girmez.
         const guide = key === 'countryGuide' ? countryGuide(this.deepestParam('country')) : undefined;
         if (key === 'countryGuide' && !guide) key = 'notFound';
+        // Türkçe rehber yazıları: başlık ve açıklama doğrudan articles.constant.ts'ten gelir.
+        const article = key === 'article' ? articleMeta(this.deepestParam('slug')) : key === 'articles' ? ARTICLES_INDEX : undefined;
+        if (key === 'article' && !article) key = 'notFound';
         const params = guide
             ? { country: this.lang.t(guide.country.nameKey), tax: guide.country.taxLabel, currency: guide.country.currency }
             : undefined;
 
-        const pageTitle = this.translated(`seo.${key}.title`, params);
+        const pageTitle = article?.title ?? this.translated(`seo.${key}.title`, params);
         const fullTitle = key === 'home' || !pageTitle ? this.lang.t('seo.home.title') : `${pageTitle} | ${siteName}`;
-        const description = this.translated(`seo.${key}.description`, params) ?? this.lang.t('seo.home.description');
+        const description = article?.description ?? this.translated(`seo.${key}.description`, params) ?? this.lang.t('seo.home.description');
         const localized = !!data['localized'];
-        const url = this.canonicalUrl(localized);
+        // `singleLang`: tek dilde yayınlanan sayfa (Türkçe rehberler); canonical adresin kendisidir, hreflang yoktur.
+        const singleLang = !!data['singleLang'];
+        const url = singleLang ? `${SITE_URL}/${this.router.url.split(/[?#]/)[0].replace(/^\//, '')}` : this.canonicalUrl(localized);
         const indexable = !data['noindex'] && key !== 'notFound';
 
         this.title.setTitle(fullTitle);
@@ -79,8 +85,11 @@ export class SeoService {
         this.meta.updateTag({ name: 'twitter:title', content: fullTitle });
         this.meta.updateTag({ name: 'twitter:description', content: description });
         this.setCanonical(url);
-        this.setAlternates(indexable ? this.basePath() : null, localized);
-        this.setStructuredData(key === 'home' && indexable ? this.homeSchema(description) : null);
+        this.setAlternates(indexable && !singleLang ? this.basePath() : null, localized);
+        this.setStructuredData(!indexable ? null
+            : key === 'home' ? this.homeSchema(description)
+            : key === 'article' && article ? this.articleSchema(article as ArticleMeta, url)
+            : null);
     }
 
     /** Çevirisi yoksa undefined (t() anahtarın kendisini döndürür). */
@@ -185,6 +194,23 @@ export class SeoService {
                     }))
                 }
             ]
+        };
+    }
+
+    private articleSchema(article: ArticleMeta, url: string): object {
+        const publisher = { '@type': 'Organization', name: this.lang.t('seo.siteName'), url: `${SITE_URL}/`, logo: `${SITE_URL}/odivon-violet-loop.png` };
+        return {
+            '@context': 'https://schema.org',
+            '@type': 'Article',
+            headline: article.title,
+            description: article.description,
+            inLanguage: 'tr',
+            datePublished: article.updated,
+            dateModified: article.updated,
+            mainEntityOfPage: url,
+            image: `${SITE_URL}/odivon-violet-loop.png`,
+            author: publisher,
+            publisher
         };
     }
 

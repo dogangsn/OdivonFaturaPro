@@ -6,6 +6,7 @@ import { LEGAL_DOCS } from './core/constants/legal.constant';
 import { SUPPORTED_LANGUAGES } from './core/services/language.service';
 
 const loadCountryGuide = () => import('./features/country-guide/country-guide.component').then(m => m.CountryGuideComponent);
+const loadArticle = () => import('./features/articles/article.component').then(m => m.ArticleComponent);
 const loadVatCalculator = () => import('./features/vat-calculator/vat-calculator.component').then(m => m.VatCalculatorComponent);
 
 // Ana sayfa dışındaki sayfalar ayrı parçalar halinde yüklenir; ilk açılış küçük kalır.
@@ -21,6 +22,10 @@ export const routes: Routes = [
     { path: 'invoice/:country', loadComponent: loadCountryGuide, data: { seo: 'countryGuide', localized: true } },
     // Ücretsiz araçlar
     { path: 'tools/vat-calculator', loadComponent: loadVatCalculator, data: { seo: 'vatCalculator', localized: true } },
+
+    // Türkçe rehber yazıları (ARTICLES); yalnızca Türkçe, hreflang yok.
+    { path: 'tr/rehber', loadComponent: () => import('./features/articles/articles-index.component').then(m => m.ArticlesIndexComponent), data: { seo: 'articles', singleLang: true } },
+    { path: 'tr/rehber/:slug', loadComponent: loadArticle, data: { seo: 'article', singleLang: true } },
 
     // `localized`: her dil için önekli sürüm (/de, /de/invoice/germany). Bunlar derlemede önceden render edilir
     // (app.routes.server.ts) ve arama motorlarına hreflang ile gösterilir; önieksiz adres x-default'tur.

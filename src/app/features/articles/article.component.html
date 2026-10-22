@@ -1,0 +1,79 @@
+<div class="min-h-screen min-h-[100dvh] flex flex-col bg-slate-50 dark:bg-slate-950">
+    <header class="flex items-center justify-between px-4 sm:px-6 py-4 bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800">
+        <a routerLink="/tr" class="flex items-center gap-2 text-primary" aria-label="Ana sayfa">
+            <img src="/logo-128.webp" alt="" class="w-8 h-8 object-contain">
+            <span class="text-lg sm:text-xl font-black tracking-tight text-slate-900 dark:text-white">Odivon <span class="text-primary">FaturaPro</span></span>
+        </a>
+        <a routerLink="/tr/rehber" class="text-sm font-semibold text-slate-600 dark:text-slate-300 hover:text-primary">Rehberler</a>
+    </header>
+
+    <main *ngIf="meta() as m; else missing" class="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-6 py-8">
+        <nav aria-label="Konum" class="text-xs text-slate-400 mb-4">
+            <a routerLink="/tr" class="hover:text-primary">Ana sayfa</a>
+            <span aria-hidden="true"> / </span>
+            <a routerLink="/tr/rehber" class="hover:text-primary">Rehberler</a>
+        </nav>
+
+        <article *ngIf="body() as b" class="space-y-6">
+            <header>
+                <h1 class="text-3xl sm:text-4xl font-black text-slate-900 dark:text-white tracking-tight">{{ m.title }}</h1>
+                <p class="mt-2 text-xs text-slate-400">Son güncelleme: <time [attr.datetime]="m.updated">{{ updated(m.updated) }}</time></p>
+            </header>
+
+            <p *ngFor="let p of b.intro" class="text-lg text-slate-600 dark:text-slate-300 leading-relaxed">{{ p }}</p>
+
+            <section *ngFor="let s of b.sections" class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white pt-2">{{ s.h }}</h2>
+                <ng-container *ngFor="let block of s.blocks">
+                    <ul *ngIf="isList(block)" class="list-disc ps-6 space-y-1.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li *ngFor="let item of block.ul">{{ item }}</li>
+                    </ul>
+                    <ol *ngIf="isOrdered(block)" class="list-decimal ps-6 space-y-1.5 text-slate-600 dark:text-slate-300 leading-relaxed">
+                        <li *ngFor="let item of block.ol">{{ item }}</li>
+                    </ol>
+                    <p *ngIf="!isList(block) && !isOrdered(block)" class="text-slate-600 dark:text-slate-300 leading-relaxed">{{ block }}</p>
+                </ng-container>
+            </section>
+
+            <aside class="rounded-2xl bg-primary/5 border border-primary/20 p-5 sm:p-6 text-center">
+                <p class="font-bold text-slate-900 dark:text-white">Faturanızı birkaç dakikada hazırlayın</p>
+                <p class="mt-1 text-sm text-slate-500">KDV hesabı otomatik, PDF olarak indirilebilir. Ücretsiz.</p>
+                <div class="mt-4 flex flex-wrap justify-center gap-3">
+                    <a routerLink="/create-invoice" [queryParams]="{ lang: 'tr', countryCode: 'TR' }"
+                        class="bg-primary text-white px-5 py-2.5 rounded-xl font-semibold hover:bg-blue-700 transition-colors shadow-sm">Ücretsiz fatura oluştur</a>
+                    <a routerLink="/tr/tools/vat-calculator"
+                        class="px-5 py-2.5 rounded-xl font-semibold text-primary bg-white dark:bg-slate-900 border border-primary/30 hover:bg-primary/10">KDV hesapla</a>
+                </div>
+            </aside>
+
+            <section *ngIf="b.faq.length" class="space-y-3">
+                <h2 class="text-xl sm:text-2xl font-bold text-slate-900 dark:text-white">Sık sorulan sorular</h2>
+                <details *ngFor="let f of b.faq" class="rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 p-4">
+                    <summary class="cursor-pointer font-semibold text-slate-900 dark:text-white">{{ f.q }}</summary>
+                    <p class="mt-2 text-sm text-slate-600 dark:text-slate-300 leading-relaxed">{{ f.a }}</p>
+                </details>
+            </section>
+
+            <p class="text-xs text-slate-400">Bu yazı genel bilgilendirme amaçlıdır; mevzuat ve tutarlar değişebilir. Kendi durumunuz için mali müşavirinize danışın.</p>
+        </article>
+
+        <nav aria-label="Diğer rehberler" class="mt-10">
+            <h2 class="text-lg font-bold text-slate-900 dark:text-white mb-3">Diğer rehberler</h2>
+            <ul class="grid sm:grid-cols-2 gap-2">
+                <li *ngFor="let o of others()">
+                    <a [routerLink]="['/tr/rehber', o.slug]"
+                        class="block h-full px-4 py-3 rounded-xl bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 text-sm font-semibold text-slate-700 dark:text-slate-300 hover:border-primary hover:text-primary">{{ o.title }}</a>
+                </li>
+            </ul>
+        </nav>
+    </main>
+
+    <ng-template #missing>
+        <main class="flex-1 flex flex-col items-center justify-center p-8 text-center">
+            <h1 class="text-2xl font-bold text-slate-900 dark:text-white mb-4">Yazı bulunamadı</h1>
+            <a routerLink="/tr/rehber" class="text-primary font-semibold">Tüm rehberler</a>
+        </main>
+    </ng-template>
+
+    <app-site-footer></app-site-footer>
+</div>

@@ -2,7 +2,7 @@
 // Dil önekli sayfalar (ana sayfa, ülke rehberleri, araçlar) /xx/ sürümleriyle, diğer herkese açık sayfalar ?lang=xx ile.
 // Listeler src/app içindeki tanımlarla aynı olmalı (release testi kontrol eder):
 //   SITE_URL → core/constants/site.constant.ts, LANGS → language.service.ts,
-//   GUIDES → country-guides.constant.ts, LEGAL → legal.constant.ts
+//   GUIDES → country-guides.constant.ts, LEGAL → legal.constant.ts, ARTICLES → articles.constant.ts
 import { writeFileSync } from 'node:fs';
 
 const SITE_URL = 'https://faturapro.odivon.com';
@@ -11,6 +11,9 @@ const GUIDES = ['turkey', 'uae', 'germany', 'france', 'uk', 'spain', 'italy', 'n
 const TOOLS = ['tools/vat-calculator'];
 const QUERY_LANG_PAGES = ['create-invoice', 'pricing'];
 const LEGAL = ['kullanim-sartlari', 'gizlilik-politikasi', 'kvkk-aydinlatma-metni', 'cerez-politikasi', 'mesafeli-satis-sozlesmesi'];
+// Yalnızca Türkçe rehber yazıları (/tr/rehber/<slug>); dil alternatifi yok.
+const ARTICLES = ['fatura-nasil-kesilir', 'proforma-fatura-nedir', 'e-fatura-e-arsiv-farki', 'kdv-nasil-hesaplanir', 'faturada-bulunmasi-gereken-bilgiler',
+  'kdv-tevkifati-nedir', 'serbest-meslek-makbuzu', 'fatura-duzenleme-suresi', 'yurt-disina-fatura-kesme', 'fatura-iptali-ve-iade-faturasi'];
 const today = new Date().toISOString().slice(0, 10);
 
 const localized = (path, lang) => `${SITE_URL}/${lang ? lang + (path ? '/' + path : '') : path}`;
@@ -28,6 +31,7 @@ const urls = [
   ...GUIDES.flatMap(slug => group(`invoice/${slug}`, localized)),
   ...TOOLS.flatMap(path => group(path, localized)),
   ...QUERY_LANG_PAGES.flatMap(path => group(path, queried)),
+  ...['tr/rehber', ...ARTICLES.map(slug => `tr/rehber/${slug}`)].map(path => `  <url><loc>${SITE_URL}/${path}</loc><lastmod>${today}</lastmod></url>`),
   ...LEGAL.map(path => `  <url><loc>${SITE_URL}/${path}</loc><lastmod>${today}</lastmod></url>`),
 ];
 
